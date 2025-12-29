@@ -1,70 +1,47 @@
-@include('layouts.header')
+@extends('layouts.app')
 
-{{-- NAVBAR --}}
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="/"><img src="{{ asset('img/hasta.jpeg') }}" alt="Hasta Logo" style="max-height:50px;"></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarColor03">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/browse-car">Book Car</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">User</a>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" href="{{ url('/login') }}">Log In</a></li>
-            <li><a class="dropdown-item" href="{{ url('/register') }}">Sign Up</a></li>
-          </ul>
-        </li>
-      </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search">
-        <button class="btn btn-primary" type="submit">Search</button>
-      </form>
-    </div>
-  </div>
-</nav>
+@section('content')
 
-{{-- HERO CAROUSEL --}}
-<div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
-      <div class="carousel-caption">
-        <h1 class="display-4 fw-bold">Drive with Comfort</h1>
-        <p class="lead">Premium vehicles for your travel needs.</p>
-        <a href="{{ url('browse.cars') }}" class="btn btn-primary">Book Now</a>
-      </div>
+{{-- HERO SECTION --}}
+<section class="hero d-flex flex-column justify-content-center align-items-center text-white text-center">
+    <h1 class="display-4 fw-bold">Rent a vehicle with HastaTravel</h1>
+    <p class="lead">Convenient vehicle rentals in UTM, Skudai</p>
+
+    <div class="input-group mt-4" style="max-width:400px;">
+      <span class="input-group-text bg-white text-dark border-0">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" class="form-control bg-white text-dark border-0" placeholder="Search for vehicle ...">
+      <button class="btn btn-light text-dark" type="button">Search</button>
     </div>
-    <div class="carousel-item" style="background-image: url('{{ asset('img/hero2.jpg') }}');">
-      <div class="carousel-caption">
-        <h1 class="display-4 fw-bold">Reliable & Safe</h1>
-        <p class="lead">Experience worry-free rides with Hasta Travel & Tours.</p>
-        <a href="{{ url('browse.cars') }}" class="btn btn-primary btn-lg">Browse Cars</a>
-      </div>
+
+    <div class="mt-3 text-white text-center">
+      <h4 class="display-5 fw-bold text-white" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
+        Vehicle Rental
+      </h4>
     </div>
-    <div class="carousel-item" style="background-image: url('{{ asset('img/hero3.jpg') }}');">
-      <div class="carousel-caption">
-        <h1 class="display-4 fw-bold">Affordable Rentals</h1>
-        <p class="lead">Competitive prices for all your journeys.</p>
-        <a href="{{ route('browse.cars') }}" class="btn btn-primary btn-lg">View Cars</a>
-      </div>
+
+    <div class="d-flex justify-content-center" style="position:relative; left:100px;">
+      <p class="mt-3 fs-5" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
+        Affordable Vehicles.<br>Unforgettable Trips.
+      </p>
     </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </button>
-</div>
+
+    <!-- rent now button -->
+    <div class="text-center" style="margin-top:60px;">
+      <a href="{{ url('/login') }}" class="btn btn-primary btn-lg">Rent Now</a>
+    </div>
+
+
+</section>
 
 {{-- CARS SECTION --}}
 <section id="cars-section" class="py-5">
   <div class="container">
-    <p class="text-center text-muted mb-0">The Cars</p>
+    <p class="text-center text-muted mb-0">The <div class="text-center" style="margin-top:30px;">
+    <a href="{{ url('/login') }}" class="btn btn-primary btn-lg">Rent Now</a>
+</div>
+ehicles</p>
     <h2 class="text-center fw-bold mb-5">Our Available Cars</h2>
 
     <div class="row g-4 justify-content-center">
@@ -110,4 +87,4 @@
   </div>
 </section>
 
-@include('layouts.footer')
+@endsection
