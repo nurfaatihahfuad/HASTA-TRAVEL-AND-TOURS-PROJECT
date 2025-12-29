@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class RegisteredUserController extends Controller
 {
@@ -36,9 +37,13 @@ class RegisteredUserController extends Controller
         ]);
 
         $user = User::create([
+            'userID' => Str::uuid(), // atau generate sendiri
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'userType' => 3,
+            'noHP'     => $request->noHP ?? '', 
+            'noIC'     => $request->noIC ?? '', 
         ]);
 
         event(new Registered($user));

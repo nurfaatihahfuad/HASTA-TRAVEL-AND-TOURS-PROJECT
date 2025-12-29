@@ -7,48 +7,38 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): View
     {
         return view('auth.login');
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(LoginRequest $request)
     {
         $request->authenticate();
         $request->session()->regenerate();
 
-        $role = auth()->user()->role;
+        $role = auth()->user()->userType; // guna field betul
 
-        if ($role === 'Admin') {
+        if ($role == 1) {
             return redirect('/admin/dashboard');
-        } elseif ($role === 'Staff') {
+        } elseif ($role == 2) {
             return redirect('/staff/dashboard');
         } else {
             return redirect('/customer/dashboard');
         }
     }
 
-
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }
