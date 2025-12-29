@@ -14,6 +14,7 @@
       <input type="text" class="form-control bg-white text-dark border-0" placeholder="Search for vehicle ...">
       <button class="btn btn-light text-dark" type="button">Search</button>
     </div>
+<<<<<<< HEAD
 
     <div class="mt-3 text-white text-center">
       <h4 class="display-5 fw-bold text-white" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
@@ -25,6 +26,21 @@
       <p class="mt-3 fs-5" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
         Affordable Vehicles.<br>Unforgettable Trips.
       </p>
+=======
+    <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
+      <div class="carousel-caption">
+        <h1 class="display-4 fw-bold">Reliable & Safe</h1>
+        <p class="lead">Experience worry-free rides with Hasta Travel & Tours.</p>
+        <a href="{{ url('browse.cars') }}" class="btn btn-primary btn-lg">Browse Cars</a>
+      </div>
+    </div>
+    <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
+      <div class="carousel-caption">
+        <h1 class="display-4 fw-bold">Affordable Rentals</h1>
+        <p class="lead">Competitive prices for all your journeys.</p>
+        <a href="{{ route('browse.cars') }}" class="btn btn-primary btn-lg">View Cars</a>
+      </div>
+>>>>>>> d214bb0bf14789f53cee460aba3f889bcdf5de71
     </div>
 
     <!-- rent now button -->
