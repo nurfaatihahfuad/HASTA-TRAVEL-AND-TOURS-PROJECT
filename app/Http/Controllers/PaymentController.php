@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -24,6 +25,15 @@ class PaymentController extends Controller
         $path = $request->file('payment_proof')->store('payment_proofs', 'public');
 
         // You can log or save this path to the database if needed
+        DB::table('payment') -> insert([
+            'paymentType' => $request->paymentType,
+            'amount' => $request->amount,
+            'receipt_file_path' => $path,
+            'paymentStatus' => 'Pending',
+            'verifiedBy' => NULL,
+            'VerifiedTime' => NULL,
+            'userID' => 001,
+        ]);
 
         return back()->with('success', 'Payment proof uploaded successfully!');
     }

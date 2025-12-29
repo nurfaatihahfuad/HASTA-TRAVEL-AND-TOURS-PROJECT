@@ -22,4 +22,7 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # Allow access to storage files
+    RewriteRule ^storage/(.*)$ storage/$1 [L]
 </IfModule>
