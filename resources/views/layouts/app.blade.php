@@ -17,6 +17,7 @@
 
     <!-- Custom CSS -->
     <style>
+        
         body { background-color: #f7f6f5; color: #212529; }
         .navbar, footer { background-color: #fff8f5; }
         .navbar .nav-link:hover, .navbar .dropdown-item:hover { color: #dc3545 !important; }
@@ -26,13 +27,19 @@
         .carousel-item { height: 70vh; background-size: cover; background-position: center; position: relative; }
         .carousel-caption { bottom: 20%; text-shadow: 0 0 10px rgba(0,0,0,0.7); }
 
-        .card { background-color: #fff8f5; border: 1px solid #dee2e6; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card { background-color: #fff8f5; border: 1px solid #dee2e6; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; max-width: 400px; margin: 0 auto;}
+        .card-body { display: flex; flex-direction: column; justify-content: space-between; min-height: 250px; /* boleh ubah ikut tinggi ideal */ font-size: 0.9rem; width: fit-content; /* ikut saiz teks, bukan penuh */ align-self: center; /* tengah dalam flex column */}
         .card:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 15px 25px rgba(0,0,0,0.5); }
         .card .card-title, .card .card-text { color: #212529; }
-        .btn-primary { background-color: #dc3545; border-color: #dc3545; transition: all 0.3s ease; }
+        .card-img-top { width: 100%; height: auto; max-height: 160px; object-fit: scale-down; border-radius: 0.5rem;}
+
+        .btn-primary { background-color: #dc3545; border-color: #dc3545; transition: all 0.3s ease; padding: 0.4rem 0.6rem; /* atas-bawah = 0.4rem, kiri-kanan = 0.6rem */ font-size: 0.85rem; width: fit-content;}
         .btn-primary:hover { background-color: #bb2d3b; border-color: #dc3545; }
 
         .form-control { background-color: #1e1e1e; color: #e0e0e0; border: 1px solid #6c757d; }
+        .form-control:focus { outline: none !important; box-shadow: none !important; border-color: #ced4da !important; /* optional: fallback border */}
+
+        .search-input:focus { outline: none; box-shadow: none; }
 
         .hero { background-image: url('/img/displayPage.jpg'); background-size: cover; background-position: center; height: 100vh; }
         .card { height: 100%; }

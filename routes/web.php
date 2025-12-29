@@ -9,7 +9,10 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Welcome page guna VehicleController@preview 
+
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome' );
+Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
+Route::get('/search', [VehicleController::class, 'search'])->name('vehicles.search');
 
 //Route::get('/dashboard', function () {
 //    return view('dashboard');
