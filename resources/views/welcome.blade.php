@@ -14,11 +14,6 @@
         <input type="text" class="form-control bg-white text-dark border-0" placeholder="Search for vehicle ...">
         <button class="btn btn-light text-dark" type="button">Search</button>
     </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 7f0dc0d5ad1d40f9f5795d988b558bb968c22956
 
     <div class="mt-3 text-white text-center">
       <h4 class="display-5 fw-bold text-white" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
@@ -54,11 +49,6 @@
         <p class="lead">Competitive prices for all your journeys.</p>
         <a href="{{ route('browse.cars') }}" class="btn btn-primary btn-lg">View Cars</a>
       </div>
->>>>>>> d214bb0bf14789f53cee460aba3f889bcdf5de71
-=======
->>>>>>> 7f0dc0d5ad1d40f9f5795d988b558bb968c22956
-=======
->>>>>>> 912d8c1a0bb168675a5559bef1e968d7ff64a247
     </div>
     <div class="carousel-item" style="background-image: url('{{ asset('img/hero3.jpg') }}');">
       <div class="carousel-caption">
