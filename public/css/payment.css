@@ -25,22 +25,18 @@ h1 {
 }
 
 .qr-section {
-    display: flex;
-    flex-direction: column;   /* stack children vertically */
-    align-items: center;      /* center horizontally */
-    gap: 10px;                /* spacing between images */
+    text-align: center;
+    padding: 20px;
 }
 
-.qr-image {
-    display: block;       /* forces each image to take full width */
-    margin: 0 auto 10px;  /* centers horizontally and adds spacing */
-    max-width: 300px;     /* optional size limit */
-    border: 5px solid #ff69b4;
-    border-radius: 8px;
+.qr-small {
+    width: 250px;       /* medium size */
+    height: auto;       /* keeps aspect ratio */
+    display: block;     /* makes it a block element */
+    margin: 0 auto 15px; /* centers horizontally + adds bottom spacing */
+    border: 4px solid #ff69b4; /* optional pink border */
+    border-radius: 8px; /* rounded corners */
 }
-
-
-
 
 form {
     display: flex;
@@ -84,5 +80,41 @@ input[type="file"] {
     text-decoration: none;
     padding: 10px 20px;
     border-radius: 6px;
+    font-weight: bold;
+}
+
+.file-submit-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.file-label {
+    background-color: #eee;
+    padding: 10px 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 40px;
+}
+
+.file-label input[type="file"] {
+    display: none; /* hides default input */
+}
+
+.submit-btn {
+    padding: 10px 16px;
+    height: 40px;
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
     font-weight: bold;
 }
