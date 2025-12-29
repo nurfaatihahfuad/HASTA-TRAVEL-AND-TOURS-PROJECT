@@ -92,10 +92,7 @@
 {{-- CARS SECTION --}}
 <section id="cars-section" class="py-5">
   <div class="container">
-    <p class="text-center text-muted mb-0">The <div class="text-center" style="margin-top:30px;">
-    <a href="{{ url('/login') }}" class="btn btn-primary btn-lg">Rent Now</a>
-</div>
-ehicles</p>
+    <p class="text-center text-muted mb-0">The Cars</p>
     <h2 class="text-center fw-bold mb-5">Our Available Cars</h2>
 
     <div class="row g-4 justify-content-center">
