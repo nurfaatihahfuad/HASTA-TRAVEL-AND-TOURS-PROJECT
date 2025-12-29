@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Payment</title>
-    <link rel="stylesheet" href="/css/payment.css">
+    {{-- Link to your CSS file in public/css --}}
+    <link rel="stylesheet" href="{{ asset('css/payment.css') }}">
 </head>
 <body>
 
     <div class="payment-card">
-        <h1 style="text-align: center;">Please Scan the QR Payment</h1>
+        <h1>Please Scan the QR Payment</h1>
 
         <div class="qr-section">
-            <img src="{{ asset('public/img/DuitNowLogo-1.jpg') }}" alt="DuitNow Logo" class="qr-section">
-            <img src="{{ asset('img/payment.png') }}" alt="DuitNow QR" class="qr-image">
+            <img src="{{ asset('img/payment.png') }}" class="qr-small" alt="QR Payment">
             <p>MALAYSIA NATIONAL QR</p>
         </div>
 
