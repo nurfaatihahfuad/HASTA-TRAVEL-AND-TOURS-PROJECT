@@ -7,63 +7,44 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Middleware\RoleMiddleware;
 
-// Welcome page guna VehicleController@preview 
-
-Route::get('/', [VehicleController::class, 'preview'])->name('welcome' );
+// Welcome page guna VehicleController@preview
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
 Route::get('/search', [VehicleController::class, 'search'])->name('vehicles.search');
-
-//Route::get('/dashboard', function () {
-//    return view('dashboard');
-//})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Browse-car boleh diakses tanpa login
 Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.vehicle');
 
-//Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-//Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-
-//Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-//Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+// Auth routes
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Dashboard routes
+// Dashboard routes ikut role (guna middleware class terus)
 Route::get('/admin/dashboard', function () {
     return view('dashboard.admin');
-})->middleware(['auth','role:Admin']);
+})->middleware(['auth', RoleMiddleware::class.':Admin'])->name('admin.dashboard');
 
 Route::get('/staff/dashboard', function () {
     return view('dashboard.staff');
-})->middleware(['auth','role:Staff']);
+})->middleware(['auth', RoleMiddleware::class.':Staff'])->name('staff.dashboard');
 
 Route::get('/customer/dashboard', function () {
     return view('dashboard.customer');
-})->middleware(['auth','role:Customer']);
+})->middleware(['auth', RoleMiddleware::class.':Customer'])->name('customer.dashboard');
 
+// Protected routes (auth required)
 Route::middleware('auth')->group(function () {
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // CRUD
     Route::resource('crud', CRUDController::class);
 
+    // Browse cars
     Route::get('browse', [CarController::class, 'index'])->name('browse.cars');
-
-
-    Route::get('/admin/dashboard', function () {
-    return view('dashboard.admin');
-    });
-
-    Route::get('/staff/dashboard', function () {
-        return view('dashboard.staff');
-    });
-
-    Route::get('/customer/dashboard', function () {
-        return view('dashboard.customer');
-    });
 });
-
 
 // Payment routes
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');

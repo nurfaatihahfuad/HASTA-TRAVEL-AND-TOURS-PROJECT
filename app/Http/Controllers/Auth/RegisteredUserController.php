@@ -50,6 +50,12 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        if ($user->userType == 1) { // Staff
+            return redirect()->route('staff.dashboard');
+        } elseif ($user->userType == 2) { // Admin
+            return redirect()->route('admin.dashboard');
+        } else { // Customer
+            return redirect()->route('customer.dashboard');
+}
     }
 }

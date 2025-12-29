@@ -1,23 +1,43 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Admin Dashboard') }}
-        </h2>
-
-        <!-- Logout button -->
-        <form method="POST" action="{{ route('logout') }}" class="inline">
-            @csrf
-            <button type="submit" class="ml-4 text-red-600">Logout</button>
-        </form>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("You're logged in!") }}
-                </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white dark:bg-gray-800 shadow-md">
+            <div class="p-6 text-lg font-bold text-gray-800 dark:text-gray-200">
+                HASTA
             </div>
-        </div>
+            <nav class="mt-6 space-y-2">
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Customer Information</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Blacklisted Record</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Sales Record</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Payment Record</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Deposit Report</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Bank Statement Record</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
+                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                <form method="POST" action="{{ route('logout') }}" class="px-6 py-2">
+                    @csrf
+                    <button type="submit" class="w-full text-left text-red-600 hover:bg-red-100 dark:hover:bg-red-700 rounded">
+                        Logout
+                    </button>
+                </form>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Admin Dashboard</h2>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+                {{ __("You're logged in!") }}
+            </div>
+        </main>
     </div>
-</x-app-layout>
+</body>
+</html>
