@@ -1,0 +1,7 @@
+User-agent: Googlebot
+Disallow: /nogooglebot/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://hasta-booking-system-ls1a4f.teleporthq.app/sitemap.xml
