@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class PaymentController extends Controller
+{
+    // Show the payment page
+    public function show()
+    {
+        return view('payment', ['bookingID' => 1]); // Replace with dynamic ID if needed
+    }
+
+    // Handle the file upload
+    public function submit(Request $request, $bookingID)
+    {
+        $request->validate([
+            'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
+        ]);
+
+        // Store the uploaded file
+        $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+
+        // You can log or save this path to the database if needed
+
+        return back()->with('success', 'Payment proof uploaded successfully!');
+    }
+}

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CRUDController ;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,5 +24,9 @@ Route::middleware('auth')->group(function () {
     Route::get('browse', [CarController::class, 'index'])->name('browse.cars');
 
 });
+
+//Payment routes
+Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
+Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
 require __DIR__.'/auth.php';
