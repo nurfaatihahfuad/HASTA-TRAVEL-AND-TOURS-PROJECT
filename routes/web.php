@@ -1,18 +1,21 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CRUDController ;
+use App\Http\Controllers\CRUDController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\VehicleController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Welcome page guna VehicleController@preview 
+Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Browse-car boleh diakses tanpa login
+Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.vehicle');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -23,22 +26,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('browse', [CarController::class, 'index'])->name('browse.cars');
 
-    Route::get('/admin/dashboard', function () {
-    return view('dashboard.admin');
-    });
-
-    Route::get('/staff/dashboard', function () {
-        return view('dashboard.staff');
-    });
-
-    Route::get('/customer/dashboard', function () {
-        return view('dashboard.customer');
-    });
-
-
 });
 
-//Payment routes
+// Payment routes
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 

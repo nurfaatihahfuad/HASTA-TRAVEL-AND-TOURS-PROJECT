@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Payment</title>
-    <link rel="stylesheet" href="/css/payment.css">
+    <!-- Corrected CSS path -->
+    <link rel="stylesheet" href="{{ asset('css/payment.css') }}">
 </head>
 <body>
 
@@ -12,8 +13,10 @@
         <h1 style="text-align: center;">Please Scan the QR Payment</h1>
 
         <div class="qr-section">
-            <img src="{{ asset('public/img/DuitNowLogo-1.jpg') }}" alt="DuitNow Logo" class="qr-section">
+            <!-- Corrected image paths -->
+            <img src="{{ asset('img/DuitNowLogo-1.jpg') }}" alt="DuitNow Logo" class="qr-logo">
             <img src="{{ asset('img/payment.png') }}" alt="DuitNow QR" class="qr-image">
+
             <p>MALAYSIA NATIONAL QR</p>
         </div>
 
@@ -31,3 +34,4 @@
 
 </body>
 </html>
+
