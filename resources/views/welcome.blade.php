@@ -38,14 +38,14 @@
         <a href="{{ url('browse.cars') }}" class="btn btn-primary">Book Now</a>
       </div>
     </div>
-    <div class="carousel-item" style="background-image: url('{{ asset('img/hero2.jpg') }}');">
+    <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
       <div class="carousel-caption">
         <h1 class="display-4 fw-bold">Reliable & Safe</h1>
         <p class="lead">Experience worry-free rides with Hasta Travel & Tours.</p>
         <a href="{{ url('browse.cars') }}" class="btn btn-primary btn-lg">Browse Cars</a>
       </div>
     </div>
-    <div class="carousel-item" style="background-image: url('{{ asset('img/hero3.jpg') }}');">
+    <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
       <div class="carousel-caption">
         <h1 class="display-4 fw-bold">Affordable Rentals</h1>
         <p class="lead">Competitive prices for all your journeys.</p>
