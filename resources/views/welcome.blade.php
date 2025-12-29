@@ -7,13 +7,13 @@
     <h1 class="display-4 fw-bold">Rent a vehicle with HastaTravel</h1>
     <p class="lead">Convenient vehicle rentals in UTM, Skudai</p>
 
-    <div class="input-group mt-4" style="max-width:400px;">
+    <form action="{{ route('vehicles.search') }}" method="GET" class="input-group mt-4" style="max-width:400px;">
         <span class="input-group-text bg-white text-dark border-0">
             <i class="bi bi-search"></i>
         </span>
-        <input type="text" class="form-control bg-white text-dark border-0" placeholder="Search for vehicle ...">
-        <button class="btn btn-light text-dark" type="button">Search</button>
-    </div>
+        <input type="text" name="q" class="form-control bg-white text-dark border-0" placeholder="Search for vehicle ...">
+        <button class="btn btn-light text-dark" type="submit">Search</button>
+    </form>
 
     <div class="mt-3 text-white text-center">
         <h4 class="display-5 fw-bold text-white" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">

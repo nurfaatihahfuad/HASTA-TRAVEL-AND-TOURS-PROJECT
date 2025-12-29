@@ -9,6 +9,7 @@ use App\Http\Controllers\VehicleController;
 
 // Welcome page guna VehicleController@preview 
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
+Route::get('/search', [VehicleController::class, 'search'])->name('vehicles.search');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
