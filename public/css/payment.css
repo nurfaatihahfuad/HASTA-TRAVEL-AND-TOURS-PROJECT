@@ -82,3 +82,23 @@ input[type="file"] {
     border-radius: 6px;
     font-weight: bold;
 }
+
+.payment-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.payment-type,
+.payment-amount {
+    flex: 1;
+}
+
+.payment-type select,
+.payment-amount input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

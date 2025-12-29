@@ -19,6 +19,22 @@
 
         <form action="{{ route('payment.submit', $bookingID) }}" method="POST" enctype="multipart/form-data">
             @csrf
+
+        <div class="payment-row">
+            <div class="payment-type">
+                <label>Choose Payment Type:</label>
+                <select name="paymentType" required>
+                    <option value="Deposit">Deposit</option>
+                    <option value="Full">Full Payment</option>
+            </select>
+            </div>
+
+            <div class="payment-amount">
+                <label>Enter Amount (RM):</label>
+                <input type="number" name="amount" step="0.01" required>
+            </div>
+        </div>
+        
             <label>UPLOAD PAYMENT PROOF IN PDF, JPEG OR PNG:</label>
             <input type="file" name="payment_proof" accept=".pdf,.jpeg,.jpg,.png" required>
 
@@ -27,6 +43,8 @@
                 <a href="/" class="back-btn">Back</a>
             </div>
         </form>
+
+        
     </div>
 
 </body>

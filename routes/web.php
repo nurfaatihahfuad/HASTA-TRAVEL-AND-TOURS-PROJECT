@@ -47,7 +47,20 @@ Route::middleware('auth')->group(function () {
 
     Route::get('browse', [CarController::class, 'index'])->name('browse.cars');
 
+
+    Route::get('/admin/dashboard', function () {
+    return view('dashboard.admin');
+    });
+
+    Route::get('/staff/dashboard', function () {
+        return view('dashboard.staff');
+    });
+
+    Route::get('/customer/dashboard', function () {
+        return view('dashboard.customer');
+    });
 });
+
 
 // Payment routes
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
