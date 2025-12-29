@@ -14,39 +14,25 @@
       <input type="text" class="form-control bg-white text-dark border-0" placeholder="Search for vehicle ...">
       <button class="btn btn-light text-dark" type="button">Search</button>
     </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 7f0dc0d5ad1d40f9f5795d988b558bb968c22956
 
     <div class="mt-3 text-white text-center">
       <h4 class="display-5 fw-bold text-white" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
         Vehicle Rental
       </h4>
     </div>
-<<<<<<< HEAD
 
     <div class="d-flex justify-content-center" style="position:relative; left:100px;">
       <p class="mt-3 fs-5" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
         Affordable Vehicles.<br>Unforgettable Trips.
       </p>
-=======
     <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
-=======
     <div class="carousel-item" style="background-image: url('{{ asset('img/hero2.jpg') }}');">
->>>>>>> 7f0dc0d5ad1d40f9f5795d988b558bb968c22956
-=======
-<<<<<<<<< Temporary merge branch 1
     <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
->>>>>>> 912d8c1a0bb168675a5559bef1e968d7ff64a247
       <div class="carousel-caption">
         <h1 class="display-4 fw-bold">Reliable & Safe</h1>
         <p class="lead">Experience worry-free rides with Hasta Travel & Tours.</p>
         <a href="{{ url('browse.cars') }}" class="btn btn-primary btn-lg">Browse Cars</a>
       </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
     </div>
     <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
       <div class="carousel-caption">
@@ -54,11 +40,7 @@
         <p class="lead">Competitive prices for all your journeys.</p>
         <a href="{{ route('browse.cars') }}" class="btn btn-primary btn-lg">View Cars</a>
       </div>
->>>>>>> d214bb0bf14789f53cee460aba3f889bcdf5de71
-=======
->>>>>>> 7f0dc0d5ad1d40f9f5795d988b558bb968c22956
-=======
->>>>>>> 912d8c1a0bb168675a5559bef1e968d7ff64a247
+
     </div>
     <div class="carousel-item" style="background-image: url('{{ asset('img/hero3.jpg') }}');">
       <div class="carousel-caption">
@@ -66,8 +48,6 @@
         <p class="lead">Competitive prices for all your journeys.</p>
         <a href="{{ route('browse.cars') }}" class="btn btn-primary btn-lg">View Cars</a>
       </div>
-=========
-
     <div class="mt-3 text-white text-center">
       <h4 class="display-5 fw-bold text-white" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
         Vehicle Rental
@@ -78,7 +58,6 @@
       <p class="mt-3 fs-5" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
         Affordable Vehicles.<br>Unforgettable Trips.
       </p>
->>>>>>>>> Temporary merge branch 2
     </div>
 
     <!-- rent now button -->
