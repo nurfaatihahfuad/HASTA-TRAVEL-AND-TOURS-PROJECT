@@ -12,20 +12,20 @@
         <h1 style="text-align: center;">Please Scan the QR Payment</h1>
 
         <div class="qr-section">
-            <img src="{{ asset('img/payment.png') }}" class="qr-small" alt="QR Payment">
+            <img src="{{ asset('public/img/DuitNowLogo-1.jpg') }}" alt="DuitNow Logo" class="qr-section">
+            <img src="{{ asset('img/payment.png') }}" alt="DuitNow QR" class="qr-image">
             <p>MALAYSIA NATIONAL QR</p>
         </div>
 
         <form action="{{ route('payment.submit', $bookingID) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <label>UPLOAD PAYMENT PROOF IN PDF, JPEG OR PNG:</label>
-            
-            <div class = "file-submit-row">
             <input type="file" name="payment_proof" accept=".pdf,.jpeg,.jpg,.png" required>
-            <button type="submit" class="submit-btn">Submit</button>
-            </div>
 
+            <div class="button-group">
+                <button type="submit" class="submit-btn">Submit</button>
                 <a href="/" class="back-btn">Back</a>
+            </div>
         </form>
     </div>
 
