@@ -12,7 +12,7 @@
   <style>
     /* Body dark mode */
     body {
-      background-color: #121212;
+      background-color: #8b8686ff;
       color: #e0e0e0;
     }
 
