@@ -24,13 +24,13 @@
       color: #e0e0e0 !important;
     }
     .navbar .nav-link:hover, .navbar .dropdown-item:hover {
-      color: #0d6efd !important;
+      color: #c0151dff !important;
     }
     footer a {
       color: #e0e0e0;
     }
     footer a:hover {
-      color: #0d6efd;
+      color: #c0151dff;
       text-decoration: underline;
     }
     footer small {
@@ -63,13 +63,13 @@
       color: #e0e0e0;
     }
     .card .btn-primary {
-      background-color: #0d6efd;
-      border-color: #0d6efd;
+      background-color: #c0151dff;
+      border-color: #c0151dff;
       transition: all 0.3s ease;
     }
     .card .btn-primary:hover {
-      background-color: #0b5ed7;
-      border-color: #0b5ed7;
+      background-color: #c0151dff;
+      border-color: #c0151dff;
     }
 
     /* Form search */

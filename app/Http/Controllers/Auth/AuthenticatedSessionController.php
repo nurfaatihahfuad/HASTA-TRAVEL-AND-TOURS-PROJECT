@@ -13,11 +13,16 @@ class AuthenticatedSessionController extends Controller
 {
     public function create(): View
     {
+        // Sentiasa tunjuk login form, walaupun user dah login
         return view('auth.login');
     }
 
     public function store(LoginRequest $request)
     {
+        // Force logout dulu supaya session lama clear
+        Auth::logout();
+
+        // Authenticate credentials
         $request->authenticate();
         $request->session()->regenerate();
 
