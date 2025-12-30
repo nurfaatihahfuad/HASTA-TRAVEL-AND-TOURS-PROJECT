@@ -27,7 +27,7 @@
         .carousel-item { height: 70vh; background-size: cover; background-position: center; position: relative; }
         .carousel-caption { bottom: 20%; text-shadow: 0 0 10px rgba(0,0,0,0.7); }
 
-        .card { background-color: #fff8f5; border: 1px solid #dee2e6; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; max-width: 400px; margin: 0 auto;}
+        .card { background-color: #fff8f5 !important; border: 1px solid #dee2e6; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; max-width: 400px; margin: 0 auto;}
         .card-body { display: flex; flex-direction: column; justify-content: space-between; min-height: 250px; /* boleh ubah ikut tinggi ideal */ font-size: 0.9rem; width: fit-content; /* ikut saiz teks, bukan penuh */ align-self: center; /* tengah dalam flex column */}
         .card:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 15px 25px rgba(0,0,0,0.5); }
         .card .card-title, .card .card-text { color: #212529; }
