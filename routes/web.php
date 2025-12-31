@@ -8,6 +8,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Controllers\CustomerRegistrationController;
 
 // Welcome page guna VehicleController@preview
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
@@ -18,6 +19,18 @@ Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.
 
 // Auth routes
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+// Customer Registration Routes
+Route::get('/register/customer', [CustomerRegistrationController::class, 'create'])
+    ->name('customer.register')
+    ->middleware('guest');
+
+Route::post('/register/customer', [CustomerRegistrationController::class, 'store'])
+    ->name('customer.register.store');
+
+Route::get('/registration/success', [CustomerRegistrationController::class, 'success'])
+    ->name('registration.success')
+    ->middleware('auth');
 
 // Dashboard routes ikut role (guna middleware class terus)
 Route::get('/admin/dashboard', function () {
@@ -51,3 +64,4 @@ Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show')
 Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
 require __DIR__.'/auth.php';
+
