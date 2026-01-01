@@ -7,8 +7,13 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\RoleMiddleware;
+
 use App\Http\Controllers\verifypaymentController;
+
+use App\Http\Controllers\CustomerRegistrationController;
+
 
 // Welcome page guna VehicleController@preview
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
@@ -20,18 +25,30 @@ Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.
 // Auth routes
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Dashboard routes ikut role (guna middleware class terus)
-Route::get('/admin/dashboard', function () {
-    return view('dashboard.admin');
-})->middleware(['auth', RoleMiddleware::class.':Admin'])->name('admin.dashboard');
+// Customer Registration Routes
+Route::get('/register/customer', [CustomerRegistrationController::class, 'create'])
+    ->name('customer.register')
+    ->middleware('guest');
 
-Route::get('/staff/dashboard', function () {
-    return view('dashboard.staff');
-})->middleware(['auth', RoleMiddleware::class.':Staff'])->name('staff.dashboard');
+Route::post('/register/customer', [CustomerRegistrationController::class, 'store'])
+    ->name('customer.register.store');
 
-Route::get('/customer/dashboard', function () {
-    return view('dashboard.customer');
-})->middleware(['auth', RoleMiddleware::class.':Customer'])->name('customer.dashboard');
+Route::get('/registration/success', [CustomerRegistrationController::class, 'success'])
+    ->name('registration.success')
+    ->middleware('auth');
+
+Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+    ->middleware(['auth', RoleMiddleware::class.':Admin'])
+    ->name('admin.dashboard');
+
+Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':Staff'])
+    ->name('staff.dashboard');
+
+Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
+    ->middleware(['auth', RoleMiddleware::class.':Customer'])
+    ->name('customer.dashboard');
+
 
 // Protected routes (auth required)
 Route::middleware('auth')->group(function () {
@@ -51,11 +68,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
-
 // Staff dashboard: list all payments
 Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
 // Staff action: approve or reject a specific payment
 Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
+
+require __DIR__.'/auth.php';
 
 require __DIR__.'/auth.php';

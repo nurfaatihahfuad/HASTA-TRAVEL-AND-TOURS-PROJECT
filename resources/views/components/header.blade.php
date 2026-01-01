@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Hasta Booking System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- header.blade.php -->
+<!-- Remove ALL HTML, head, body tags - ONLY keep navbar markup -->
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
@@ -82,10 +78,12 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- NAVBAR --> 
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
   <div class="container">
-    <a class="navbar-brand" href="/"><img src="{{ asset('img/hasta.jpeg') }}" alt="Hasta Logo" style="max-height:50px;"></a>
+    <a class="navbar-brand" href="/">
+      <img src="{{ asset('img/hasta.jpeg') }}" alt="Hasta Logo" style="max-height:50px;">
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -109,9 +107,3 @@
     </div>
   </div>
 </nav>
-
-<!-- Bootstrap JS + Popper -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
-</body>
-</html>
