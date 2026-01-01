@@ -8,6 +8,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Controllers\verifypaymentController;
 
 // Welcome page guna VehicleController@preview
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
@@ -49,5 +50,12 @@ Route::middleware('auth')->group(function () {
 // Payment routes
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
+
+
+// Staff dashboard: list all payments
+Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
+// Staff action: approve or reject a specific payment
+Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+
 
 require __DIR__.'/auth.php';
