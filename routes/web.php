@@ -7,6 +7,7 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\CustomerRegistrationController;
 
@@ -32,18 +33,18 @@ Route::get('/registration/success', [CustomerRegistrationController::class, 'suc
     ->name('registration.success')
     ->middleware('auth');
 
-// Dashboard routes ikut role (guna middleware class terus)
-Route::get('/admin/dashboard', function () {
-    return view('dashboard.admin');
-})->middleware(['auth', RoleMiddleware::class.':Admin'])->name('admin.dashboard');
+Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+    ->middleware(['auth', RoleMiddleware::class.':Admin'])
+    ->name('admin.dashboard');
 
-Route::get('/staff/dashboard', function () {
-    return view('dashboard.staff');
-})->middleware(['auth', RoleMiddleware::class.':Staff'])->name('staff.dashboard');
+Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':Staff'])
+    ->name('staff.dashboard');
 
-Route::get('/customer/dashboard', function () {
-    return view('dashboard.customer');
-})->middleware(['auth', RoleMiddleware::class.':Customer'])->name('customer.dashboard');
+Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
+    ->middleware(['auth', RoleMiddleware::class.':Customer'])
+    ->name('customer.dashboard');
+
 
 // Protected routes (auth required)
 Route::middleware('auth')->group(function () {
