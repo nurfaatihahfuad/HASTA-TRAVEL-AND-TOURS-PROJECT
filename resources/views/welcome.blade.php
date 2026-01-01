@@ -31,6 +31,8 @@
 
     <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
 
+    <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
+
       <div class="carousel-caption">
         <h1 class="display-4 fw-bold">Reliable & Safe</h1>
         <p class="lead">Experience worry-free rides with Hasta Travel & Tours.</p>
