@@ -1,43 +1,161 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-100 dark:bg-gray-900">
-    <div class="flex min-h-screen">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white dark:bg-gray-800 shadow-md">
-            <div class="p-6 text-lg font-bold text-gray-800 dark:text-gray-200">
-                HASTA
-            </div>
-            <nav class="mt-6 space-y-2">
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Customer Information</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Blacklisted Record</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Sales Record</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Payment Record</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Deposit Report</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Bank Statement Record</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
-                <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
-                <form method="POST" action="{{ route('logout') }}" class="px-6 py-2">
-                    @csrf
-                    <button type="submit" class="w-full text-left text-red-600 hover:bg-red-100 dark:hover:bg-red-700 rounded">
-                        Logout
-                    </button>
-                </form>
-            </nav>
-        </aside>
+@extends('layouts.app')
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Admin Dashboard</h2>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
-                {{ __("You're logged in!") }}
+@section('content')
+<div class="container py-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="section-card">
+                <h5 class="mb-3">HASTA</h5>
+                <nav class="d-grid gap-2">
+                    <a class="sidebar-link" href="#">Dashboard</a>
+                    <a class="sidebar-link" href="#">Customer Informations</a>
+                    <a class="sidebar-link" href="#">Car Inspection Checklist</a>
+                    <a class="sidebar-link" href="#">Report</a>
+                    <a class="sidebar-link" href="#">Sales Record</a>
+                    <a class="sidebar-link" href="#">Payment Record</a>
+                    <a class="sidebar-link" href="#">Deposit Record</a>
+                    <a class="sidebar-link" href="#">Bank Statement Record</a>
+                    <hr>
+                    <a class="sidebar-link" href="#">Profile</a>
+                    <a class="sidebar-link" href="#">Settings</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button class="btn btn-outline-danger w-100 mt-2">Logout</button>
+                    </form>
+                </nav>
             </div>
-        </main>
+        </div>
+
+        <!-- Main -->
+        <div class="col-md-9">
+            <!-- Metrics -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="metric-title">New Booking</div>
+                        <div class="metric-value">{{ number_format($newBookings) }}</div>
+                        <div class="metric-delta">↑ 5.2%</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="metric-title">Rented Cars</div>
+                        <div class="metric-value">{{ number_format($rentedCars) }}</div>
+                        <div class="metric-delta">↑ 21.2%</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="metric-title">Available Cars</div>
+                        <div class="metric-value">{{ number_format($availableCars) }}</div>
+                        <div class="metric-delta">↑ 7.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts + Availability -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <div class="section-card">
+                        <h6 class="mb-3">Booking overview</h6>
+                        <canvas id="adminBookingBar"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="section-card">
+                        <h6 class="mb-3">Car availability</h6>
+                        <form class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Car ID</label>
+                                <select class="form-select">
+                                    <option selected>Choose...</option>
+                                    <option>AXIA-001</option>
+                                    <option>MYVI-002</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Time</label>
+                                <input type="time" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" type="button">CHECK</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Car Type + Booking Status -->
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="section-card">
+                        <h6 class="mb-3">Car type</h6>
+                        <div class="row g-3">
+                            @foreach($carTypes as $type)
+                                <div class="col-md-4">
+                                    <div class="metric-card">
+                                        <div class="metric-title">{{ $type['label'] }}</div>
+                                        <div class="metric-value">{{ $type['value'] }}%</div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="section-card">
+                        <h6 class="mb-3">Booking status</h6>
+                        <canvas id="adminStatusPie"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+</div>
+
+{{-- Charts --}}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Bar chart
+    const ctxBar = document.getElementById('adminBookingBar');
+    new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: @json($weeklyLabels),
+            datasets: [{
+                label: 'Bookings',
+                data: @json($weeklyData),
+                backgroundColor: '#dc3545',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 5 } }
+            }
+        }
+    });
+
+    // Pie chart
+    const ctxPie = document.getElementById('adminStatusPie');
+    new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+            labels: ['Cancelled', 'Booked', 'Pending'],
+            datasets: [{
+                data: [{{ $statusCancelled }}, {{ $statusBooked }}, {{ $statusPending }}],
+                backgroundColor: ['#adb5bd', '#dc3545', '#212529']
+            }]
+        },
+        options: { responsive: true }
+    });
+});
+</script>
+@endsection

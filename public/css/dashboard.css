@@ -1,0 +1,58 @@
+.dashboard-container {
+    padding: 20px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f4f8, #e9ecef);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
+.dashboard-container h1 {
+    color: #2c3e50;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.dashboard-container p {
+    font-size: 18px;
+    color: #34495e;
+}
+
+/* public/css/dashboard.css */
+    .metric-card {
+        background: linear-gradient(145deg, #ffffff, #f9f9f9);
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .metric-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(0,0,0,.12);
+    }
+
+  .metric-title { font-size: .9rem; color: #6c757d; }
+  .metric-value { font-size: 1.8rem; font-weight: 700; color: #212529; }
+  .metric-delta { font-size: .85rem; color: #198754; }
+  
+  .section-card {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    }
+
+    .sidebar-link {
+        display: block;
+        padding: .6rem 1rem;
+        border-radius: .5rem;
+        color: #212529;
+        transition: background .3s ease, color .3s ease;
+    }
+    .sidebar-link:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+    
+  
