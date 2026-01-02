@@ -11,27 +11,20 @@ class DashboardController extends Controller
     // ============================
     public function admin()
     {
-<<<<<<< Updated upstream
-        // High-level metrics
-        $newBookings = DB::table('booking')->whereDate('created_at', now())->count();
-        $rentedCars  = DB::table('booking')->where('status', 'booked')->count();
-        $availableCars = DB::table('vehicle')->where('available', 1)->count();
-=======
         // 1. High-level metrics
         $newBookings    = DB::table('booking')->whereDate('created_at', now())->count(); // booking baru hari ini
         $rentedCars     = DB::table('booking')->where('status', 'booked')->count();      // jumlah kereta sedang disewa
         $availableCars  = DB::table('vehicles')->where('available', 1)->count();         // kereta available
->>>>>>> Stashed changes
 
         // 2. Weekly booking bar chart (Mon..Sun) - contoh data statik
         $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
         $weeklyData   = [22, 28, 35, 40, 30, 25, 38]; // boleh diganti dengan aggregation dari DB
 
-<<<<<<< Updated upstream
+
         // Booking status pie
-=======
+
         // 3. Booking status pie chart
->>>>>>> Stashed changes
+
         $statusCancelled = DB::table('booking')->where('status', 'cancelled')->count();
         $statusBooked    = DB::table('booking')->where('status', 'booked')->count();
         $statusPending   = DB::table('booking')->where('status', 'pending')->count();
@@ -64,17 +57,17 @@ class DashboardController extends Controller
     {
         $userId = auth()->user()->userId; // ambil ID staff dari login
 
-<<<<<<< Updated upstream
+
         // Assigned bookings
-        $bookings = DB::table('booking')->where('staffID', $userId)->get();
+        $booking = DB::table('booking')->where('staffID', $userId)->get();
 
         // KPI cards
-=======
+
         // 1. Semua booking yang assigned pada staff ini
         $bookings = DB::table('booking')->where('staffID', $userId)->get();
 
         // 2. KPI cards
->>>>>>> Stashed changes
+
         $assignedToday = DB::table('booking')
             ->where('staffID', $userId)
             ->whereDate('created_at', now())
@@ -93,11 +86,11 @@ class DashboardController extends Controller
         $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
         $weeklyData   = [3, 6, 5, 7, 4, 2, 8];
 
-<<<<<<< Updated upstream
+
         // Status pie (for staff’s assigned bookings)
-=======
+
         // 4. Booking status pie chart untuk staff
->>>>>>> Stashed changes
+
         $statusCancelled = DB::table('booking')->where('staffID', $userId)->where('status', 'cancelled')->count();
         $statusBooked    = DB::table('booking')->where('staffID', $userId)->where('status', 'booked')->count();
         $statusPending   = DB::table('booking')->where('staffID', $userId)->where('status', 'pending')->count();
@@ -120,12 +113,11 @@ class DashboardController extends Controller
     // ============================
     public function customer()
     {
-<<<<<<< Updated upstream
+
         $userId   = auth()->user()->userID;
         $bookings = DB::table('booking')->where('userID', $userId)->get();
-=======
+
         $userId = auth()->user()->userId; // ambil ID customer dari login
->>>>>>> Stashed changes
 
         // 1. Ambil semua booking customer
         $bookings = DB::table('booking')->where('userID', $userId)->get();
