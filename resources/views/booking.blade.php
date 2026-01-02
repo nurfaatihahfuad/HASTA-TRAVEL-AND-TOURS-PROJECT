@@ -49,17 +49,17 @@
 
         <!-- Right: Car Info -->
         @if($vehicle)
-    <div class="car-info">
-        <h2>{{ $vehicle->brand }} {{ $vehicle->model }}</h2>
-        <p>RM{{ $vehicle->rate_per_hour }}/hour</p>
-        <img src="{{ asset('imag/' . $vehicle->imag_url) }}" alt="{{ $vehicle->brand }}" class="car-image">
-        <ul>
-            <li>✅ {{ $vehicle->seats }}-seater</li>
-            <li>✅ {{ $vehicle->features }}</li>
-            <li>❌ No smoking</li>
-        </ul>
-    </div>
-@endif
+        <div class="car-info">
+            <h2>{{ $vehicle->brand }} {{ $vehicle->model }}</h2>
+            <p>RM{{ $vehicle->price_per_day }}/hour</p>
+            <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->brand }}" class="car-image">
+            <ul>
+                <li>✅ {{ $vehicle->seats }}-seater</li>
+                <li>✅ {{ $vehicle->type }}</li>
+                <li>❌ No smoking</li>
+            </ul>
+        </div>
+        @endif
 
 </body>
 </html>
