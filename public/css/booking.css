@@ -116,3 +116,10 @@ form {
     }
 }
 
+/* Dalam booking.css */
+.required {
+    color: red;
+    font-weight: bold;
+}
+
+
