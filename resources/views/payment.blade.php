@@ -24,13 +24,13 @@
             <div class="payment-type">
                 <label>Choose Payment Type:</label>
                 <select name="paymentType" required>
-                    <option value="Deposit">Deposit</option>
+                    <option value="Deposit">Deposit Payment</option>
                     <option value="Full">Full Payment</option>
             </select>
             </div>
 
             <div class="payment-amount">
-                <label>Enter Amount (RM):</label>
+                <label>Amount Should Paid (RM):</label>
                 <input type="number" name="amount" step="0.01" required>
             </div>
         </div>

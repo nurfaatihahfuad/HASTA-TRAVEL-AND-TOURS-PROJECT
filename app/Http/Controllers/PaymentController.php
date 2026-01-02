@@ -12,6 +12,8 @@ class PaymentController extends Controller
     public function show()
     {
         return view('payment', ['bookingID' => 1]); // Replace with dynamic ID if needed
+
+        $depositAmount = 100;
     }
 
     // Handle the file upload
@@ -19,15 +21,26 @@ class PaymentController extends Controller
     {
         $request->validate([
             'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
+            'paymentType' => 'required',
         ]);
 
         // Store the uploaded file
         $path = $request->file('payment_proof')->store('payment_proofs', 'public');
 
+        if($request -> paymentType == 'Deposit Payment')
+        {
+            $amount = 100;
+        }
+
+        else
+        {
+            $amount = $request -> amount;
+        }
+
         // You can log or save this path to the database if needed
         DB::table('payment') -> insert([
             'paymentType' => $request->paymentType,
-            'amount' => $request->amount,
+            'amount' => $amount,
             'receipt_file_path' => $path,
             'paymentStatus' => 'Pending',
             'verifiedBy' => NULL,
