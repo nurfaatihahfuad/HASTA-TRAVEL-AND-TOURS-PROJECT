@@ -44,7 +44,7 @@
                 <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
             @endif
 
-            <button type="submit" class="submit-btn">Submit</button>
+            <button type="submit" class="submit-btn">Next</button>
         </form>
 
         <!-- Right: Car Info -->

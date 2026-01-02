@@ -22,7 +22,7 @@ class BookingController extends Controller
             $vehicle = Vehicle::findOrFail($vehicle_id);
         }
 
-        $vehicle = Vehicle::find(1);
+        $vehicle = Vehicle::find(3);
         return view('booking', compact('vehicle'));
     }
 
