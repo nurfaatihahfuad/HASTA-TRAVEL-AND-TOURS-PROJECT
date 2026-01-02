@@ -23,8 +23,6 @@ class BookingController extends Controller
         }
 
         $vehicle = Vehicle::find(1);
-        return view('booking', compact('vehicles'));
-
         return view('booking', compact('vehicle'));
     }
 
