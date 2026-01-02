@@ -13,7 +13,7 @@ class DashboardController extends Controller
     {
         // 1. High-level metrics
         $newBookings    = DB::table('booking')->whereDate('created_at', now())->count(); // booking baru hari ini
-        $rentedCars     = DB::table('booking')->where('status', 'booked')->count();      // jumlah kereta sedang disewa
+        $rentedCars     = DB::table('booking')->where('bookingStatus', 'booked')->count();      // jumlah kereta sedang disewa
         $availableCars  = DB::table('vehicles')->where('available', 1)->count();         // kereta available
 
         // 2. Weekly booking bar chart (Mon..Sun) - contoh data statik
@@ -25,9 +25,9 @@ class DashboardController extends Controller
 
         // 3. Booking status pie chart
 
-        $statusCancelled = DB::table('booking')->where('status', 'cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('status', 'booked')->count();
-        $statusPending   = DB::table('booking')->where('status', 'pending')->count();
+        $statusCancelled = DB::table('booking')->where('bookingStatus', 'cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('bookingStatus', 'booked')->count();
+        $statusPending   = DB::table('booking')->where('bookingStatus', 'pending')->count();
 
         // 4. Car type distribution (example)
         $carTypes = [
@@ -75,7 +75,7 @@ class DashboardController extends Controller
 
         $pendingPayments = DB::table('payment')
             ->where('staffID', $userId)
-            ->where('status', 'pending')
+            ->where('bookingStatus', 'pending')
             ->count(); // payment pending
 
         $damageCases = DB::table('damage_case') // sesuaikan table nama plural/singular
@@ -91,9 +91,9 @@ class DashboardController extends Controller
 
         // 4. Booking status pie chart untuk staff
 
-        $statusCancelled = DB::table('booking')->where('staffID', $userId)->where('status', 'cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('staffID', $userId)->where('status', 'booked')->count();
-        $statusPending   = DB::table('booking')->where('staffID', $userId)->where('status', 'pending')->count();
+        $statusCancelled = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'booked')->count();
+        $statusPending   = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'pending')->count();
 
         return view('dashboard.staff', compact(
             'bookings',

@@ -19,7 +19,6 @@ class RoleMiddleware
         ]);
 
         if (!Auth::check()) {
-<<<<<<< Updated upstream
             Log::warning('User not authenticated in RoleMiddleware');
             return redirect('/login');
         }
@@ -38,28 +37,34 @@ class RoleMiddleware
         ]);
 
         // Redirect to appropriate dashboard based on actual role
-        if ($userType == 'admin') {
+        /*if ($userType == 'admin') {
             return redirect('/admin/dashboard');
         } elseif ($userType == 'staff') {
             return redirect('/staff/dashboard');
         } elseif ($userType == 'customer') {
             return redirect('/customer/dashboard');
+        }*/
+
+        switch ($userType) {
+            case 'admin':
+                return redirect('/admin/dashboard');
+            case 'staff':
+                if ($user->staff) {
+                    // Redirect to appropriate staff dashboard
+                    if ($user->staff->staffRole === 'salesperson') {
+                        return redirect('/salesperson/dashboard');
+                    } elseif ($user->staff->staffRole === 'runner') {
+                        return redirect('/runner/dashboard');
+                    }
+                }
+                return redirect('/staff/dashboard');
+            case 'customer':
+                return redirect('/customer/dashboard');
+
+            default:
+                Auth::logout();
+                return redirect('/login')->withErrors(['role' => 'Invalid user role']);
         }
 
-        // If role doesn't match any known type, logout
-        Auth::logout();
-        return redirect('/login')->withErrors(['role' => 'Invalid user role']);
     }
 }
-=======
-            return redirect()->route('login');
-        }
-
-        if (Auth::user()->userType !== $role) {
-            abort(403, 'Unauthorized');
-        }
-
-        return $next($request);
-    }
-}
->>>>>>> Stashed changes

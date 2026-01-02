@@ -121,6 +121,54 @@ class User extends Authenticatable
         return $this->hasOne(VerificationDocs::class, 'userID','userID');
     }
 
+    // relationship with Staff
+    public function staff()
+    {
+        return $this->hasOne(Staff::class, 'staffID', 'userID');
+    }
+
+    // Add role checking methods to User model (add these methods)
+    public function hasRole($role)
+    {
+        if (str_contains($role, '.')) {
+            [$userType, $staffRole] = explode('.', $role, 2);
+            
+            if ($this->userType !== $userType) {
+                return false;
+            }
+            
+            if ($this->userType === 'staff' && $this->staff) {
+                return $this->staff->staffRole === $staffRole;
+            }
+            
+            return false;
+        }
+        
+        return $this->userType === $role;
+    }
+
+    public function isSalesperson()
+    {
+        return $this->userType === 'staff' && 
+               $this->staff && 
+               $this->staff->staffRole === 'salesperson';
+    }
+
+    public function isRunner()
+    {
+        return $this->userType === 'staff' && 
+               $this->staff && 
+               $this->staff->staffRole === 'runner';
+    }
+
+    public function getFullRoleAttribute()
+    {
+        if ($this->userType === 'staff' && $this->staff) {
+            return 'staff.' . $this->staff->staffRole;
+        }
+        return $this->userType;
+    }
+
     // Booking
     public function bookings()
     {
