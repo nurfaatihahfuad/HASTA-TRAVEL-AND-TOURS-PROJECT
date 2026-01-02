@@ -17,3 +17,5 @@ class Vehicle extends Model
     ];
 }
 
+
+
