@@ -19,6 +19,7 @@ class RoleMiddleware
         ]);
 
         if (!Auth::check()) {
+<<<<<<< Updated upstream
             Log::warning('User not authenticated in RoleMiddleware');
             return redirect('/login');
         }
@@ -50,3 +51,15 @@ class RoleMiddleware
         return redirect('/login')->withErrors(['role' => 'Invalid user role']);
     }
 }
+=======
+            return redirect()->route('login');
+        }
+
+        if (Auth::user()->userType !== $role) {
+            abort(403, 'Unauthorized');
+        }
+
+        return $next($request);
+    }
+}
+>>>>>>> Stashed changes

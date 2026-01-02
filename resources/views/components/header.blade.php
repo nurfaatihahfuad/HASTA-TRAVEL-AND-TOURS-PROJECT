@@ -96,7 +96,7 @@
           <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">User</a>
           <ul class="dropdown-menu dropdown-menu-dark">
             <li><a class="dropdown-item" href="{{ route('login') }}">Log In</a></li>
-            <li><a class="dropdown-item" href="{{ route('register') }}">Sign Up</a></li>
+            <li><a class="dropdown-item" href="{{ route('customer.register') }}">Sign Up</a></li>
           </ul>
         </li>
       </ul>
