@@ -15,23 +15,25 @@
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
-            <div class="form-group">
-                <label for="pickup_date">Pick-up Date Time:</label>
-                <input type="date" name="pickup_dateTime" required>
+            <div class = "form-group">
+                <label for="pickup_dateTime">Pick-up Date & Time: <span style="color:red">*</span></label>
+                <input type="datetime-local" name="pickup_dateTime" required>
             </div>
 
-            <div class="form-group">
-                <label for="return_date">Return Date:</label>
-                <input type="date" name="return_dateTime" required>
-            </div>
 
             <div class="form-group">
-                <label for="pickup_location">Pick-up Location:</label>
+                <label for="return_dateTime">Return Date & Time: <span style="color:red">*</span></label>
+                <input type="datetime-local" name="return_dateTime" required>
+            </div>
+
+
+            <div class="form-group">
+                <label for="pickup_location">Pick-up Location: <span style="color:red">*</span></label>
                 <input type="text" name="pickupAddress" value="UTM Mall" required>
             </div>
 
             <div class="form-group">
-                <label for="return_location">Return Location:</label>
+                <label for="return_location">Return Location: <span style="color:red">*</span></label>
                 <input type="text" name="returnAddress" value="UTM Mall" required>
             </div>
 
@@ -59,7 +61,7 @@
                 <li>❌ No smoking</li>
             </ul>
         </div>
-        @endif
+@endif
 
 </body>
 </html>
