@@ -173,11 +173,14 @@ class CustomerRegistrationController extends Controller
             // Log the user in automatically
             // auth()->login($user);
 
+            // Store userID in session
+            session(['registered_user_id' => $user->userID]);
+            
             // Redirect to success page
-            // return redirect()->route('customer.register.success');
+            return redirect()->route('customer.register.success');
 
             // Return back with success message
-            return back()->with('success', 'Registration successful!');
+            // return back()->with('success', 'Registration successful!');
 
         } catch (\Exception $e) {
             // Rollback transaction on error
@@ -193,18 +196,6 @@ class CustomerRegistrationController extends Controller
                 ->withInput()
                 ->with('error_details', $e->getMessage());
         }
-
-        // store in session to be passed to success page **NOT WORKING
-        session(['registered_user_id' => $user->userID]);
-        return redirect()->route('customer.register.success');
-
-        // For debugging - pass data in URL
-        /*return redirect()->route('customer.register.success', [
-            'name' => urlencode($user->name),
-            'email' => urlencode($user->email),
-        ]);*/
-
-        
     }
 
     
