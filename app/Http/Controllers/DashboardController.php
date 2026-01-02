@@ -10,9 +10,9 @@ class DashboardController extends Controller
     public function admin()
     {
         // High-level metrics
-        $newBookings = DB::table('bookings')->whereDate('created_at', now())->count();
-        $rentedCars  = DB::table('bookings')->where('status', 'booked')->count();
-        $availableCars = DB::table('vehicles')->where('available', 1)->count();
+        $newBookings = DB::table('booking')->whereDate('created_at', now())->count();
+        $rentedCars  = DB::table('booking')->where('status', 'booked')->count();
+        $availableCars = DB::table('vehicle')->where('available', 1)->count();
 
 
         // Weekly booking bar chart (Mon..Sun)
@@ -20,9 +20,9 @@ class DashboardController extends Controller
         $weeklyData   = [22, 28, 35, 40, 30, 25, 38]; // Replace with real aggregation if needed
 
         // Booking status pie
-        $statusCancelled = DB::table('bookings')->where('status', 'cancelled')->count();
-        $statusBooked    = DB::table('bookings')->where('status', 'booked')->count();
-        $statusPending   = DB::table('bookings')->where('status', 'pending')->count();
+        $statusCancelled = DB::table('booking')->where('status', 'cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('status', 'booked')->count();
+        $statusPending   = DB::table('booking')->where('status', 'pending')->count();
 
         // Car type distribution (example categories)
         $carTypes = [
@@ -50,10 +50,10 @@ class DashboardController extends Controller
         $userId = auth()->user()->userID;
 
         // Assigned bookings
-        $bookings = DB::table('bookings')->where('staffID', $userId)->get();
+        $bookings = DB::table('booking')->where('staffID', $userId)->get();
 
         // KPI cards
-        $assignedToday = DB::table('bookings')
+        $assignedToday = DB::table('booking')
             ->where('staffID', $userId)
             ->whereDate('created_at', now())
             ->count();
@@ -72,9 +72,9 @@ class DashboardController extends Controller
         $weeklyData   = [3, 6, 5, 7, 4, 2, 8]; // Replace with real aggregation if needed
 
         // Status pie (for staff’s assigned bookings)
-        $statusCancelled = DB::table('bookings')->where('staffID', $userId)->where('status', 'cancelled')->count();
-        $statusBooked    = DB::table('bookings')->where('staffID', $userId)->where('status', 'booked')->count();
-        $statusPending   = DB::table('bookings')->where('staffID', $userId)->where('status', 'pending')->count();
+        $statusCancelled = DB::table('booking')->where('staffID', $userId)->where('status', 'cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('staffID', $userId)->where('status', 'booked')->count();
+        $statusPending   = DB::table('booking')->where('staffID', $userId)->where('status', 'pending')->count();
 
         return view('dashboard.staff', compact(
             'bookings',
@@ -93,7 +93,7 @@ class DashboardController extends Controller
     public function customer()
     {
         $userId   = auth()->user()->userID;
-        $bookings = DB::table('bookings')->where('userID', $userId)->get();
+        $bookings = DB::table('booking')->where('userID', $userId)->get();
 
         $totalBookings = $bookings->count();
         $totalDays     = $bookings->sum('days_rented');

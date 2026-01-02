@@ -29,24 +29,20 @@ Route::get('/register/customer', [CustomerRegistrationController::class, 'create
 Route::post('/register/customer', [CustomerRegistrationController::class, 'store'])
     ->name('customer.register.store');
 
-/*Route::get('/registration/success', [CustomerRegistrationController::class, 'success'])
-    ->name('registration.success')
-    ->middleware('auth');*/
-
 // Successful Registration
 Route::get('/register/customer/success', [CustomerRegistrationController::class, 'success'])
-    ->name('customer.register.success');
+    ->name('customer.register.success'); //here
 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
-    ->middleware(['auth', RoleMiddleware::class.':Admin'])
+    ->middleware(['auth'])
     ->name('admin.dashboard');
 
 Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware(['auth', RoleMiddleware::class.':Staff'])
+    ->middleware(['auth'])
     ->name('staff.dashboard');
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware(['auth', RoleMiddleware::class.':Customer'])
+    ->middleware(['auth'])
     ->name('customer.dashboard');
 
 
