@@ -15,6 +15,11 @@ class Vehicle extends Model
         'price_per_day', 'available', 'image_url', 
         'description', 'created_at' , 'updated_at', 'image_url'
     ];
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }
 
 
