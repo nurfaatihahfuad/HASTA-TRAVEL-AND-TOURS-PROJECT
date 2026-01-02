@@ -1,0 +1,117 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 20px;
+}
+
+.booking-container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.quantity-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.quantity-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.quantity-controls button {
+    padding: 5px 10px;
+    font-size: 18px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: crimson;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.car-info {
+    margin-top: 30px;
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.car-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.car-info li {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.booking-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+form {
+    flex: 2;
+}
+
+.car-info {
+    flex: 1;
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.car-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+/* Optional: Responsive stacking on mobile */
+@media (max-width: 768px) {
+    .booking-content {
+        flex-direction: column;
+    }
+}
+
