@@ -28,9 +28,13 @@ Route::get('/register/customer', [CustomerRegistrationController::class, 'create
 Route::post('/register/customer', [CustomerRegistrationController::class, 'store'])
     ->name('customer.register.store');
 
-Route::get('/registration/success', [CustomerRegistrationController::class, 'success'])
+/*Route::get('/registration/success', [CustomerRegistrationController::class, 'success'])
     ->name('registration.success')
-    ->middleware('auth');
+    ->middleware('auth');*/
+
+// Successful Registration
+Route::get('/register/customer/success', [CustomerRegistrationController::class, 'success'])
+    ->name('customer.register.success');
 
 // Dashboard routes ikut role (guna middleware class terus)
 Route::get('/admin/dashboard', function () {

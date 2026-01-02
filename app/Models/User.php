@@ -21,7 +21,8 @@ class User extends Authenticatable
     // declare primary key (cus by default 'id')
     protected $primaryKey = 'userID';
     protected $table = 'user';
-    public $incrementing = true; // by default true, better to set explicitly
+    protected $keyType = 'string';
+    public $incrementing = false; // by default true
     public $timestamps = false;
 
     // declare attributes 
@@ -39,6 +40,35 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    // for userID prefix
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Decide prefix based on userType
+            $prefix = match ($model->userType) {
+                'customer' => 'UC',
+                'admin'    => 'UD',
+                'staff'    => 'US',
+                default    => 'U'
+            };
+
+            // Find last ID with this prefix
+            $lastUser = User::where('userID', 'LIKE', $prefix.'%')
+                            ->orderBy('userID', 'desc')
+                            ->first();
+
+            $nextNum = $lastUser
+                ? intval(substr($lastUser->userID, 2)) + 1
+                : 1;
+
+            // Assign new ID
+            $model->userID = $prefix . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+        });
+    }
+
 
     // relationship with Customer
     public function customer()
@@ -86,7 +116,7 @@ class User extends Authenticatable
     }
 
     // for salesperson to verify documents
-    public function verificationDoc()
+    public function verificationDocs()
     {
         return $this->hasOne(VerificationDocs::class, 'userID','userID');
     }

@@ -11,6 +11,8 @@ class VerificationDocs extends Model
 
     protected $table = 'verificationdocs';
     protected $primaryKey = 'docID';
+    protected $keyType = 'string';
+    public $incrementing = false;
     
     protected $fillable = [
         'userID',
@@ -25,6 +27,27 @@ class VerificationDocs extends Model
     protected $casts = [
         'verified_at' => 'datetime',
     ];
+
+    // prefix for docID
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $prefix = 'D';
+
+            $lastDoc = VerificationDocs::where('docID', 'LIKE', $prefix.'%')
+                                       ->orderBy('docID', 'desc')
+                                       ->first();
+
+            $nextNum = $lastDoc
+                ? intval(substr($lastDoc->docID, 1)) + 1
+                : 1;
+
+            $model->docID = $prefix . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+        });
+    }
+
 
     // Relationship to User
     public function user()

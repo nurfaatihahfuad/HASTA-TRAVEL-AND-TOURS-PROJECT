@@ -23,25 +23,6 @@ class CustomerRegistrationController extends Controller
         // Fetch from database
         $faculties = Faculty::orderBy('facultyName')->get();
         $residentialColleges = College::orderBy('collegeName')->get();
-        /*$faculties = [
-            'Faculty of Engineering',
-            'Faculty of Science',
-            'Faculty of Medicine',
-            'Faculty of Business',
-            'Faculty of Arts',
-            'Faculty of Law',
-            'Faculty of Education',
-            'Faculty of Computing',
-            'Faculty of Architecture',
-            'Faculty of Pharmacy'
-        ];
-
-        $residentialColleges = [
-            'KTDI',
-            'KTHO',
-            'KTF',
-            'KTR'
-        ];*/
 
         $bankTypes = [
             'Maybank',
@@ -82,7 +63,7 @@ class CustomerRegistrationController extends Controller
             'customerType' => 'required|in:student,staff',
             
             // Customer information
-            'referralCode' => 'nullable|string|max:50|unique:customer,referralCode',
+            'referralCode' => 'nullable|string|max:50',
             'accountNumber' => 'required|string|max:50',
             'bankType' => 'required|string|max:50|in:Maybank,CIMB,Public Bank,RHB,Hong Leong Bank,Ambank,HSBC Malaysia,OCBC Malaysia,Bank Rakyat,Bank Islam,Affin Bank,Alliance Bank,BSN',
             
@@ -91,8 +72,8 @@ class CustomerRegistrationController extends Controller
         // Add conditional validation based on customer type
         if ($request->customerType === 'student') {
             $validationRules['matricNo'] = 'required|string|max:50|unique:studentcustomer,matricNo';
-            $validationRules['facultyID'] = 'required|exists:faculty,facultyID';
-            $validationRules['collegeID'] = 'required|exists:college,collegeID';
+            $validationRules['facultyID'] = 'required|string';
+            $validationRules['collegeID'] = 'required|string';
         } else {
             $validationRules['staffNo'] = 'required|string|max:50|unique:staffcustomer,staffNo';
         }
@@ -121,8 +102,13 @@ class CustomerRegistrationController extends Controller
                 'userType' => 'customer',
             ]);
 
+
+            //$user->refresh(); // reloads trigger-generated userID
+            $user = User::where('email', $validated['email'])->first();
+            \Log::info('Generated UserID: ' . $user->userID);
+
             // 2. Generate referral code if not provided
-            $referralCode = $validated['referralCode'] ?? $this->generateReferralCode();
+            $referralCode = $validated['referralCode'];
 
             // 3. Create Customer
             $customer = Customer::create([
@@ -135,14 +121,12 @@ class CustomerRegistrationController extends Controller
 
             // 4. Create specific customer type record
             if ($validated['customerType'] === 'student') {
-                $facultyID = Faculty::find($validated['facultyID']);
-                $collegeID = College::find($validated['collegeID']);
 
                 StudentCustomer::create([
                     'userID' => $user->userID,
                     'matricNo' => $validated['matricNo'],
-                    'facultyID' => $facultyID->facultyID,
-                    'collegeID' => $collegeID->collegeID,
+                    'facultyID' => $validated['facultyID'],
+                    'collegeID' => $validated['collegeID'],
                     'customerStatus' => 'pending', // pending verification
                 ]);
             } else {
@@ -190,9 +174,10 @@ class CustomerRegistrationController extends Controller
             // auth()->login($user);
 
             // Redirect to success page
-            /*return redirect()->route('customer.dashboard')
-                ->with('success', 'Registration successful! Welcome, ' . $user->name);*/
-            return redirect()->route('welcome')->with('success', 'Login successful!');
+            // return redirect()->route('customer.register.success');
+
+            // Return back with success message
+            return back()->with('success', 'Registration successful!');
 
         } catch (\Exception $e) {
             // Rollback transaction on error
@@ -208,23 +193,65 @@ class CustomerRegistrationController extends Controller
                 ->withInput()
                 ->with('error_details', $e->getMessage());
         }
+
+        // store in session to be passed to success page **NOT WORKING
+        session(['registered_user_id' => $user->userID]);
+        return redirect()->route('customer.register.success');
+
+        // For debugging - pass data in URL
+        /*return redirect()->route('customer.register.success', [
+            'name' => urlencode($user->name),
+            'email' => urlencode($user->email),
+        ]);*/
+
+        
     }
 
     
 
     // Generate unique referral code
-    private function generateReferralCode()
+    /*private function generateReferralCode()
     {
         do {
             $code = Str::upper(Str::random(8));
         } while (Customer::where('referralCode', $code)->exists());
 
         return $code;
-    }
+    }*/
 
     // Show success page (optional)
     public function success()
     {
-        return view('customers.success');
+        $userId = session('registered_user_id'); // from function store above
+
+        if (!$userId) {
+        // If no user ID, redirect to registration
+            return redirect()->route('customer.register')
+                ->with('error', 'Registration session expired. Please register again.');
+        }
+
+        // Load user with ALL related data
+        $user = User::with([
+            'customer',
+            'studentCustomer.faculty',
+            'studentCustomer.college', 
+            'staffCustomer',
+            'verificationDocs'
+        ])->find($userId);
+        
+        if (!$user) {
+            return redirect()->route('customer.register')
+                ->with('error', 'User not found. Please register again.');
+        }
+
+        //$user = User::find($userId);
+        
+        // loads the success.blade.php with registered user data
+        return view('customers.success', [
+            'user' => $user
+        ]);
+
+        
+        
     }
 }

@@ -13,11 +13,25 @@
     
     <style>
         /* CSS Variables - Scoped only to this page */
+        
         :root {
             --reg-primary: #EC9A85;
             --reg-primary-dark: #D98B77;
             --reg-primary-light: #F9E0D9;
             --reg-primary-lightest: #FEF5F2;
+        }
+
+        body {
+            background-image: url("/img/registration-bg.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .min-h-screen {
+            position: relative;
+            z-index: 1;
         }
         
         /* Registration-specific utility classes */
