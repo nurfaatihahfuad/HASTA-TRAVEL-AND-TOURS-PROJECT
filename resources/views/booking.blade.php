@@ -16,14 +16,15 @@
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
             <div class="form-group">
-                <label for="pickup_date">Pick-up Date Time:</label>
-                <input type="date" name="pickup_dateTime" required>
+                <label for="pickup_dateTime">Pick-up Date & Time:</label>
+                <input type="datetime-local" name="pickup_dateTime" required>
             </div>
 
             <div class="form-group">
-                <label for="return_date">Return Date:</label>
-                <input type="date" name="return_dateTime" required>
+                <label for="return_dateTime">Return Date & Time:</label>
+                <input type="datetime-local" name="return_dateTime" required>
             </div>
+
 
             <div class="form-group">
                 <label for="pickup_location">Pick-up Location:</label>
@@ -51,8 +52,8 @@
         @if($vehicle)
     <div class="car-info">
         <h2>{{ $vehicle->brand }} {{ $vehicle->model }}</h2>
-        <p>RM{{ $vehicle->rate_per_hour }}/hour</p>
-        <img src="{{ asset('images/' . $vehicle->image_url) }}" alt="{{ $vehicle->brand }}" class="car-image">
+        <p>RM{{ $vehicle->price_per_day }}/hour</p>
+        <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->brand }}" class="car-image">
         <ul>
             <li>✅ {{ $vehicle->seats }}-seater</li>
             <li>✅ {{ $vehicle->features }}</li>

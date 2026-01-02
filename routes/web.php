@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\BookingController;
@@ -38,7 +38,16 @@ Route::post('/register/customer', [CustomerRegistrationController::class, 'store
 Route::get('/register/customer/success', [CustomerRegistrationController::class, 'success'])
     ->name('customer.register.success'); //here
 
+//login
+Route::get('/login', [AuthenticatedSessionController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'login']);
+
+// Logout
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+//login route to dashboard    
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+<<<<<<< Updated upstream
     ->middleware(['auth'])
     ->name('admin.dashboard');
 
@@ -48,8 +57,18 @@ Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth'])
-    ->name('customer.dashboard');
+=======
+    ->middleware('auth')
+    ->name('admin.dashboard');
 
+Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware('auth')
+    ->name('staff.dashboard');
+
+Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
+    ->middleware('auth')
+>>>>>>> Stashed changes
+    ->name('customer.dashboard');
 
 // Protected routes (auth required)
 Route::middleware('auth')->group(function () {
@@ -86,6 +105,7 @@ Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
+<<<<<<< Updated upstream
 // Staff dashboard: list all payments
 Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
 // Staff action: approve or reject a specific payment
@@ -93,5 +113,8 @@ Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->
 
 
 require __DIR__.'/auth.php';
+=======
+//require __DIR__.'/auth.php';
+>>>>>>> Stashed changes
 
 require __DIR__.'/auth.php';
