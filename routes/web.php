@@ -34,9 +34,13 @@ Route::get('/register/customer', [CustomerRegistrationController::class, 'create
 Route::post('/register/customer', [CustomerRegistrationController::class, 'store'])
     ->name('customer.register.store');
 
-Route::get('/registration/success', [CustomerRegistrationController::class, 'success'])
+/*Route::get('/registration/success', [CustomerRegistrationController::class, 'success'])
     ->name('registration.success')
-    ->middleware('auth');
+    ->middleware('auth');*/
+
+// Successful Registration
+Route::get('/register/customer/success', [CustomerRegistrationController::class, 'success'])
+    ->name('customer.register.success');
 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth', RoleMiddleware::class.':Admin'])
