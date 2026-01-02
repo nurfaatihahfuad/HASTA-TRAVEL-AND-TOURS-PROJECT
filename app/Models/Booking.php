@@ -18,6 +18,7 @@ class Booking extends Model
         'voucherCode',
         'bookingStatus',
         'quantity',
+        'created_at' , 'updated_at',
     ];
 
     public function user() 
