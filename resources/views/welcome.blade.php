@@ -91,7 +91,7 @@
             <div class="card-body text-center">
               <h5 class="card-title fw-bold">{{ $vehicle->brand }} {{ $vehicle->model }}</h5>
               <p class="card-text text-muted">{{ $vehicle->description }}</p>
-              <a href="{{ url('/login') }}" class="btn btn-primary">Book Now</a>
+              <a href="{{ route ('booking.form' , $vehicle-> vehicleID)  }}" class="btn btn-primary">Book Now</a>
             </div>
           </div>
         </div>

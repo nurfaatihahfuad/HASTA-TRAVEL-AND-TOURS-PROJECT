@@ -14,16 +14,19 @@ class BookingController extends Controller
     /**
      * Show the booking form to the customer.
      */
+
+    
     public function create($vehicle_id = null): View
     {
         $vehicle = null;
         if ($vehicle_id) 
         {
             $vehicle = Vehicle::findOrFail($vehicle_id);
+             
         }
-
-        $vehicle = Vehicle::find(1);
         return view('booking', compact('vehicle'));
+
+        //$vehicle = Vehicle::find(1);
     }
 
 
