@@ -15,6 +15,16 @@ class StaffController extends Controller
     // Display a listing of staff members.
     public function index(Request $request)
     {
+        // Get total counts before filtering
+        $totalStaff = User::where('userType', 'staff')->count();
+        $totalSalespersons = User::where('userType','staff')
+                            ->whereHas('staff', function($q) {
+                                $q->where('staffRole','salesperson');
+                            })->count();
+        $totalRunners = User::where('userType','staff')
+                            ->whereHas('staff', function($q) {
+                                $q->where('staffRole','runner');
+                            })->count();
         // Get all staff (userType = 'staff')
         // order by latest staff added
         /*$staff = User::where('userType', 'staff')
@@ -33,9 +43,15 @@ class StaffController extends Controller
             });
         }
     
-    $staff = $query->get();
+        $staff = $query->get();
         
-        return view('admin.staff.index', compact('staff'));
+        return view('admin.staff.index',[
+            'staff' => $staff,
+            'totalStaff' => $totalStaff,
+            'totalSalespersons' => $totalSalespersons,
+            'totalRunners' => $totalRunners,
+            'currentFilter' => $request->role
+        ]);
     }
 
     // Show the form for creating a new staff member.
@@ -115,16 +131,16 @@ class StaffController extends Controller
     }
 
     // Show the form for editing the specified staff member.
-    /*public function edit($id)
+    public function edit($id)
     {
         $staff = User::where('userID', $id)
                     ->where('userType', 'staff')
                     ->firstOrFail();
         
-        return view('admin.staff.edit', compact('staff'));
-    }*/
+        return view('admin.staff.update', compact('staff'));
+    }
 
-    // Update the specified staff member in storage.
+    // Update the specified staff member in storage (submit update form)
     public function update(Request $request, $id)
     {
         $staff = User::where('userID', $id)

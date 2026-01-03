@@ -15,6 +15,7 @@ use App\Http\Controllers\verifypaymentController;
 
 use App\Http\Controllers\CustomerRegistrationController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\AdminController;
 
 
 // Welcome page guna VehicleController@preview
@@ -122,6 +123,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->grou
     Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])->name('edit');
     Route::put('/staff/{id}', [StaffController::class, 'update'])->name('update');
     Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('destroy');
+});
+
+// Admin Management Routes
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admins.')->group(function () {
+    Route::get('/admins', [AdminController::class, 'index'])->name('index');
+    Route::get('/admins/create', [AdminController::class, 'create'])->name('create');
+    Route::post('/admins', [AdminController::class, 'store'])->name('store');
+    Route::get('/admins/{id}', [AdminController::class, 'show'])->name('show');
+    Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('edit');
+    Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
+    Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
 });
 
 //require __DIR__.'/auth.php';

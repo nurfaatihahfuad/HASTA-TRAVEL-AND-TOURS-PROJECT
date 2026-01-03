@@ -36,9 +36,26 @@
         .card .card-title, .card .card-text { color: #212529; }
         .card-img-top { width: 100%; height: auto; max-height: 160px; object-fit: scale-down; border-radius: 0.5rem;}
 
-        .btn-primary { background-color: #dc3545; border-color: #dc3545; transition: all 0.3s ease; padding: 0.4rem 0.6rem; /* atas-bawah = 0.4rem, kiri-kanan = 0.6rem */ font-size: 0.85rem; width: fit-content;}
-        .btn-primary:hover { background-color: #bb2d3b; border-color: #dc3545; }
+        .btn-primary { 
+            background-color: #dc3545 !important; 
+            border-color: #dc3545 !important; 
+            transition: all 0.3s ease; 
+            padding: 0.4rem 0.8rem; /* atas-bawah = 0.4rem, kiri-kanan = 0.6rem */ 
+            font-size: 1.2rem; width: fit-content;
+        }
 
+        .card .btn-primary {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary:hover { background-color: #bb2d3b !important; border-color: #dc3545 !important; }
+
+        footer a {
+            color: #000000 !important; /* Black color */
+            text-decoration: none !important; /* Remove underline */
+        }
+        footer a:hover { color: #dc3545 !important; }
         .form-control { background-color: #1e1e1e; color: #e0e0e0; border: 1px solid #6c757d; }
         .form-control:focus { outline: none !important; box-shadow: none !important; border-color: #ced4da !important; /* optional: fallback border */}
 
@@ -47,6 +64,8 @@
         .hero { background-image: url('/img/displayPage.jpg'); background-size: cover; background-position: center; height: 100vh; }
         .card { height: 100%; }
         .card-body { min-height: 180px; }
+
+        
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])

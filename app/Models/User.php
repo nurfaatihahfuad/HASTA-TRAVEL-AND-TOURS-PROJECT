@@ -169,6 +169,12 @@ class User extends Authenticatable
         return $this->userType;
     }
 
+    // Relationship to Admin
+    public function admin()
+    {
+        return $this->hasOne(Admin::class, 'adminID', 'userID');
+    }
+
     // Booking
     public function bookings()
     {

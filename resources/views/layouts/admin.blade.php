@@ -12,7 +12,7 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Chart.js (if needed) -->
     @stack('styles')
     
@@ -154,8 +154,13 @@
             </a>
             
             <a class="sidebar-link @if(str_contains($currentRoute, 'staff.')) active @endif" 
-               href="{{ route('staff.dashboard') }}">
+               href="{{ route('staff.index') }}">
                 <i class="fas fa-user-tie"></i> Staff Management
+            </a>
+
+            <a class="sidebar-link @if(str_contains($currentRoute, 'admins.')) active @endif" 
+               href="{{ route('admins.index') }}">
+                <i class='fas fa-user-shield'></i> Admin Management
             </a>
             
             <a class="sidebar-link" href="#">
