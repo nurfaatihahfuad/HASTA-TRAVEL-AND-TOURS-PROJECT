@@ -54,9 +54,13 @@ Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
 Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff.dashboard');
-/*
+
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
+    ->name('customer.dashboard');
+
+/*
+Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
     ->middleware('auth')
     ->name('admin.dashboard');
 
@@ -67,6 +71,7 @@ Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware('auth')
     ->name('customer.dashboard');*/
+
 
 // Protected routes (auth required)
 Route::middleware('auth')->group(function () {
@@ -107,6 +112,7 @@ Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.
 // Staff action: approve or reject a specific payment
 Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
+
 // Staff Management Routes (Admin only)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->group(function () {
     Route::get('/staff', [StaffController::class, 'index'])->name('index');
@@ -117,6 +123,5 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->grou
     Route::put('/staff/{id}', [StaffController::class, 'update'])->name('update');
     Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('destroy');
 });
-
 
 //require __DIR__.'/auth.php';
