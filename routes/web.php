@@ -122,7 +122,7 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
         Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('edit');
         Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
         Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
-    });
+    })
 
 //require __DIR__.'/auth.php';
 
