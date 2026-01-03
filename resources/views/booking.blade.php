@@ -8,13 +8,17 @@
 </head>
 <body>
 
-    <div class="booking-container">
-    <h1>Book Your Car</h1>
+    
 
-    <div class="booking-content">
+        <div class ="booking-container"
+        <div class="booking-content">
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
+
+            <div class="booking-box"> 
+            <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2> 
+            </div>
 
             <div>
             <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
@@ -37,15 +41,15 @@
 
 
             <div class="form-group">
-                <label for="pickup_location">Pick-up Location: <span style="color:red">*</span></label>
+                <label for="pickup_location">Pick-up Location: (Can be change)<span style="color:red">*</span></label>
                 <input type="text" name="pickupAddress" value="UTM Mall" required>
             </div>
 
             <div class="form-group">
-                <label for="return_location">Return Location: <span style="color:red">*</span></label>
+                <label for="return_location">Return Location: (Can be change)<span style="color:red">*</span></label>
                 <input type="text" name="returnAddress" value="UTM Mall" required>
             </div>
-
+    
             <div class="form-group">
                 <label for="voucherCode">Voucher Code:</label>
                 <input type="text" name="voucherCode">
@@ -70,7 +74,10 @@
                 <li>❌ No smoking</li>
             </ul>
         </div>
-@endif
+        @endif
+    </div>
+</div>
+
 
 </body>
 </html>
