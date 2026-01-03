@@ -3,28 +3,28 @@
 @section('content')
 
 {{-- HERO SECTION --}}
-{{-- HERO SECTION --}}
 <section class="hero d-flex flex-column justify-content-center align-items-center text-white text-center">
     <h1 class="display-4 fw-bold">Rent a vehicle with HastaTravel</h1>
     <p class="lead">Convenient vehicle rentals in UTM, Skudai</p>
 
     <form action="{{ route('vehicles.search') }}" method="GET" class="bg-white p-4 rounded shadow mt-4" style="max-width: 500px; width: 100%;">
         <div class="mb-3 text-start">
-        <label for="pickup_dateTime" class="form-label fw-bold text-dark">Pick-up Date & Time</label>
-            <input type="datetime-local" name="pickup_dateTime" class="form-control" required>
+            <label for="pickup_dateTime" class="form-label fw-bold text-dark">Pick-up Date & Time</label>
+            <input type="datetime-local" name="pickup_dateTime" class="form-control bg-white text-dark border-dark" required>
         </div>
 
         <div class="mb-3 text-start">
-        <label for="return_dateTime" class="form-label fw-bold text-dark">Return Date & Time</label>
-            <input type="datetime-local" name="return_dateTime" class="form-control" required>
+            <label for="return_dateTime" class="form-label fw-bold text-dark">Return Date & Time</label>
+            <input type="datetime-local" name="return_dateTime" class="form-control bg-white text-dark border-dark" required>
         </div>
 
         <div class="text-center">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-danger">
                 <i class="bi bi-search"></i> Search
             </button>
         </div>
     </form>
+
 
     <div class="mt-3 text-white text-center">
       <h4 class="display-5 fw-bold text-white" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
