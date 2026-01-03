@@ -9,6 +9,7 @@
 </head>
 <body>
 
+    <div class="payment-details-box">
     <div class="payment-card">
         <h1>Please Scan the QR Payment</h1>
 
