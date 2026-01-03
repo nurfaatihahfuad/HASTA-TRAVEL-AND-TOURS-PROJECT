@@ -14,8 +14,6 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\verifypaymentController;
 
 use App\Http\Controllers\CustomerRegistrationController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\AdminController;
 
 
 // Welcome page guna VehicleController@preview
@@ -47,9 +45,9 @@ Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 // Logout
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-//login route to dashboard  
-/*  
+//login route to dashboard    
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+
     ->middleware('auth')
     ->name('admin.dashboard');
 
@@ -59,30 +57,8 @@ Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware('auth')
-    ->middleware(['auth', RoleMiddleware::class.':admin'])
-    ->name('admin.dashboard');
-*/
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware(['auth', RoleMiddleware::class.':staff'])
-    ->name('staff.dashboard');
 
-Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
-
-/*
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('admin.dashboard');
-
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('staff.dashboard');
-
-Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware('auth')
-    ->name('customer.dashboard');*/
-
 
 // Protected routes (auth required)
     Route::middleware('auth')->group(function () {
@@ -99,13 +75,13 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
 });
 
 // Booking form without vehicle (optional)
-    Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.cars');
     Route::get('/book-car/{vehicleID}', [BookingController::class, 'create'])->name('booking.form');
     Route::post('/book-car',  [BookingController::class, 'store'])->name('booking.store');
 
     // Payment routes
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
+
 
     // Staff dashboard: list all payments
     Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
@@ -114,35 +90,9 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
 
     //require __DIR__.'/auth.php';
 
-// Payment routes
-Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
-Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
-// Staff dashboard: list all payments
-Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-// Staff action: approve or reject a specific payment
-Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+    // Staff dashboard: list all payments
+    Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
+    // Staff action: approve or reject a specific payment
+    Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
-
-// Staff Management Routes (Admin only)
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->group(function () {
-    Route::get('/staff', [StaffController::class, 'index'])->name('index');
-    Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
-    Route::post('/staff', [StaffController::class, 'store'])->name('store');
-    Route::get('/staff/{id}', [StaffController::class, 'show'])->name('show');
-    Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])->name('edit');
-    Route::put('/staff/{id}', [StaffController::class, 'update'])->name('update');
-    Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('destroy');
-});
-
-// Admin Management Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admins.')->group(function () {
-    Route::get('/admins', [AdminController::class, 'index'])->name('index');
-    Route::get('/admins/create', [AdminController::class, 'create'])->name('create');
-    Route::post('/admins', [AdminController::class, 'store'])->name('store');
-    Route::get('/admins/{id}', [AdminController::class, 'show'])->name('show');
-    Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('edit');
-    Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
-    Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
-});
-
-//require __DIR__.'/auth.php';
+    //require DIR.'/auth.php';

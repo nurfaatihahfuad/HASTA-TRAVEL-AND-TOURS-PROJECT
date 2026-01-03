@@ -32,4 +32,3 @@ class Booking extends Model
         return $this->belongsTo(Vehicle::class);
     }
 }
-

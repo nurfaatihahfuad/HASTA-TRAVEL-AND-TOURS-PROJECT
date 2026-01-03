@@ -10,7 +10,7 @@
 
     
 
-        <div class ="booking-container"
+        <div class ="booking-container" >
         <div class="booking-content">
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
