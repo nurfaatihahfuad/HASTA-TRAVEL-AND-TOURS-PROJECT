@@ -88,4 +88,28 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     // Staff action: approve or reject a specific payment
     Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
+    // Staff Management Routes (Admin only)
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->group(function () {
+        Route::get('/staff', [StaffController::class, 'index'])->name('index');
+        Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
+        Route::post('/staff', [StaffController::class, 'store'])->name('store');
+        Route::get('/staff/{id}', [StaffController::class, 'show'])->name('show');
+        Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])->name('edit');
+        Route::put('/staff/{id}', [StaffController::class, 'update'])->name('update');
+        Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('destroy');
+    });
+
+    // Admin Management Routes
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admins.')->group(function () {
+        Route::get('/admins', [AdminController::class, 'index'])->name('index');
+        Route::get('/admins/create', [AdminController::class, 'create'])->name('create');
+        Route::post('/admins', [AdminController::class, 'store'])->name('store');
+        Route::get('/admins/{id}', [AdminController::class, 'show'])->name('show');
+        Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('edit');
+        Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
+        Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
+    });
+
+//require __DIR__.'/auth.php';
+
     //require DIR.'/auth.php';
