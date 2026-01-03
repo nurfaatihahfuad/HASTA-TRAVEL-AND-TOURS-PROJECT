@@ -46,7 +46,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 //login route to dashboard 
-/*   
+
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
 
     ->middleware('auth')
@@ -61,7 +61,7 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
 
     ->name('customer.dashboard');
 
-*/
+
 Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
     ->middleware('auth')
     ->name('admin.dashboard');
