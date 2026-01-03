@@ -30,4 +30,10 @@ class Staff extends Model
     {
         return $this->belongsTo(User::class, 'staffID', 'userID');
     }
+
+    // Relationship to verificationDocs
+    public function document()
+    {
+        return $this->hasOne(VerificationDocs::class, 'staffID', 'verified_by');
+    }
 }

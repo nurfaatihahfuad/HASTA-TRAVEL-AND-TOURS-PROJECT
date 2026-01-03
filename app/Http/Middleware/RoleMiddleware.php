@@ -52,12 +52,11 @@ class RoleMiddleware
                 if ($user->staff) {
                     // Redirect to appropriate staff dashboard
                     if ($user->staff->staffRole === 'salesperson') {
-                        return redirect('/salesperson/dashboard');
+                        return redirect('/staff_salesperson/dashboard');
                     } elseif ($user->staff->staffRole === 'runner') {
-                        return redirect('/runner/dashboard');
+                        return redirect('/staff_runner/dashboard');
                     }
                 }
-                return redirect('/staff/dashboard');
             case 'customer':
                 return redirect('/customer/dashboard');
 

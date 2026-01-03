@@ -59,98 +59,75 @@ class DashboardController extends Controller
     // ============================
     public function staff()
     {
-
-        /*
-        $userId = auth()->user()->userId; // ambil ID staff dari login
-
-
-        // Assigned bookings
-        $booking = DB::table('booking')->where('staffID', $userId)->get();
-
-        // KPI cards
-
-        // 1. Semua booking yang assigned pada staff ini
-        $booking = DB::table('booking')->where('staffID', $userId)->get();
-
-        // 2. KPI cards
-
-        $userId = auth()->user()->userId; // ambil ID staff dari login
-
-        // 1. Semua booking yang assigned pada staff ini
-        $bookings = DB::table('booking')->where('staffID', $userId)->get();
-
-        // 2. KPI cards
-        $assignedToday = DB::table('booking')
-            ->where('staffID', $userId)
-            ->whereDate('created_at', now())
-            ->count(); // booking assigned hari ini
-
-        $pendingPayments = DB::table('payment')
-            ->where('staffID', $userId)
-
-            ->where('bookingStatus', 'pending')
-
-            ->count(); // payment pending
-
-        $damageCases = DB::table('damage_case') // sesuaikan table nama plural/singular
-            ->where('staffID', $userId)
-            ->count();
-
-        // 3. Weekly productivity chart (contoh data)
-        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-        $weeklyData   = [3, 6, 5, 7, 4, 2, 8];
-
-
-        // Status pie (for staff’s assigned bookings)
-
-        // 4. Booking status pie chart untuk staff
-
-        $statusCancelled = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'booked')->count();
-        $statusPending   = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'pending')->count();
-
-
-        return view('dashboard.staff', compact(
-            'booking',
-            'assignedToday',
-            'pendingPayments',
-            'damageCases',
-            'weeklyLabels',
-            'weeklyData',
-            'statusCancelled',
-            'statusBooked',
-            'statusPending'
-        ));*/
         $user = auth()->user();
+        if (!$user->staff) {
+            // fallback if no staff record
+            return view('dashboard.staff', [
+                'role'            => null,
+                'bookings'        => collect(),
+                'assignedToday'   => 0,
+                'pendingPayments' => 0,
+                'damageCases'     => 0,
+                'statusCancelled' => 0,
+                'statusBooked'    => 0,
+                'statusPending'   => 0,
+                'weeklyLabels'    => ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                'weeklyData'      => [0,0,0,0,0,0,0],
+            ]);
+        }
 
-if ($user->staffProfile) {
-    $staffID = $user->staffProfile->staffID;
+        $staffID = $user->staff->staffID;
+        $role    = $user->staff->staffRole;
 
-    $bookings = DB::table('booking')->where('staffID', $staffID)->get();
-    $assignedToday = DB::table('booking')->where('staffID', $staffID)->whereDate('created_at', now())->count();
-    $pendingPayments = DB::table('payment')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
-    $damageCases = DB::table('damage_case')->where('staffID', $staffID)->count();
-    $statusCancelled = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'cancelled')->count();
-    $statusBooked = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'booked')->count();
-    $statusPending = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
-} else {
-    $bookings = collect();
-    $assignedToday = 0;
-    $pendingPayments = 0;
-    $damageCases = 0;
-    $statusCancelled = 0;
-    $statusBooked = 0;
-    $statusPending = 0;
-}
+        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        $weeklyData   = [3,6,5,7,4,2,8]; // should calculate booking count for every day in current week
 
-// Example chart data
-$weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-$weeklyData   = [3,6,5,7,4,2,8];
+        if($user->isSalesperson()) {
+            // Salesperson metrics
+            $bookings        = DB::table('booking')->get();
+            //$assignedToday   = DB::table('booking')->where('staffID', $staffID)->whereDate('created_at', now())->count();
+            //$pendingPayments = DB::table('payment')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
 
-return view('dashboard.staff', compact(
-    'bookings','assignedToday','pendingPayments','damageCases',
-    'weeklyLabels','weeklyData','statusCancelled','statusBooked','statusPending'
-));
+            $statusCancelled = DB::table('booking')->where('bookingStatus', 'cancelled')->count();
+            $statusBooked    = DB::table('booking')->where('bookingStatus', 'booked')->count();
+            $statusPending   = DB::table('booking')->where('bookingStatus', 'pending')->count();
+
+            return view('dashboard.staff_salesperson', compact(
+                'role','bookings','statusCancelled','statusBooked','statusPending',
+                'weeklyLabels','weeklyData'
+            ));
+        }
+
+        if ($user->isRunner()) {
+            // Runner metrics
+            $bookings      = DB::table('booking')->where('staffID', $staffID)->get();
+            $assignedToday = DB::table('booking')->where('staffID', $staffID)->whereDate('created_at', now())->count();
+            $damageCases   = DB::table('damage_case')->where('staffID', $staffID)->count();
+
+            $statusCancelled = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'cancelled')->count();
+            $statusBooked    = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'booked')->count();
+            $statusPending   = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
+
+            return view('dashboard.staff_runner', compact(
+                'role','bookings','assignedToday','damageCases',
+                'statusCancelled','statusBooked','statusPending',
+                'weeklyLabels','weeklyData'
+            ));
+        }
+
+        // fallback if role not recognized
+        return view('dashboard.staff', [
+            'role'            => $role,
+            'bookings'        => collect(),
+            'assignedToday'   => 0,
+            'pendingPayments' => 0,
+            'damageCases'     => 0,
+            'statusCancelled' => 0,
+            'statusBooked'    => 0,
+            'statusPending'   => 0,
+            'weeklyLabels'    => $weeklyLabels,
+            'weeklyData'      => $weeklyData,
+        ]);
 
     }
 

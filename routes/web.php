@@ -10,6 +10,8 @@ use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\AdminController;
 
 use App\Http\Controllers\verifypaymentController;
 
@@ -18,7 +20,7 @@ use App\Http\Controllers\CustomerRegistrationController;
 
 // Welcome page guna VehicleController@preview
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
-Route::get('/search', [VehicleController::class, 'search'])->name('vehicles.search');
+Route::get('/vehicles/search', [VehicleController::class, 'search'])->name('vehicles.search');
 
 // Browse-car boleh diakses tanpa login
 Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.vehicle');
@@ -46,33 +48,32 @@ Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 //login route to dashboard 
-
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
-
-    ->middleware('auth')
+    ->middleware(['auth', RoleMiddleware::class.':admin'])
     ->name('admin.dashboard');
 
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('staff.dashboard');
+/*Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff.dashboard');*/
+
+Route::get('/staff_salesperson/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff_salesperson.dashboard');
+
+Route::get('/staff_runner/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff_runner.dashboard');
+
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware('auth')
-
+    ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
 
-
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('admin.dashboard');
-
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('staff.dashboard');
-
-Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware('auth')
-    ->name('customer.dashboard');
+// Booking routes (customer mesti login sebelum boleh book)
+Route::middleware('auth')->group(function () {
+    Route::get('/book-car/{vehicleID}', [BookingController::class, 'create'])->name('booking.form');
+    Route::post('/book-car', [BookingController::class, 'store'])->name('booking.store');
+});
 
 // Protected routes (auth required)
     Route::middleware('auth')->group(function () {
@@ -87,10 +88,6 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     // Browse cars
     Route::get('browse', [CarController::class, 'index'])->name('browse.cars');   
 });
-
-// Booking form without vehicle (optional)
-    Route::get('/book-car/{vehicleID}', [BookingController::class, 'create'])->name('booking.form');
-    Route::post('/book-car',  [BookingController::class, 'store'])->name('booking.store');
 
     // Payment routes
     Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
