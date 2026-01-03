@@ -23,18 +23,16 @@
 
     <div class="d-flex justify-content-center" style="position:relative; center">
       <p class="mt-3 fs-5" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
-
         Affordable Vehicles.<br>Unforgettable Trips.
       </p>
-
-    <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
-
-
-
-    <!-- Rent Now button -->
-    <div class="text-center mt-4">
-        <a href="{{ url('/login') }}" class="btn btn-primary btn-lg">Rent Now</a>
     </div>
+
+    <!-- Rent Now button (contoh: direct ke kereta pertama) -->
+    @if($vehicles->count() > 0)
+      <div class="text-center mt-4">
+          <a href="{{ route('booking.form', $vehicles->first()->vehicleID) }}" class="btn btn-primary btn-lg">Rent Now</a>
+      </div>
+    @endif
 </section>
 
 {{-- CARS SECTION --}}
@@ -48,14 +46,17 @@
         <div class="col-md-4 col-sm-6">
           <div class="card shadow-sm rounded-3 p-3">
             @if($vehicle->image_url)
-              <img src="{{ asset('img/' . $vehicle->image_url) }}" class="card-img-top" alt="{{ $vehicle->brand }} {{ $vehicle->model }}">
+              <img src="{{ asset('img/' . $vehicle->image_url) }}" class="card-img-top" alt="{{ $vehicle->vehicleName }}">
             @else
               <img src="{{ asset('img/default-car.png') }}" class="card-img-top" alt="Default Car">
             @endif
             <div class="card-body text-center">
-              <h5 class="card-title fw-bold">{{ $vehicle->brand }} {{ $vehicle->model }}</h5>
+              <h5 class="card-title fw-bold">{{ $vehicle->vehicleName }}</h5>
+              <p class="card-text text-muted">Plate No: {{ $vehicle->plateNo }}</p>
               <p class="card-text text-muted">{{ $vehicle->description }}</p>
-              <a href="{{ route ('booking.form' , $vehicle-> vehicleID)  }}" class="btn btn-primary">Book Now</a>
+
+              <p class="card-text fw-bold">RM{{ $vehicle->price_per_day }}/hour</p>
+              <a href="{{ route('booking.form', $vehicle->vehicleID) }}" class="btn btn-primary">Book Now</a>
             </div>
           </div>
         </div>
@@ -64,10 +65,9 @@
 
     <!-- View More button -->
     <div class="text-center mt-5">
-      <a href="{{ url('/browseVehicle') }}" class="btn btn-lg btn-primary">View More</a>
+      <a href="{{ route('browse.vehicle') }}" class="btn btn-lg btn-primary">View More</a>
     </div>
   </div>
 </section>
-
 
 @endsection

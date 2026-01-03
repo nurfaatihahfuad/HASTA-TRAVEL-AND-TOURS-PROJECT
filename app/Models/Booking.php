@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Booking extends Model
 {
@@ -17,8 +18,8 @@ class Booking extends Model
         'returnAddress',
         'voucherCode',
         'bookingStatus',
-        'quantity',
-        'created_at' , 'updated_at',
+        'created_at', 
+        'updated_at',
     ];
 
     public function user() 
@@ -31,4 +32,3 @@ class Booking extends Model
         return $this->belongsTo(Vehicle::class);
     }
 }
-
