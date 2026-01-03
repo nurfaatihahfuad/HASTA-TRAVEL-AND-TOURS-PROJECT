@@ -7,15 +7,15 @@
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
 </head>
 <body>
-
-    <div class="reg-bg-primary text-white py-6 px-8">
-        <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2>
-    </div>
-
+        <div class="booking-container">
         <div class="booking-content">
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
+            
+            <div class="booking-box"> 
+                <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2> 
+            </div>
 
             <div>
             <input type="hidden" name="userID" value="{{ auth()->id() }}">
