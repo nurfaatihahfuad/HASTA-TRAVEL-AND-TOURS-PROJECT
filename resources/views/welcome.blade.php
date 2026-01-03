@@ -1,5 +1,6 @@
 @extends('layouts.app')
 
+
 @section('content')
 
 {{-- HERO SECTION --}}
@@ -21,17 +22,14 @@
       </h4>
     </div>
 
-    <div class="d-flex justify-content-center" style="position:relative; left:100px;">
+    <div class="d-flex justify-content-center" style="position:relative; center;">
       <p class="mt-3 fs-5" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
-
-
-      
         Affordable Vehicles.<br>Unforgettable Trips.
       </p>
 
     <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
 
-    <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
+    <!--<div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
 
       <div class="carousel-caption">
         <h1 class="display-4 fw-bold">Reliable & Safe</h1>
@@ -65,7 +63,7 @@
         Affordable Vehicles.<br>Unforgettable Trips.
       </p>
 
-    </div>
+    </div>-->
 
     <!-- Rent Now button -->
     <div class="text-center mt-4">
@@ -100,7 +98,7 @@
 
     <!-- View More button -->
     <div class="text-center mt-5">
-      <a href="{{ url('/browseVehicle') }}" class="btn btn-lg btn-primary">View More</a>
+      <a href="{{ url('/browseVehicle') }}" class="btn btn-lg btn-view-more">View More</a>
     </div>
   </div>
 </section>

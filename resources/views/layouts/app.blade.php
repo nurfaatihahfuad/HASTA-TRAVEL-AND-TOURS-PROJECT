@@ -20,11 +20,14 @@
 
     <!-- Custom CSS -->
     <style>
-        
         body { background-color: #f7f6f5; color: #212529; }
         .navbar, footer { background-color: #fff8f5; }
         .navbar .nav-link:hover, .navbar .dropdown-item:hover { color: #dc3545 !important; }
-        footer a:hover { color: #dc3545; text-decoration: underline; }
+        footer a {
+            color: #000000 !important; /* Black color */
+            text-decoration: none !important; /* Remove underline */
+        }
+        footer a:hover { color: #dc3545 !important; text-decoration: underline; }
         footer small { color: #6c757d; }
 
         .carousel-item { height: 70vh; background-size: cover; background-position: center; position: relative; }
@@ -36,9 +39,22 @@
         .card .card-title, .card .card-text { color: #212529; }
         .card-img-top { width: 100%; height: auto; max-height: 160px; object-fit: scale-down; border-radius: 0.5rem;}
 
-        .btn-primary { background-color: #dc3545; border-color: #dc3545; transition: all 0.3s ease; padding: 0.4rem 0.6rem; /* atas-bawah = 0.4rem, kiri-kanan = 0.6rem */ font-size: 0.85rem; width: fit-content;}
-        .btn-primary:hover { background-color: #bb2d3b; border-color: #dc3545; }
+        .btn-primary { 
+            background-color: #dc3545 !important; 
+            border-color: #dc3545 !important; 
+            transition: all 0.3s ease; 
+            padding: 0.4rem 0.8rem; /* atas-bawah = 0.4rem, kiri-kanan = 0.6rem */ 
+            font-size: 1.2rem; width: fit-content;
+        }
 
+        .card .btn-primary {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary:hover { background-color: #bb2d3b !important; border-color: #dc3545 !important; }
+
+        
         .form-control { background-color: #1e1e1e; color: #e0e0e0; border: 1px solid #6c757d; }
         .form-control:focus { outline: none !important; box-shadow: none !important; border-color: #ced4da !important; /* optional: fallback border */}
 
@@ -47,6 +63,47 @@
         .hero { background-image: url('/img/displayPage.jpg'); background-size: cover; background-position: center; height: 100vh; }
         .card { height: 100%; }
         .card-body { min-height: 180px; }
+
+        /* Add this to your app.blade.php CSS section */
+
+        /* Ensure navbar expands properly on large screens */
+        @media (min-width: 992px) {
+            .navbar-expand-lg .navbar-collapse {
+                display: flex !important;
+                flex-basis: auto;
+            }
+            
+            .navbar-expand-lg .navbar-toggler {
+                display: none;
+            }
+        }
+
+        /* Ensure navbar items are visible */
+        .navbar-nav {
+            display: flex;
+            flex-direction: row;
+            list-style: none;
+        }
+
+        /* Make sure nav links are visible */
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            padding: 0.5rem 1rem !important;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        /* Make dropdown menu visible */
+        .dropdown-menu {
+            display: none; /* Let Bootstrap handle this */
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block; /* Show on hover */
+        }
+        
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -67,6 +124,7 @@
 
     </div>
 
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Chart.js -->
