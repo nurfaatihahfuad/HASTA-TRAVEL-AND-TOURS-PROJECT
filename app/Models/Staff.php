@@ -17,7 +17,12 @@ class Staff extends Model
     
     protected $fillable = [
         'staffID',
-        'staffRole'
+        'staffRole',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     // Relationship back to User
