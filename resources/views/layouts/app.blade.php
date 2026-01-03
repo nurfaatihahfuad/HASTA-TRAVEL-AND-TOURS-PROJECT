@@ -20,14 +20,11 @@
 
     <!-- Custom CSS -->
     <style>
+        
         body { background-color: #f7f6f5; color: #212529; }
         .navbar, footer { background-color: #fff8f5; }
         .navbar .nav-link:hover, .navbar .dropdown-item:hover { color: #dc3545 !important; }
-        footer a {
-            color: #000000 !important; /* Black color */
-            text-decoration: none !important; /* Remove underline */
-        }
-        footer a:hover { color: #dc3545 !important; text-decoration: underline; }
+        footer a:hover { color: #dc3545; text-decoration: underline; }
         footer small { color: #6c757d; }
 
         .carousel-item { height: 70vh; background-size: cover; background-position: center; position: relative; }
@@ -54,7 +51,11 @@
 
         .btn-primary:hover { background-color: #bb2d3b !important; border-color: #dc3545 !important; }
 
-        
+        footer a {
+            color: #000000 !important; /* Black color */
+            text-decoration: none !important; /* Remove underline */
+        }
+        footer a:hover { color: #dc3545 !important; }
         .form-control { background-color: #1e1e1e; color: #e0e0e0; border: 1px solid #6c757d; }
         .form-control:focus { outline: none !important; box-shadow: none !important; border-color: #ced4da !important; /* optional: fallback border */}
 
@@ -85,7 +86,6 @@
 
     </div>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Chart.js -->
