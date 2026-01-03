@@ -64,45 +64,6 @@
         .card { height: 100%; }
         .card-body { min-height: 180px; }
 
-        /* Add this to your app.blade.php CSS section */
-
-        /* Ensure navbar expands properly on large screens */
-        @media (min-width: 992px) {
-            .navbar-expand-lg .navbar-collapse {
-                display: flex !important;
-                flex-basis: auto;
-            }
-            
-            .navbar-expand-lg .navbar-toggler {
-                display: none;
-            }
-        }
-
-        /* Ensure navbar items are visible */
-        .navbar-nav {
-            display: flex;
-            flex-direction: row;
-            list-style: none;
-        }
-
-        /* Make sure nav links are visible */
-        .nav-link {
-            color: rgba(255, 255, 255, 0.85) !important;
-            padding: 0.5rem 1rem !important;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-        }
-
-        /* Make dropdown menu visible */
-        .dropdown-menu {
-            display: none; /* Let Bootstrap handle this */
-        }
-
-        .dropdown:hover .dropdown-menu {
-            display: block; /* Show on hover */
-        }
         
     </style>
 

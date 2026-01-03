@@ -98,7 +98,7 @@
 
     <!-- View More button -->
     <div class="text-center mt-5">
-      <a href="{{ url('/browseVehicle') }}" class="btn btn-lg btn-view-more">View More</a>
+      <a href="{{ url('/browseVehicle') }}" class="btn btn-lg btn-primary">View More</a>
     </div>
   </div>
 </section>
