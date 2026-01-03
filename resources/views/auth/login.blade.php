@@ -22,7 +22,7 @@
                 <div class="input-group">
                     <label for="email">E-mail</label>
                     <input type="email" id="email" name="email" placeholder="Enter your e-mail"
-                           value="{{ old('email') }}" required autofocus autocomplete="username">
+                        value="" required autofocus autocomplete="username">
                     @error('email')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror

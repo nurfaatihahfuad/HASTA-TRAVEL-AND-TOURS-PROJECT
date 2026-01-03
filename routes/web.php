@@ -86,7 +86,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('crud', CRUDController::class);
 
     // Browse cars
-    Route::get('browse', [CarController::class, 'index'])->name('browse.cars');   
+    //Route::get('browse', [CarController::class, 'index'])->name('browse.cars');   
 });
 
     // Payment routes

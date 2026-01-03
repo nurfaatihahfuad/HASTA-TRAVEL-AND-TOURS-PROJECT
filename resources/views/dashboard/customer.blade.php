@@ -12,7 +12,7 @@
             <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Booking History</a>
             <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Profile</a>
             <a href="#" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
-            <a href="{{ route('browse.cars') }}" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Book Now</a>
+            <a href="{{ route('browse.vehicle') }}" class="block px-6 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Book Now</a>
             <form method="POST" action="{{ route('logout') }}" class="px-6 py-2">
                 @csrf
                 <button type="submit" class="w-full text-left text-red-600 hover:bg-red-100 dark:hover:bg-red-700 rounded">
