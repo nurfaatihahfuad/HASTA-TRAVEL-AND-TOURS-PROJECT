@@ -59,6 +59,7 @@
               <h5 class="card-title fw-bold">{{ $vehicle->vehicleName }}</h5>
               <p class="card-text text-muted">Plate No: {{ $vehicle->plateNo }}</p>
               <p class="card-text text-muted">{{ $vehicle->description }}</p>
+
               <p class="card-text fw-bold">RM{{ $vehicle->price_per_day }}/hour</p>
               <a href="{{ route('booking.form', $vehicle->vehicleID) }}" class="btn btn-primary">Book Now</a>
             </div>
