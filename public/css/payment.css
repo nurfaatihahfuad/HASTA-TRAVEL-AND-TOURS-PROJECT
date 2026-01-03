@@ -15,12 +15,12 @@ body {
 }
 
 .payment-details-box { 
-    border: 2px solid #ccc; 
+    border: none;
     border-radius: 12px; 
     padding: 25px 30px; 
-    background-color: rgba(255, 255, 255, 0.9); /* tembus sikit */ 
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); 
-    margin-top: 30px; 
+    background-color: transparent;
+    box-shadow: none; 
+    margin-top: 30px;
 }
 
 .payment-card {
@@ -32,8 +32,6 @@ body {
     max-width: none;
     text-align: center;
     background-color: rgba(255, 255, 255, 0.6); 
-    backdrop-filter: blur(8px); /* kaburkan background belakang */ 
-    -webkit-backdrop-filter: blur(8px); /* untuk Safari */
 }
 
 h1 {

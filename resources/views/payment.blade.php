@@ -16,9 +16,7 @@
         <div class="qr-section">
             <img src="{{ asset('img/payment.png') }}" class="qr-small" alt="QR Payment">
             <p>MALAYSIA NATIONAL QR</p>
-        </div>
-
-        <div class="payment-summary">
+        
             <h3>Booking Summary</h3>
             <p>Car: {{ $vehicle['brand'] }} {{ $vehicle['model'] }} | Total Hours: {{ $totalHours }}</p>
             <p>Total Payment: RM{{ $totalPayment }}</p>
