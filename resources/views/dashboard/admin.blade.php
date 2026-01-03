@@ -3,7 +3,9 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
+
 <!-- Metrics -->
+<h3 class="mb-4">Welcome, {{ auth()->user()->name }}</h3>
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="metric-card">

@@ -34,6 +34,12 @@ class Customer extends Model
     {
         return $this->hasOne(StaffCustomer::class, 'userID', 'userID');
     }
+
+    // for salesperson to verify documents
+    public function verificationDocs()
+    {
+        return $this->hasOne(VerificationDocs::class, 'userID','userID');
+    }
     
     // Dynamic relationship based on type
     public function specificCustomer()

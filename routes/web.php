@@ -10,6 +10,8 @@ use App\Http\Controllers\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\AdminController;
 
 use App\Http\Controllers\verifypaymentController;
 

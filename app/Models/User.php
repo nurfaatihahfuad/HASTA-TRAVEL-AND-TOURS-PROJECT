@@ -118,12 +118,6 @@ class User extends Authenticatable
         ];
     }
 
-    // for salesperson to verify documents
-    public function verificationDocs()
-    {
-        return $this->hasOne(VerificationDocs::class, 'userID','userID');
-    }
-
     // relationship with Staff
     public function staff()
     {
