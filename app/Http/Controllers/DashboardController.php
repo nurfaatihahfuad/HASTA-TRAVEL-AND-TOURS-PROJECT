@@ -13,7 +13,9 @@ class DashboardController extends Controller
     {
         // 1. High-level metrics
         $newBookings    = DB::table('booking')->whereDate('created_at', now())->count(); // booking baru hari ini
+
         $rentedCars     = DB::table('booking')->where('bookingStatus', 'booked')->count();      // jumlah kereta sedang disewa
+
         $availableCars  = DB::table('vehicles')->where('available', 1)->count();         // kereta available
 
         // 2. Weekly booking bar chart (Mon..Sun) - contoh data statik
@@ -64,7 +66,7 @@ class DashboardController extends Controller
         // KPI cards
 
         // 1. Semua booking yang assigned pada staff ini
-        $bookings = DB::table('booking')->where('staffID', $userId)->get();
+        $booking = DB::table('booking')->where('staffID', $userId)->get();
 
         // 2. KPI cards
 
@@ -115,16 +117,16 @@ class DashboardController extends Controller
     {
 
         $userId   = auth()->user()->userID;
-        $bookings = DB::table('booking')->where('userID', $userId)->get();
+        $booking = DB::table('booking')->where('userID', $userId)->get();
 
         $userId = auth()->user()->userId; // ambil ID customer dari login
 
         // 1. Ambil semua booking customer
-        $bookings = DB::table('booking')->where('userID', $userId)->get();
+        $booking = DB::table('booking')->where('userID', $userId)->get();
 
         // 2. Total metrics
-        $totalBookings = $bookings->count();           // jumlah booking customer
-        $totalDays     = $bookings->sum('days_rented'); // jumlah hari sewa
+        $totalBookings = $booking->count();           // jumlah booking customer
+        $totalDays     = $booking->sum('days_rented'); // jumlah hari sewa
 
         // 3. Most rented car model
         $mostCar = $bookings

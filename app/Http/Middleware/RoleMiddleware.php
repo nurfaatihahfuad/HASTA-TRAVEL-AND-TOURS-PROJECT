@@ -66,5 +66,14 @@ class RoleMiddleware
                 return redirect('/login')->withErrors(['role' => 'Invalid user role']);
         }
 
+            return redirect()->route('login');
+        }
+
+        if (Auth::user()->userType !== $role) {
+            abort(403, 'Unauthorized');
+        }
+
+        return $next($request);
+
     }
-}
+
