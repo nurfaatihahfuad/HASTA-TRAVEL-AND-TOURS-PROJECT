@@ -15,7 +15,7 @@ class CarController extends Controller
             ['name' => 'Proton Saga', 'seats' => 5, 'image' => 'car3.png'],
         ];
 
-        return view('browse');
+        return view('browseVehicles');
     }
 }
 
