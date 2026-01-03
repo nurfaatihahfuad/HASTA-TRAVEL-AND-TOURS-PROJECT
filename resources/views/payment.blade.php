@@ -17,25 +17,46 @@
             <p>MALAYSIA NATIONAL QR</p>
         </div>
 
-        <form action="{{ route('payment.submit', $bookingID) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-        <div class="payment-row">
-            <div class="payment-type">
-                <label>Choose Payment Type:</label>
-                <select name="paymentType" required>
-                    <option value="Deposit">Deposit Payment</option>
-                    <option value="Full">Full Payment</option>
-            </select>
-            </div>
-
-            <div class="payment-amount">
-                <label>Amount Should Paid (RM):</label>
-                <input type="number" name="amount" step="0.01" required>
-            </div>
+        <div class="payment-summary">
+            <h3>Booking Summary</h3>
+            <p>Car: {{ $vehicle['brand'] }} {{ $vehicle['model'] }} | Total Hours: {{ $totalHours }}</p>
+            <p>Total Payment: RM{{ $totalPayment }}</p>
         </div>
 
-            <label>UPLOAD PAYMENT PROOF IN PDF, JPEG OR PNG:</label>
+        {{-- Form GET untuk pilih payment type dan paparkan amount --}}
+        <form action="{{ route('payment.show') }}" method="GET">
+            <div class="payment-row">
+                <div class="payment-type">
+                    <label>Choose Payment Type:</label>
+                    <select name="paymentType" onchange="this.form.submit()">
+                        <option value="Deposit" {{ $paymentType == 'Deposit' ? 'selected' : '' }}>Deposit Payment</option>
+                        <option value="Full" {{ $paymentType == 'Full' ? 'selected' : '' }}>Full Payment</option>
+                    </select>
+                </div>
+
+                <div class="payment-amount">
+                    <label>Amount Should Pay (RM):</label>
+                    <p class="amount-display">
+                        @if($amountToPay !== null)
+                            RM{{ $amountToPay }}
+                        @else
+                            -
+                        @endif
+                    </p>
+                </div>
+            </div>
+            {{-- Jika tak mahu onchange (tanpa JS), buang onchange dan tambah butang ini:
+            <button type="submit" class="submit-btn">Update</button>
+            --}}
+        </form>
+
+        {{-- Form POST untuk submit payment proof + hantar pilihan/amount yang telah dikira --}}
+        <form action="{{ route('payment.submit') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="paymentType" value="{{ $paymentType }}">
+            <input type="hidden" name="amount" value="{{ $amountToPay }}">
+
+            <label>Upload Payment Proof:</label>
             <input type="file" name="payment_proof" accept=".pdf,.jpeg,.jpg,.png" required>
 
             <div class="button-group">
@@ -43,50 +64,6 @@
                 <a href="/" class="back-btn">Back</a>
             </div>
         </form>
-
-        <div class="payment-summary">
-            <h3>Booking Summary</h3>
-            <p>Total Hours: {{ $totalHours }}</p>
-            <p>Total Payment: RM{{ $totalPayment }}</p>
-        </div>  
-
-        <div class="payment-summary">
-        <h3>Booking Summary</h3>
-        <p>Total Hours: {{ $totalHours }}</p>
-        <p>Total Payment: RM{{ $totalPayment }}</p>
-        </div>
-
-        <h2>Booking Summary</h2>
-            <p>Car: {{ $vehicle->brand }} {{ $vehicle->model }}</p>
-            <p>Total Hours: {{ $totalHours }}</p>
-            <p>Total Payment: RM{{ $totalPayment }}</p>
-
-            <form action="{{ route('payment.submit') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-                <!-- Payment fields -->
-                <label>Payment Type:</label>
-                <select name="payment_type" required>
-                    <option value="Deposit">Deposit</option>
-                    <option value="Full">Full Payment</option>
-                </select>
-
-                <label>Upload Proof:</label>
-                <input type="file" name="payment_proof" required>
-
-                <!-- Hidden booking fields -->
-                <input type="hidden" name="pickup_dateTime" value="{{ $bookingData['pickup_dateTime'] }}">
-                <input type="hidden" name="return_dateTime" value="{{ $bookingData['return_dateTime'] }}">
-                <input type="hidden" name="pickupAddress" value="{{ $bookingData['pickupAddress'] }}">
-                <input type="hidden" name="returnAddress" value="{{ $bookingData['returnAddress'] }}">
-                <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
-                <input type="hidden" name="quantity" value="{{ $bookingData['quantity'] }}">
-                <input type="hidden" name="totalPayment" value="{{ $totalPayment }}">
-
-                <button type="submit">Submit Payment</button>
-            </form>
-
-
     </div>
 
 </body>

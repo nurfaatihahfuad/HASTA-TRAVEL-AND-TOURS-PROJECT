@@ -93,8 +93,8 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     Route::post('/book-car',  [BookingController::class, 'store'])->name('booking.store');
 
     // Payment routes
-    Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
+    Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
 
 
     // Staff dashboard: list all payments

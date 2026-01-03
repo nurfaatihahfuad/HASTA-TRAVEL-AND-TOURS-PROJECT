@@ -3,58 +3,61 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use App\Models\Booking;
-use App\Models\Payment;
 use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
-    // Show the payment page
-    public function show($bookingID)
+    public function show(Request $request)
     {
-        $booking = Booking::with('vehicle')->findOrFail($bookingID);
+        // Dummy data (boleh tukar ikut keperluan)
+        $vehicle = [
+            'brand' => 'Toyota',
+            'model' => 'Vios',
+            'price_per_day' => 20,
+        ];
 
-        $pickup = Carbon::parse($booking->pickup_dateTime);
-        $return = Carbon::parse($booking->return_dateTime);
+        $pickup = Carbon::parse('2026-01-03 10:00:00');
+        $return = Carbon::parse('2026-01-03 15:00:00');
         $totalHours = $pickup->diffInHours($return);
-        $totalPayment = $totalHours * $booking->vehicle->price_per_day;
+        $totalPayment = $totalHours * $vehicle['price_per_day'];
 
-        return view('payment', [
-            'booking' => $booking,
-            'bookingID' => $booking->id,
-            'totalHours' => $totalHours,
-            'totalPayment' => $totalPayment, ]
-        ); 
+        $paymentType = $request->input('paymentType'); 
+        $amountToPay = null; 
+        
+        if ($paymentType === 'Full') 
+        { 
+            $amountToPay = $totalPayment; 
+        } 
+        elseif ($paymentType === 'Deposit') 
+        { 
+            $amountToPay = 20; 
+        } 
+        return view('payment', compact('vehicle', 'totalHours', 'totalPayment', 'paymentType', 'amountToPay')); 
     }
 
-    public function submit(Request $request, $bookingID)
+    public function submit(Request $request)
     {
+        $vehicle = [
+            'brand' => 'Toyota',
+            'model' => 'Vios',
+            'price_per_day' => 20,
+        ];
+
+        $pickup = Carbon::parse('2026-01-03 10:00:00');
+        $return = Carbon::parse('2026-01-03 15:00:00');
+        $totalHours = $pickup->diffInHours($return);
+        $totalPayment = $totalHours * $vehicle['price_per_day'];
+
+        $paymentType = $request->input('paymentType');
+        $amount = $paymentType === 'Full' ? $totalPayment : 20;
+
         $request->validate([
             'paymentType' => 'required|string',
-            'payment_proof' => 'required|file|mimes:jpeg, png, pdf|max:2048',
+            'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
         ]);
 
-        $booking = Booking::findOrFail($bookingID);
-
-        $pickup = Carbon::parse($booking->pickup_dateTime);
-        $return = Carbon::parse($booking->return_dateTime);
-        $totalHours = $pickup->diffInHours($return);
-        $totalPayment = $totalHours * $booking->vehicle->price_per_day;
-
-        $path = $request->file('payment_proof')->store('payment', 'public');
-
-        Payment::create([
-            'booking_id' => $booking->id, 
-            'paymentType' => $request->paymentType,
-            'amount' => $amount, 
-            'receipt_file_path' => $path,
-            'paymentStatus' => 'Pending',
-            'userID' => auth()->id(),
-        ]);
-
-        return redirect()->route('customer.dashboard')
-            ->with('success', 'Payment submitted Successfully!');
+        return redirect()->route('payment.show', ['paymentType' => $paymentType])
+        ->with('success', "Payment submitted successfully. Amount: RM{$amount}");
     }
+
 }
