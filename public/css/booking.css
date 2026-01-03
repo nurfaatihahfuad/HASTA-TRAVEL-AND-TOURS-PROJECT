@@ -1,16 +1,25 @@
 body {
+    background-image: url("/img/registration-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+body {
     font-family: Arial, sans-serif;
     background-color: #f9f9f9;
     padding: 20px;
+    font-weight: normal;
 }
 
 .booking-container {
-    max-width: 600px;
+    max-width: 600px;   
     margin: auto;
     background: white;
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(48, 110, 64, 0.1);
 }
 
 h1, h2 {
@@ -62,7 +71,7 @@ select {
 .submit-btn {
     width: 100%;
     padding: 10px;
-    background-color: crimson;
+    background-color: #EC9A85;
     color: white;
     border: none;
     border-radius: 5px;
@@ -116,3 +125,8 @@ form {
     }
 }
 
+/* Dalam booking.css */
+.required {
+    color: red;
+    font-weight: bold;
+}

@@ -11,7 +11,7 @@ class Vehicle extends Model
     protected $primaryKey = 'vehicleID';
 
     protected $fillable = [
-        'brand', 'model', 'year', 'type', 'seats',
+        'vehicleName', 'plateNo', 'year',
         'price_per_day', 'available', 'image_url', 
         'description', 'created_at' , 'updated_at', 'image_url'
     ];

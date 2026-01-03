@@ -8,41 +8,48 @@
 </head>
 <body>
 
-    <div class="booking-container">
-    <h1>Book Your Car</h1>
+    <div class="reg-bg-primary text-white py-6 px-8">
+        <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2>
+    </div>
 
-    <div class="booking-content">
+        <div class="booking-content">
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
-            <div class="form-group">
-                <label for="pickup_dateTime">Pick-up Date & Time:</label>
+
+            <div>
+            <input type="hidden" name="userID" value="{{ auth()->id() }}">
+            </div>
+
+            <div class = "form-group">
+                <label for="pickup_dateTime">Pick-up Date & Time: <span style="color:red">*</span></label>
                 <input type="datetime-local" name="pickup_dateTime" required>
             </div>
 
+
             <div class="form-group">
-                <label for="return_dateTime">Return Date & Time:</label>
+                <label for="return_dateTime">Return Date & Time: <span style="color:red">*</span></label>
                 <input type="datetime-local" name="return_dateTime" required>
             </div>
 
 
             <div class="form-group">
-                <label for="pickup_location">Pick-up Location:</label>
+                <label for="pickup_location">Pick-up Location: (Can be change)<span style="color:red">*</span></label>
                 <input type="text" name="pickupAddress" value="UTM Mall" required>
             </div>
 
             <div class="form-group">
-                <label for="return_location">Return Location:</label>
+                <label for="return_location">Return Location: (Can be change)<span style="color:red">*</span></label>
                 <input type="text" name="returnAddress" value="UTM Mall" required>
             </div>
-
+    
             <div class="form-group">
                 <label for="voucherCode">Voucher Code:</label>
                 <input type="text" name="voucherCode">
             </div>
 
              @if(isset($vehicle))
-                <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+                <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
             @endif
 
             <button type="submit" class="submit-btn">Submit</button>
@@ -50,17 +57,20 @@
 
         <!-- Right: Car Info -->
         @if($vehicle)
-    <div class="car-info">
-        <h2>{{ $vehicle->brand }} {{ $vehicle->model }}</h2>
-        <p>RM{{ $vehicle->price_per_day }}/hour</p>
-        <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->brand }}" class="car-image">
-        <ul>
-            <li>✅ {{ $vehicle->seats }}-seater</li>
-            <li>✅ {{ $vehicle->features }}</li>
-            <li>❌ No smoking</li>
-        </ul>
-    </div>
-@endif
+        <div class="car-info">
+            <h2>{{ $vehicle->vehicleName }}</h2> <!-- Ganti brand + model -->
+            <p>RM{{ $vehicle->price_per_day }}/hour</p> <!-- Masih sama -->
+            <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->vehicleName }}" class="car-image">
+
+            <ul>
+                <li>✅ Plate No: {{ $vehicle->plateNo }}</li>
+                <li>✅ Year: {{ $vehicle->year }}</li>
+                <li>✅ Description: {{ $vehicle->description }}</li>
+                <li>❌ No smoking</li>
+            </ul>
+        </div>
+        @endif
+
 
 </body>
 </html>
