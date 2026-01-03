@@ -33,16 +33,27 @@ class AuthenticatedSessionController extends Controller
         }*/
         
         $user = auth()->user();
+        if($user->isITadmin()) {
+            return redirect()->route('admin.dashboard'); // nnti tukar pegi IT admin dashboard
+        } else if($user->isFinanceAdmin()) {
+            return redirect()->route('admin.dashboard'); // nnti tukar pegi finance admin dashboard
+        } else if($user->isRunner()) {
+            return redirect()->route('staff_runner.dashboard');
+        } else if($user->isSalesperson()) {
+            return redirect()->route('staff_salesperson.dashboard');
+        } else if($user->customer) {
+            return redirect()->route('customer.dashboard');
+        }
         // Block if email not verified (Laravel built-in)
-        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
+        /*if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
             Auth::logout();
             return back()->withErrors([
                 'email' => 'Please verify your email before logging in.'
             ]);
-        }
+        }*/
 
         // Role specific
-        if ($user->userType === 'customer') {
+        /*if ($user->userType === 'customer') {
             if ($user->customer->customerStatus !== 'active') {
                 Auth::logout();
                 return back()->withErrors([
@@ -70,7 +81,7 @@ class AuthenticatedSessionController extends Controller
                 ]);
             }
             return redirect()->route('admin.dashboard');
-        }
+        }*/
 
         // fallback kalau role tak dikenali
         return redirect('/');
