@@ -15,6 +15,7 @@ class BookingController extends Controller
     /**
      * Show the booking form to the customer.
      */
+
     public function create($vehicleID = null): View
     {
         $vehicle = null;
@@ -22,8 +23,9 @@ class BookingController extends Controller
         if ($vehicleID) {
             $vehicle = Vehicle::findOrFail($vehicleID);
         }
-
         return view('booking', compact('vehicle'));
+
+        //$vehicle = Vehicle::find(1);
     }
 
 

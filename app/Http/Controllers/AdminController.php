@@ -84,7 +84,8 @@ class AdminController extends Controller
             
             Admin::create([
                 'adminID' => $user->userID,
-                'adminType' => $validated['adminType']
+                'adminType' => $validated['adminType'],
+                'is_active' => false,
             ]);
 
             Log::info('New Admin created', [

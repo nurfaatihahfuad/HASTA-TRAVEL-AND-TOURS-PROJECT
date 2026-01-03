@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -22,14 +23,53 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        $role = auth()->user()->userType; // field userType dalam DB
-
+        /*$role = auth()->user()->userType; // field userType dalam DB
         if ($role === 'admin') {
             return redirect()->route('admin.dashboard');
         } elseif ($role === 'staff') {
             return redirect()->route('staff.dashboard');
         } elseif ($role === 'customer') {
             return redirect()->route('customer.dashboard');
+        }*/
+        
+        $user = auth()->user();
+        // Block if email not verified (Laravel built-in)
+        if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Please verify your email before logging in.'
+            ]);
+        }
+
+        // Role specific
+        if ($user->userType === 'customer') {
+            if ($user->customer->customerStatus !== 'active') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your account is not active yet. Please wait for staff verification and activation.'
+                ]);
+            }
+            return redirect()->route('customer.dashboard');
+        }
+
+        if ($user->userType === 'staff') {
+            if (!$user->staff->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your staff account is not active yet. Please check your activation email.'
+                ]);
+            }
+            return redirect()->route('staff.dashboard');
+        }
+
+        if ($user->userType === 'admin') {
+            if (!$user->admin->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your admin account is not active yet. Please check your activation email.'
+                ]);
+            }
+            return redirect()->route('admin.dashboard');
         }
 
         // fallback kalau role tak dikenali

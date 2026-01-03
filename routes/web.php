@@ -45,7 +45,8 @@ Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 // Logout
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-//login route to dashboard    
+//login route to dashboard 
+/*   
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
 
     ->middleware('auth')
@@ -58,6 +59,19 @@ Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware('auth')
 
+    ->name('customer.dashboard');
+
+*/
+Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware('auth')
+    ->name('admin.dashboard');
+
+Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware('auth')
+    ->name('staff.dashboard');
+
+Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
+    ->middleware('auth')
     ->name('customer.dashboard');
 
 // Protected routes (auth required)
@@ -88,11 +102,27 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     // Staff action: approve or reject a specific payment
     Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
-    //require __DIR__.'/auth.php';
+    // Staff Management Routes (Admin only)
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->group(function () {
+        Route::get('/staff', [StaffController::class, 'index'])->name('index');
+        Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
+        Route::post('/staff', [StaffController::class, 'store'])->name('store');
+        Route::get('/staff/{id}', [StaffController::class, 'show'])->name('show');
+        Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])->name('edit');
+        Route::put('/staff/{id}', [StaffController::class, 'update'])->name('update');
+        Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('destroy');
+    });
 
-    // Staff dashboard: list all payments
-    Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-    // Staff action: approve or reject a specific payment
-    Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+    // Admin Management Routes
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admins.')->group(function () {
+        Route::get('/admins', [AdminController::class, 'index'])->name('index');
+        Route::get('/admins/create', [AdminController::class, 'create'])->name('create');
+        Route::post('/admins', [AdminController::class, 'store'])->name('store');
+        Route::get('/admins/{id}', [AdminController::class, 'show'])->name('show');
+        Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('edit');
+        Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
+        Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
+    });
 
-    //require DIR.'/auth.php';
+//require __DIR__.'/auth.php';
+//require DIR.'/auth.php';
