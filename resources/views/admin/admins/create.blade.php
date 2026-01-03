@@ -1,16 +1,16 @@
-<!--CREATE new staff-->
+<!--CREATE new admin-->
 @extends('layouts.admin')
 
-@section('title', 'Add New Staff')
+@section('title', 'Add New Admin')
 
 @section('content')
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h4 class="mb-1">Add New Staff</h4>
-        <p class="text-muted mb-0">Create a new staff member account</p>
+        <h4 class="mb-1">Add New Administrator</h4>
+        <p class="text-muted mb-0">Create a new admin account</p>
     </div>
-    <a href="{{ route('staff.index') }}" class="btn btn-outline-secondary">
+    <a href="{{ route('admins.index') }}" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-2"></i> Back to List
     </a>
 </div>
@@ -29,7 +29,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('staff.store') }}">
+    <form method="POST" action="{{ route('admins.store') }}">
         @csrf
         
         <div class="row">
@@ -137,34 +137,34 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Staff Role Selection -->
+
+        <!-- Admin Type Selection -->
         <div class="row mb-4">
             <div class="col-12">
-                <label class="form-label">Staff Role *</label>
+                <label class="form-label">Admin Department *</label>
                 <div class="row">
-                    <!-- Salesperson Card -->
+                    <!-- IT Card -->
                     <div class="col-md-6 mb-3">
-                        <div class="card h-100 border @if(old('staffRole') == 'salesperson') border-primary border-2 @elseif($errors->has('staffRole')) border-danger @endif" 
+                        <div class="card h-100 border @if(old('adminType') == 'IT') border-primary border-2 @elseif($errors->has('adminType')) border-danger @endif" 
                              style="cursor: pointer;"
-                             onclick="selectRole('salesperson')">
+                             onclick="selectRole('IT')">
                             <div class="card-body h-100">
                                 <div class="form-check d-flex align-items-center mb-0">
                                     <input class="form-check-input me-3" 
                                            type="radio" 
-                                           name="staffRole" 
-                                           id="roleSalesperson" 
-                                           value="salesperson"
-                                           {{ old('staffRole') == 'salesperson' ? 'checked' : '' }}
+                                           name="adminType" 
+                                           id="roleIT" 
+                                           value="IT"
+                                           {{ old('adminType') == 'IT' ? 'checked' : '' }}
                                            required>
                                     <div class="d-flex align-items-center w-100">
                                         <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
                                             <i class="fas fa-chart-line text-primary"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Salesperson</h6>
+                                            <h6 class="mb-0">IT Department</h6>
                                             <p class="text-muted small mb-0 mt-1">
-                                                Manages customer accounts, bookings, and verifies documents.
+                                                Oversees and manages the Hasta Vehicle Booking System
                                             </p>
                                         </div>
                                     </div>
@@ -173,27 +173,27 @@
                         </div>
                     </div>
                     
-                    <!-- Runner Card -->
+                    <!-- Finance Card -->
                     <div class="col-md-6 mb-3">
-                        <div class="card h-100 border @if(old('staffRole') == 'runner') border-primary border-2 @elseif($errors->has('staffRole')) border-danger @endif" 
+                        <div class="card h-100 border @if(old('staffRole') == 'finance') border-primary border-2 @elseif($errors->has('adminType')) border-danger @endif" 
                              style="cursor: pointer;"
-                             onclick="selectRole('runner')">
+                             onclick="selectRole('finance')">
                             <div class="card-body h-100">
                                 <div class="form-check d-flex align-items-center mb-0">
                                     <input class="form-check-input me-3" 
                                            type="radio" 
-                                           name="staffRole" 
-                                           id="roleRunner" 
-                                           value="runner"
-                                           {{ old('staffRole') == 'runner' ? 'checked' : '' }}>
+                                           name="adminType" 
+                                           id="roleFinance" 
+                                           value="finance"
+                                           {{ old('adminType') == 'finance' ? 'checked' : '' }}>
                                     <div class="d-flex align-items-center w-100">
                                         <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
                                             <i class="fas fa-truck text-success"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">Runner</h6>
+                                            <h6 class="mb-0">Finance Department</h6>
                                             <p class="text-muted small mb-0 mt-1">
-                                                Handles vehicle deliveries, transfers, and inspections.
+                                                Handles staff commissions and access revenue reporting
                                             </p>
                                         </div>
                                     </div>
@@ -202,21 +202,24 @@
                         </div>
                     </div>
                 </div>
-                @error('staffRole')
+                @error('adminType')
                     <div class="text-danger small">{{ $message }}</div>
                 @enderror
             </div>
         </div>
         
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Admin ID will be automatically generated as <strong>UDXXXX</strong>.
+        </div>
         
         <div class="mt-4 d-flex justify-content-center gap-3">
-            <button type="submit" class="btn btn-primary px-4">
-                <i class="fas fa-user-plus me-2"></i> Create Staff
-            </button>
-            <a href="{{ route('staff.index') }}" class="btn btn-outline-secondary px-4">
-                Cancel
+            <a href="{{ route('admins.index') }}" class="btn btn-outline-secondary px-4">
+                <i class="fas fa-times me-2"></i> Cancel
             </a>
-            
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="fas fa-user-shield me-2"></i> Create Admin
+            </button>
         </div>
     </form>
 </div>
@@ -236,10 +239,10 @@
             icon.classList.add('fa-eye');
         }
     }
-    
+
     function selectRole(role) {
         // Uncheck all radio buttons first
-        document.querySelectorAll('input[name="staffRole"]').forEach(radio => {
+        document.querySelectorAll('input[name="adminType"]').forEach(radio => {
             radio.checked = false;
             // Remove border-primary from all cards
             radio.closest('.card').classList.remove('border-primary', 'border-2');
@@ -256,7 +259,7 @@
     
     // Initialize border for already selected role
     document.addEventListener('DOMContentLoaded', function() {
-        const selectedRole = document.querySelector('input[name="staffRole"]:checked');
+        const selectedRole = document.querySelector('input[name="adminType"]:checked');
         if (selectedRole) {
             selectedRole.closest('.card').classList.add('border-primary', 'border-2');
         }
@@ -274,14 +277,13 @@
     // Form validation
     document.querySelector('form').addEventListener('submit', function(e) {
         // Check if role is selected
-        const staffRole = document.querySelector('input[name="staffRole"]:checked');
-        if (!staffRole) {
+        const adminType = document.querySelector('input[name="adminType"]:checked');
+        if (!adminType) {
             e.preventDefault();
-            alert('Please select a staff role');
+            alert('Please select the admin department');
             return;
         }
         
-        // Check passwords match
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('password_confirmation').value;
         

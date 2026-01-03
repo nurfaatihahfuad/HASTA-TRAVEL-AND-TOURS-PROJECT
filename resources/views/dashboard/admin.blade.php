@@ -1,4 +1,4 @@
-<!--@extends('layouts.app')--> <!--header and footer-->
+
 @extends('layouts.admin')
 @section('title', 'Admin Dashboard')
 

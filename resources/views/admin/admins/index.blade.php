@@ -1,48 +1,48 @@
-<!--List of staff for CRUD-->
+<!--List of admins for CRUD-->
 @extends('layouts.admin')
 
-@section('title', 'Staff Management')
+@section('title', 'Admin Management')
 
 @section('content')
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h4 class="mb-1">Staff Management</h4>
-        <p class="text-muted mb-0">Manage all staff members</p>
+        <h4 class="mb-1">Admin Management</h4>
+        <p class="text-muted mb-0">Manage system administrators</p>
     </div>
-    <a href="{{ route('staff.create') }}" class="btn btn-primary">
-        <i class="fas fa-user-plus me-2"></i> Add New Staff
+    <a href="{{ route('admins.create') }}" class="btn btn-primary">
+        <i class="fas fa-user-plus me-2"></i> Add New Admin
     </a>
 </div>
 
-<!-- Stats Cards -->
+<!-- Stats Card -->
 <div class="row mb-4">
-    <div class="col-md-4 mb-3">
+    <div class="col-md-4">
         <div class="card border-0 bg-primary bg-opacity-10">
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="bg-primary bg-opacity-25 rounded-circle p-3 me-3">
-                        <i class="fas fa-users text-primary"></i>
+                        <i class="fas fa-user-shield text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="card-title mb-0">{{ $totalStaff}}</h5>
-                        <p class="text-muted mb-0">Total Staff</p>
+                        <h5 class="card-title mb-0">{{ $totalAdmin}}</h5>
+                        <p class="text-muted mb-0">Total Admins</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-4 mb-3">
         <div class="card border-0 bg-info bg-opacity-10">
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="bg-info bg-opacity-25 rounded-circle p-3 me-3">
-                        <i class="fas fa-chart-line text-info"></i>
+                        <i class="fa fa-cogs"></i>
                     </div>
                     <div>
-                        <h5 class="card-title mb-0">{{ $totalSalespersons }}</h5>
-                        <p class="text-muted mb-0">Salespersons</p>
+                        <h5 class="card-title mb-0">{{ $totalITAdmin }}</h5>
+                        <p class="text-muted mb-0">IT Department</p>
                     </div>
                 </div>
             </div>
@@ -54,11 +54,11 @@
             <div class="card-body">
                 <div class="d-flex align-items-center">
                     <div class="bg-success bg-opacity-25 rounded-circle p-3 me-3">
-                        <i class="fas fa-truck text-success"></i>
+                        <i class='fas fa-donate'></i>
                     </div>
                     <div>
-                        <h5 class="card-title mb-0">{{ $totalRunners }}</h5>
-                        <p class="text-muted mb-0">Runners</p>
+                        <h5 class="card-title mb-0">{{ $totalfinanceAd }}</h5>
+                        <p class="text-muted mb-0">Finance Department</p>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
     </div>
 </div>
 
-<!-- Staff Table -->
+<!-- Admins Table -->
 <div class="section-card">
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -87,44 +87,44 @@
     <!-- Filter Buttons -->
     <div class="d-flex justify-content-center mb-4">
         <div class="btn-group" role="group">
-            <a href="{{ route('staff.index') }}" 
+            <a href="{{ route('admins.index') }}" 
                class="btn {{ !request('role') ? 'btn-primary' : 'btn-outline-primary' }}">
-                All Staff
+                All Admin
             </a>
-            <a href="{{ route('staff.index', ['role' => 'salesperson']) }}" 
-               class="btn {{ request('role') == 'salesperson' ? 'btn-primary' : 'btn-outline-primary' }}">
-                Salespersons
+            <a href="{{ route('admins.index', ['role' => 'IT']) }}" 
+               class="btn {{ request('role') == 'IT' ? 'btn-primary' : 'btn-outline-primary' }}">
+                IT Admin
             </a>
-            <a href="{{ route('staff.index', ['role' => 'runner']) }}" 
-               class="btn {{ request('role') == 'runner' ? 'btn-primary' : 'btn-outline-primary' }}">
-                Runners
+            <a href="{{ route('admins.index', ['role' => 'finance']) }}" 
+               class="btn {{ request('role') == 'finance' ? 'btn-primary' : 'btn-outline-primary' }}">
+                Finance Admin
             </a>
         </div>
     </div>
 
-    <!-- Table -->
     <div class="table-responsive">
         <table class="table table-hover">
             <thead class="table-light">
                 <tr>
-                    <th>Staff ID</th>
+                    <th>Admin ID</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Role</th>
+                    <th>Department</th>
                     <th>Phone</th>
+                    <th>IC Number</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($staff as $member)
+                @forelse($admin as $member)
                     <tr>
                         <td>
                             <span class="fw-bold">{{ $member->userID }}</span>
                         </td>
                         <td>
                             <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-3">
-                                    <i class="fas fa-user text-secondary"></i>
+                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                                    <i class="fas fa-user-shield text-primary"></i>
                                 </div>
                                 <div>
                                     <div class="fw-medium">{{ $member->name }}</div>
@@ -133,14 +133,14 @@
                         </td>
                         <td>{{ $member->email }}</td>
                         <td>
-                            @if($member->staff)
-                                @if($member->staff->staffRole == 'salesperson')
+                            @if($member->admin)
+                                @if($member->admin->adminType == 'IT')
                                     <span class="badge bg-info">
-                                        <i class="fas fa-chart-line me-1"></i> Salesperson
+                                        <i class="fa fa-cogs"></i> IT Admin
                                     </span>
                                 @else
                                     <span class="badge bg-success">
-                                        <i class="fas fa-truck me-1"></i> Runner
+                                        <i class='fas fa-donate'></i> Finance Admin
                                     </span>
                                 @endif
                             @else
@@ -150,23 +150,23 @@
                             @endif
                         </td>
                         <td>+60 {{ $member->noHP }}</td>
+                        <td>{{ $member->noIC }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ route('staff.show', $member->userID) }}" 
-                                   class="btn btn-outline-info" 
-                                   title="View">
+                                <a href="{{ route('admins.show', $member->userID) }}" 
+                                   class="btn btn-outline-info" title="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ route('staff.edit', $member->userID) }}" 
-                                   class="btn btn-outline-primary" 
-                                   title="Edit">
+                                <a href="{{ route('admins.edit', $member->userID) }}" 
+                                   class="btn btn-outline-primary" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button type="button" 
                                         class="btn btn-outline-danger" 
                                         title="Delete"
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#deleteModal{{ $member->userID }}">
+                                        data-bs-target="#deleteModal{{ $member->userID }}"
+                                        {{ $member->userID === auth()->id() ? 'disabled' : '' }}>
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -180,12 +180,12 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <p>Are you sure you want to delete staff member <strong>{{ $member->name }}</strong> ({{ $member->userID }})?</p>
+                                            <p>Are you sure you want to delete admin <strong>{{ $member->name }}</strong> ({{ $member->userID }})?</p>
                                             <p class="text-danger mb-0">This action cannot be undone.</p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <form action="{{ route('staff.destroy', $member->userID) }}" method="POST">
+                                            <form action="{{ route('admins.destroy', $member->userID) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger">Delete</button>
@@ -200,8 +200,11 @@
                     <tr>
                         <td colspan="6" class="text-center py-4">
                             <div class="text-muted">
-                                <i class="fas fa-users fa-2x mb-3"></i>
-                                <p class="mb-0">No staff members found</p>
+                                <i class="fas fa-user-shield fa-2x mb-3"></i>
+                                <p class="mb-0">No administrators found</p>
+                                <a href="{{ route('admins.create') }}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-user-plus me-2"></i> Add First Admin
+                                </a>
                             </div>
                         </td>
                     </tr>
@@ -209,6 +212,5 @@
             </tbody>
         </table>
     </div>
-    
 </div>
 @endsection
