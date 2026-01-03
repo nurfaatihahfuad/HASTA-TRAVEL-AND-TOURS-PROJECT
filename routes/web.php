@@ -18,7 +18,7 @@ use App\Http\Controllers\CustomerRegistrationController;
 
 // Welcome page guna VehicleController@preview
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
-Route::get('/search', [VehicleController::class, 'search'])->name('vehicles.search');
+Route::get('/vehicles/search', [VehicleController::class, 'search'])->name('vehicles.search');
 
 // Browse-car boleh diakses tanpa login
 Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.vehicle');
@@ -74,6 +74,12 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware('auth')
     ->name('customer.dashboard');
 
+// Booking routes (customer mesti login sebelum boleh book)
+Route::middleware('auth')->group(function () {
+    Route::get('/book-car/{vehicleID}', [BookingController::class, 'create'])->name('booking.form');
+    Route::post('/book-car', [BookingController::class, 'store'])->name('booking.store');
+});
+
 // Protected routes (auth required)
     Route::middleware('auth')->group(function () {
     // Profile
@@ -87,10 +93,6 @@ Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     // Browse cars
     Route::get('browse', [CarController::class, 'index'])->name('browse.cars');   
 });
-
-// Booking form without vehicle (optional)
-    Route::get('/book-car/{vehicleID}', [BookingController::class, 'create'])->name('booking.form');
-    Route::post('/book-car',  [BookingController::class, 'store'])->name('booking.store');
 
     // Payment routes
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
