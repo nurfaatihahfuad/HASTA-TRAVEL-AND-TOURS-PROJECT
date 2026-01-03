@@ -65,12 +65,14 @@
         <!-- Right: Car Info -->
         @if($vehicle)
         <div class="car-info">
-            <h2>{{ $vehicle->brand }} {{ $vehicle->model }}</h2>
-            <p>RM{{ $vehicle->price_per_day }}/hour</p>
-            <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->brand }}" class="car-image">
+            <h2>{{ $vehicle->vehicleName }}</h2> <!-- Ganti brand + model -->
+            <p>RM{{ $vehicle->price_per_day }}/hour</p> <!-- Masih sama -->
+            <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->vehicleName }}" class="car-image">
+
             <ul>
-                <li>✅ {{ $vehicle->seats }}-seater</li>
-                <li>✅ {{ $vehicle->type }}</li>
+                <li>✅ Plate No: {{ $vehicle->plateNo }}</li>
+                <li>✅ Year: {{ $vehicle->year }}</li>
+                <li>✅ Description: {{ $vehicle->description }}</li>
                 <li>❌ No smoking</li>
             </ul>
         </div>

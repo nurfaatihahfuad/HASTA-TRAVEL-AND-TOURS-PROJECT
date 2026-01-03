@@ -15,7 +15,6 @@ class BookingController extends Controller
     /**
      * Show the booking form to the customer.
      */
-
     public function create($vehicleID = null): View
     {
         $vehicle = null;
@@ -23,6 +22,7 @@ class BookingController extends Controller
         if ($vehicleID) {
             $vehicle = Vehicle::findOrFail($vehicleID);
         }
+
         return view('booking', compact('vehicle'));
     }
 
@@ -57,9 +57,5 @@ class BookingController extends Controller
 
         return redirect()->back()->with('success', 'Booking saved!');
 
-        //return redirect()->route('booking.success', $booking->bookingID)
-                //->with('success', 'Booking Submit Successfully!');
-    }
-
-    
+}
 }
