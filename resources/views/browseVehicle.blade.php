@@ -30,7 +30,7 @@
                                 <p class="card-text">
                                     <strong>RM{{ number_format($vehicle->price_per_day, 2) }}/day</strong>
                                 </p>
-                                <a href="{{ url('/login') }}" class="btn btn-primary mx-auto">Book Now</a>
+                                <a href="{{ route('booking.form', $vehicle->vehicleID ) }}" class="btn btn-primary mx-auto">Book Now</a>
                             </div>
                         </div>
                     </div>

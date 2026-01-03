@@ -5,49 +5,56 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use App\Models\Booking;
+use App\Models\Payment;
+use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
     // Show the payment page
-    public function show()
+    public function show($bookingID)
     {
-        return view('payment', ['bookingID' => 1]); // Replace with dynamic ID if needed
+        $booking = Booking::with('vehicle')->findOrFail($bookingID);
 
-        $depositAmount = 100;
+        $pickup = Carbon::parse($booking->pickup_dateTime);
+        $return = Carbon::parse($booking->return_dateTime);
+        $totalHours = $pickup->diffInHours($return);
+        $totalPayment = $totalHours * $booking->vehicle->price_per_day;
+
+        return view('payment', [
+            'booking' => $booking,
+            'bookingID' => $booking->id,
+            'totalHours' => $totalHours,
+            'totalPayment' => $totalPayment, ]
+        ); 
     }
 
-    // Handle the file upload
     public function submit(Request $request, $bookingID)
     {
         $request->validate([
-            'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
-            'paymentType' => 'required',
+            'paymentType' => 'required|string',
+            'payment_proof' => 'required|file|mimes:jpeg, png, pdf|max:2048',
         ]);
 
-        // Store the uploaded file
-        $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+        $booking = Booking::findOrFail($bookingID);
 
-        if($request -> paymentType == 'Deposit Payment')
-        {
-            $amount = 100;
-        }
+        $pickup = Carbon::parse($booking->pickup_dateTime);
+        $return = Carbon::parse($booking->return_dateTime);
+        $totalHours = $pickup->diffInHours($return);
+        $totalPayment = $totalHours * $booking->vehicle->price_per_day;
 
-        else
-        {
-            $amount = $request -> amount;
-        }
+        $path = $request->file('payment_proof')->store('payment', 'public');
 
-        // You can log or save this path to the database if needed
-        DB::table('payment') -> insert([
+        Payment::create([
+            'booking_id' => $booking->id, 
             'paymentType' => $request->paymentType,
-            'amount' => $amount,
+            'amount' => $amount, 
             'receipt_file_path' => $path,
             'paymentStatus' => 'Pending',
-            'verifiedBy' => NULL,
-            'VerifiedTime' => NULL,
-            'userID' => 001,
+            'userID' => auth()->id(),
         ]);
 
-        return back()->with('success', 'Payment proof uploaded successfully!');
+        return redirect()->route('customer.dashboard')
+            ->with('success', 'Payment submitted Successfully!');
     }
 }

@@ -15,6 +15,15 @@
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
+
+            <div>
+            <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
+            </div>
+
+            <div>
+            <input type="hidden" name="userID" value="{{ auth()->id() }}">
+            </div>
+
             <div class = "form-group">
                 <label for="pickup_dateTime">Pick-up Date & Time: <span style="color:red">*</span></label>
                 <input type="datetime-local" name="pickup_dateTime" required>
@@ -43,10 +52,10 @@
             </div>
 
              @if(isset($vehicle))
-                <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+                <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
             @endif
 
-            <button type="submit" class="submit-btn">Next</button>
+            <button type="submit" class="submit-btn">Submit</button>
         </form>
 
         <!-- Right: Car Info -->

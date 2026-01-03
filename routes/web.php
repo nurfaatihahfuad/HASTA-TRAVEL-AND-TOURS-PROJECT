@@ -47,17 +47,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 
 //login route to dashboard    
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
-<<<<<<< Updated upstream
-    ->middleware(['auth'])
-    ->name('admin.dashboard');
 
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware(['auth'])
-    ->name('staff.dashboard');
-
-Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware(['auth'])
-=======
     ->middleware('auth')
     ->name('admin.dashboard');
 
@@ -67,11 +57,11 @@ Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware('auth')
->>>>>>> Stashed changes
+
     ->name('customer.dashboard');
 
 // Protected routes (auth required)
-Route::middleware('auth')->group(function () {
+    Route::middleware('auth')->group(function () {
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -81,40 +71,27 @@ Route::middleware('auth')->group(function () {
     Route::resource('crud', CRUDController::class);
 
     // Browse cars
-    Route::get('browse', [CarController::class, 'index'])->name('browse.cars');
+    Route::get('browse', [CarController::class, 'index'])->name('browse.cars');   
 });
 
-
-
 // Booking form without vehicle (optional)
-Route::get('/book-car', [BookingController::class, 'create'])->name('booking.form');
+    Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.cars');
+    Route::get('/book-car/{vehicleID}', [BookingController::class, 'create'])->name('booking.form');
+    Route::post('/book-car',  [BookingController::class, 'store'])->name('booking.store');
 
-// Booking form with vehicle (requires login)
-Route::get('/book-car/{vehicle_id}', [BookingController::class, 'create'])
-    ->middleware('auth')
-    ->name('booking.withVehicle');
-
-// Store booking
-Route::post('/book-car', [BookingController::class, 'store'])->name('booking.store');
-
-// Browse page (public)
-Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.cars');
+    // Payment routes
+    Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
 
-// Payment routes
-Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
-Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
+    // Staff dashboard: list all payments
+    Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
+    // Staff action: approve or reject a specific payment
+    Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
-<<<<<<< Updated upstream
-// Staff dashboard: list all payments
-Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-// Staff action: approve or reject a specific payment
-Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+    //require __DIR__.'/auth.php';
 
 
-require __DIR__.'/auth.php';
-=======
-//require __DIR__.'/auth.php';
->>>>>>> Stashed changes
 
-require __DIR__.'/auth.php';
+
+
