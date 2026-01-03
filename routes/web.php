@@ -90,8 +90,8 @@ Route::middleware('auth')->group(function () {
 });
 
     // Payment routes
-    Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
+    Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
 
 
     // Staff dashboard: list all payments
@@ -122,5 +122,4 @@ Route::middleware('auth')->group(function () {
     });
 
 //require __DIR__.'/auth.php';
-
-    //require DIR.'/auth.php';
+//require DIR.'/auth.php';

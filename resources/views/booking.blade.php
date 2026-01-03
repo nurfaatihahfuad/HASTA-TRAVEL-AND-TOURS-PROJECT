@@ -7,14 +7,21 @@
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
 </head>
 <body>
-        <div class="booking-container">
+
+    
+
+        <div class ="booking-container" >
         <div class="booking-content">
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
-            
+
             <div class="booking-box"> 
-                <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2> 
+            <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2> 
+            </div>
+
+            <div>
+            <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
             </div>
 
             <div>
@@ -70,6 +77,8 @@
             </ul>
         </div>
         @endif
+    </div>
+</div>
 
 
 </body>

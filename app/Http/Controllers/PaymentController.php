@@ -3,51 +3,61 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
-    // Show the payment page
-    public function show()
+    public function show(Request $request)
     {
-        return view('payment', ['bookingID' => 1]); // Replace with dynamic ID if needed
+        // Dummy data (boleh tukar ikut keperluan)
+        $vehicle = [
+            'brand' => 'Toyota',
+            'model' => 'Vios',
+            'price_per_day' => 20,
+        ];
 
-        $depositAmount = 100;
+        $pickup = Carbon::parse('2026-01-03 10:00:00');
+        $return = Carbon::parse('2026-01-03 15:00:00');
+        $totalHours = $pickup->diffInHours($return);
+        $totalPayment = $totalHours * $vehicle['price_per_day'];
+
+        $paymentType = $request->input('paymentType'); 
+        $amountToPay = null; 
+        
+        if ($paymentType === 'Full') 
+        { 
+            $amountToPay = $totalPayment; 
+        } 
+        elseif ($paymentType === 'Deposit') 
+        { 
+            $amountToPay = 20; 
+        } 
+        return view('payment', compact('vehicle', 'totalHours', 'totalPayment', 'paymentType', 'amountToPay')); 
     }
 
-    // Handle the file upload
-    public function submit(Request $request, $bookingID)
+    public function submit(Request $request)
     {
+        $vehicle = [
+            'brand' => 'Toyota',
+            'model' => 'Vios',
+            'price_per_day' => 20,
+        ];
+
+        $pickup = Carbon::parse('2026-01-03 10:00:00');
+        $return = Carbon::parse('2026-01-03 15:00:00');
+        $totalHours = $pickup->diffInHours($return);
+        $totalPayment = $totalHours * $vehicle['price_per_day'];
+
+        $paymentType = $request->input('paymentType');
+        $amount = $paymentType === 'Full' ? $totalPayment : 20;
+
         $request->validate([
+            'paymentType' => 'required|string',
             'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
-            'paymentType' => 'required',
         ]);
 
-        // Store the uploaded file
-        $path = $request->file('payment_proof')->store('payment_proofs', 'public');
-
-        if($request -> paymentType == 'Deposit Payment')
-        {
-            $amount = 100;
-        }
-
-        else
-        {
-            $amount = $request -> amount;
-        }
-
-        // You can log or save this path to the database if needed
-        DB::table('payment') -> insert([
-            'paymentType' => $request->paymentType,
-            'amount' => $amount,
-            'receipt_file_path' => $path,
-            'paymentStatus' => 'Pending',
-            'verifiedBy' => NULL,
-            'VerifiedTime' => NULL,
-            'userID' => 001,
-        ]);
-
-        return back()->with('success', 'Payment proof uploaded successfully!');
+        return redirect()->route('payment.show', ['paymentType' => $paymentType])
+        ->with('success', "Payment submitted successfully. Amount: RM{$amount}");
     }
+
 }
