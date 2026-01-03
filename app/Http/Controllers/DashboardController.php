@@ -57,6 +57,7 @@ class DashboardController extends Controller
     // ============================
     public function staff()
     {
+        /*
         $userId = auth()->user()->userId; // ambil ID staff dari login
 
 
@@ -98,7 +99,7 @@ class DashboardController extends Controller
         $statusPending   = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'pending')->count();
 
         return view('dashboard.staff', compact(
-            'bookings',
+            'booking',
             'assignedToday',
             'pendingPayments',
             'damageCases',
@@ -107,7 +108,38 @@ class DashboardController extends Controller
             'statusCancelled',
             'statusBooked',
             'statusPending'
-        ));
+        ));*/
+        $user = auth()->user();
+
+if ($user->staffProfile) {
+    $staffID = $user->staffProfile->staffID;
+
+    $bookings = DB::table('booking')->where('staffID', $staffID)->get();
+    $assignedToday = DB::table('booking')->where('staffID', $staffID)->whereDate('created_at', now())->count();
+    $pendingPayments = DB::table('payment')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
+    $damageCases = DB::table('damage_case')->where('staffID', $staffID)->count();
+    $statusCancelled = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'cancelled')->count();
+    $statusBooked = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'booked')->count();
+    $statusPending = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
+} else {
+    $bookings = collect();
+    $assignedToday = 0;
+    $pendingPayments = 0;
+    $damageCases = 0;
+    $statusCancelled = 0;
+    $statusBooked = 0;
+    $statusPending = 0;
+}
+
+// Example chart data
+$weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+$weeklyData   = [3,6,5,7,4,2,8];
+
+return view('dashboard.staff', compact(
+    'bookings','assignedToday','pendingPayments','damageCases',
+    'weeklyLabels','weeklyData','statusCancelled','statusBooked','statusPending'
+));
+
     }
 
     // ============================
@@ -129,7 +161,7 @@ class DashboardController extends Controller
         $totalDays     = $booking->sum('days_rented'); // jumlah hari sewa
 
         // 3. Most rented car model
-        $mostCar = $bookings
+        $mostCar = $booking
             ->groupBy('carModel')  // kumpulkan mengikut model
             ->sortByDesc(fn($group) => count($group)) // sort by frequency
             ->keys()                // ambil keys (carModel)
@@ -137,7 +169,7 @@ class DashboardController extends Controller
 
         // 4. Return view customer
         return view('dashboard.customer', compact(
-            'bookings', 'totalBookings', 'totalDays', 'mostCar'
+            'booking', 'totalBookings', 'totalDays', 'mostCar'
         ));
     }
 }
