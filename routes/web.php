@@ -46,32 +46,25 @@ Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 //login route to dashboard 
-
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
-
-    ->middleware('auth')
+    ->middleware(['auth', RoleMiddleware::class.':admin'])
     ->name('admin.dashboard');
 
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('staff.dashboard');
+/*Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff.dashboard');*/
+
+Route::get('/staff_salesperson/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff_salesperson.dashboard');
+
+Route::get('/staff_runner/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff_runner.dashboard');
+
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware('auth')
-
-    ->name('customer.dashboard');
-
-
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('admin.dashboard');
-
-Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware('auth')
-    ->name('staff.dashboard');
-
-Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware('auth')
+    ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
 
 // Booking routes (customer mesti login sebelum boleh book)
