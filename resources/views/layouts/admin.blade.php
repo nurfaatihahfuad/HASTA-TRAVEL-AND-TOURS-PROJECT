@@ -154,7 +154,7 @@
             </a>
             
             <a class="sidebar-link @if(str_contains($currentRoute, 'staff.')) active @endif" 
-               href="{{ route('staff.index') }}">
+               href="{{ route('staff.dashboard') }}">
                 <i class="fas fa-user-tie"></i> Staff Management
             </a>
             

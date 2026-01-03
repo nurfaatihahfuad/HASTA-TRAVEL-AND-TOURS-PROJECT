@@ -54,7 +54,7 @@
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Booking History</h3>
 
-            @forelse($bookings as $booking)
+            @forelse($booking as $booking)
                 <div class="mb-4 border-b pb-4">
                     <p><strong>Car:</strong> {{ $booking->carModel }}</p>
                     <p><strong>Booking Dates:</strong> {{ $booking->start_date }} → {{ $booking->end_date }}</p>
