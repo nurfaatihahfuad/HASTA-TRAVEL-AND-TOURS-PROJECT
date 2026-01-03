@@ -13,7 +13,7 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function create(): View
+    public function create()
     {
         // If already logged in, redirect to appropriate dashboard
         if (Auth::check()) {
@@ -25,8 +25,13 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request)
     {
+        
+        
         Log::info('Login attempt', ['email' => $request->email]);
         
+        // Add 'remember me' functionality
+        $remember = $request->boolean('remember', false);
+
         // Authenticate using the email field
         if (!Auth::attempt([
             'email' => $request->email,
@@ -56,6 +61,8 @@ class AuthenticatedSessionController extends Controller
             'session_id' => session()->getId(),
             'user_id_set' => Auth::id()
         ]);
+
+
         
         return $this->redirectToDashboard();
     }

@@ -12,7 +12,7 @@
             <i class="bi bi-search"></i>
         </span>
         <input type="text" name="q" class="form-control bg-white text-dark border-0" placeholder="Search for vehicle ...">
-        <button class="btn btn-light text-dark" type="submit">Search</button>
+        <button class="btn btn-primary" type="submit">Search</button>
     </form>
 
     <div class="mt-3 text-white text-center">
@@ -21,11 +21,9 @@
       </h4>
     </div>
 
-    <div class="d-flex justify-content-center" style="position:relative; left:100px;">
+    <div class="d-flex justify-content-center" style="position:relative; center">
       <p class="mt-3 fs-5" style="text-shadow: 2px 2px 5px rgba(0,0,0,0.7);">
 
-
-      
         Affordable Vehicles.<br>Unforgettable Trips.
       </p>
 
@@ -77,7 +75,7 @@
 <section id="cars-section" class="py-5">
   <div class="container">
     <p class="text-center text-muted mb-0">The Cars</p>
-    <h2 class="text-center fw-bold mb-5">Our Available Cars</h2>
+    <h2 class="text-center fw-bold mb-5 display-6">Our Available Cars</h2>
 
     <div class="row g-4 justify-content-center">
       @foreach($vehicles as $vehicle)

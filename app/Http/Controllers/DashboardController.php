@@ -13,7 +13,10 @@ class DashboardController extends Controller
     {
         // 1. High-level metrics
         $newBookings    = DB::table('booking')->whereDate('created_at', now())->count(); // booking baru hari ini
-        $rentedCars     = DB::table('booking')->where('status', 'booked')->count();      // jumlah kereta sedang disewa
+
+
+        $rentedCars     = DB::table('booking')->where('bookingStatus', 'booked')->count();      // jumlah kereta sedang disewa
+
         $availableCars  = DB::table('vehicles')->where('available', 1)->count();         // kereta available
 
         // 2. Weekly booking bar chart (Mon..Sun) - contoh data statik
@@ -25,9 +28,10 @@ class DashboardController extends Controller
 
         // 3. Booking status pie chart
 
-        $statusCancelled = DB::table('booking')->where('status', 'cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('status', 'booked')->count();
-        $statusPending   = DB::table('booking')->where('status', 'pending')->count();
+        $statusCancelled = DB::table('booking')->where('bookingStatus', 'cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('bookingStatus', 'booked')->count();
+        $statusPending   = DB::table('booking')->where('bookingStatus', 'pending')->count();
+
 
         // 4. Car type distribution (example)
         $carTypes = [
@@ -55,6 +59,8 @@ class DashboardController extends Controller
     // ============================
     public function staff()
     {
+
+        /*
         $userId = auth()->user()->userId; // ambil ID staff dari login
 
 
@@ -64,10 +70,16 @@ class DashboardController extends Controller
         // KPI cards
 
         // 1. Semua booking yang assigned pada staff ini
-        $bookings = DB::table('booking')->where('staffID', $userId)->get();
+        $booking = DB::table('booking')->where('staffID', $userId)->get();
 
         // 2. KPI cards
 
+        $userId = auth()->user()->userId; // ambil ID staff dari login
+
+        // 1. Semua booking yang assigned pada staff ini
+        $bookings = DB::table('booking')->where('staffID', $userId)->get();
+
+        // 2. KPI cards
         $assignedToday = DB::table('booking')
             ->where('staffID', $userId)
             ->whereDate('created_at', now())
@@ -75,7 +87,9 @@ class DashboardController extends Controller
 
         $pendingPayments = DB::table('payment')
             ->where('staffID', $userId)
-            ->where('status', 'pending')
+
+            ->where('bookingStatus', 'pending')
+
             ->count(); // payment pending
 
         $damageCases = DB::table('damage_case') // sesuaikan table nama plural/singular
@@ -91,12 +105,13 @@ class DashboardController extends Controller
 
         // 4. Booking status pie chart untuk staff
 
-        $statusCancelled = DB::table('booking')->where('staffID', $userId)->where('status', 'cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('staffID', $userId)->where('status', 'booked')->count();
-        $statusPending   = DB::table('booking')->where('staffID', $userId)->where('status', 'pending')->count();
+        $statusCancelled = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'booked')->count();
+        $statusPending   = DB::table('booking')->where('staffID', $userId)->where('bookingStatus', 'pending')->count();
+
 
         return view('dashboard.staff', compact(
-            'bookings',
+            'booking',
             'assignedToday',
             'pendingPayments',
             'damageCases',
@@ -105,7 +120,38 @@ class DashboardController extends Controller
             'statusCancelled',
             'statusBooked',
             'statusPending'
-        ));
+        ));*/
+        $user = auth()->user();
+
+if ($user->staffProfile) {
+    $staffID = $user->staffProfile->staffID;
+
+    $bookings = DB::table('booking')->where('staffID', $staffID)->get();
+    $assignedToday = DB::table('booking')->where('staffID', $staffID)->whereDate('created_at', now())->count();
+    $pendingPayments = DB::table('payment')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
+    $damageCases = DB::table('damage_case')->where('staffID', $staffID)->count();
+    $statusCancelled = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'cancelled')->count();
+    $statusBooked = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'booked')->count();
+    $statusPending = DB::table('booking')->where('staffID', $staffID)->where('bookingStatus', 'pending')->count();
+} else {
+    $bookings = collect();
+    $assignedToday = 0;
+    $pendingPayments = 0;
+    $damageCases = 0;
+    $statusCancelled = 0;
+    $statusBooked = 0;
+    $statusPending = 0;
+}
+
+// Example chart data
+$weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+$weeklyData   = [3,6,5,7,4,2,8];
+
+return view('dashboard.staff', compact(
+    'bookings','assignedToday','pendingPayments','damageCases',
+    'weeklyLabels','weeklyData','statusCancelled','statusBooked','statusPending'
+));
+
     }
 
     // ============================
@@ -115,19 +161,19 @@ class DashboardController extends Controller
     {
 
         $userId   = auth()->user()->userID;
-        $bookings = DB::table('booking')->where('userID', $userId)->get();
+        $booking = DB::table('booking')->where('userID', $userId)->get();
 
         $userId = auth()->user()->userId; // ambil ID customer dari login
 
         // 1. Ambil semua booking customer
-        $bookings = DB::table('booking')->where('userID', $userId)->get();
+        $booking = DB::table('booking')->where('userID', $userId)->get();
 
         // 2. Total metrics
-        $totalBookings = $bookings->count();           // jumlah booking customer
-        $totalDays     = $bookings->sum('days_rented'); // jumlah hari sewa
+        $totalBookings = $booking->count();           // jumlah booking customer
+        $totalDays     = $booking->sum('days_rented'); // jumlah hari sewa
 
         // 3. Most rented car model
-        $mostCar = $bookings
+        $mostCar = $booking
             ->groupBy('carModel')  // kumpulkan mengikut model
             ->sortByDesc(fn($group) => count($group)) // sort by frequency
             ->keys()                // ambil keys (carModel)
@@ -135,7 +181,8 @@ class DashboardController extends Controller
 
         // 4. Return view customer
         return view('dashboard.customer', compact(
-            'bookings', 'totalBookings', 'totalDays', 'mostCar'
+            'booking', 'totalBookings', 'totalDays', 'mostCar'
+
         ));
     }
 }
