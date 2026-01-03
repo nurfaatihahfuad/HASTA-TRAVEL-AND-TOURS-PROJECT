@@ -49,13 +49,13 @@ class VerificationDocs extends Model
     }
 
 
-    // Relationship to Customer
-    public function customer()
+    // Relationship to User
+    public function user()
     {
-        return $this->belongsTo(Customer::class, 'userID', 'userID');
+        return $this->belongsTo(User::class, 'userID', 'userID');
     }
 
-    // Relationship to Salesperson who verified (optional)
+    // Relationship to Admin who verified (optional)
     public function verifiedBy()
     {
         return $this->belongsTo(User::class, 'verified_by', 'userID');
