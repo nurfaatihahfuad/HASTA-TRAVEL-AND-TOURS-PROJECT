@@ -13,6 +13,7 @@ use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\InspectionController;
 
 use App\Http\Controllers\verifypaymentController;
 
@@ -53,11 +54,14 @@ Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth', RoleMiddleware::class.':admin'])
     ->name('admin.dashboard');
 
-/*Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    
+Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff.dashboard');*/
 
 /*buka comment sini gak----------------------
+
+    
 Route::get('/staff_salesperson/dashboard', [DashboardController::class, 'staff'])
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff_salesperson.dashboard');
@@ -65,7 +69,7 @@ Route::get('/staff_salesperson/dashboard', [DashboardController::class, 'staff']
 Route::get('/staff_runner/dashboard', [DashboardController::class, 'staff'])
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff_runner.dashboard');
-
+*/
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
@@ -100,6 +104,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
     // Staff action: approve or reject a specific payment
     Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+
+    // Car inspection to damage case
+    Route::post('/inspection/store', [InspectionController::class, 'store'])->name('inspection.store');
+    Route::post('/damage-case/resolve/{id}', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
+
+    // Inspection page
+    Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection.index');
+
+    // Damage Case page
+   Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage.index');
 
     // Staff Management Routes (Admin only)
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->group(function () {

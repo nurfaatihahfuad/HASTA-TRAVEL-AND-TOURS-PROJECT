@@ -24,9 +24,11 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        /*$role = auth()->user()->userType; // field userType dalam DB
+        $user = auth()->user();
+        $role = auth()->user()->userType; // field userType dalam DB
+
         if ($role === 'admin') {
-            return redirect()->route('admin.dashboard');
+        return redirect()->route('admin.dashboard');
         } elseif ($role === 'staff') {
             return redirect()->route('staff.dashboard');
         } elseif ($role === 'customer') {
@@ -34,6 +36,20 @@ class AuthenticatedSessionController extends Controller
         }*/
         
 /*-----------------------------------------------------------------dina
+
+        }
+
+    /*if ($role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    } elseif ($role === 'staff_salesperson') {
+        return redirect()->route('staff_salesperson.dashboard');
+    } elseif ($role === 'staff_runner') {
+        return redirect()->route('staff_runner.dashboard');
+    } elseif ($role === 'customer') {
+        return redirect()->route('customer.dashboard');
+    }
+      
+>>>>>>> Stashed changes
         $user = auth()->user();
         if($user->isITadmin()) {
             return redirect()->route('admin.dashboard'); // nnti tukar pegi IT admin dashboard
@@ -46,6 +62,7 @@ class AuthenticatedSessionController extends Controller
         } else if($user->customer) {
             return redirect()->route('customer.dashboard');
         }
+            */
         // Block if email not verified (Laravel built-in)
         /*if ($user instanceof MustVerifyEmail && !$user->hasVerifiedEmail()) {
             Auth::logout();
