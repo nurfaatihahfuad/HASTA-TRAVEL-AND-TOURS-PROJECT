@@ -164,6 +164,11 @@ class User extends Authenticatable
                $this->staff->staffRole === 'runner';
     }
 
+        public function isCustomer()
+    {
+        return $this->userType === 'customer';
+    }
+
     public function getFullRoleAttribute()
     {
         if ($this->userType === 'staff' && $this->staff) {

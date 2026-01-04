@@ -1,5 +1,6 @@
 <?php
 
+/* ----------------------------------------dina
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
@@ -32,6 +33,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('customer.dashboard');
         }*/
         
+/*-----------------------------------------------------------------dina
         $user = auth()->user();
         if($user->isITadmin()) {
             return redirect()->route('admin.dashboard'); // nnti tukar pegi IT admin dashboard
@@ -82,6 +84,61 @@ class AuthenticatedSessionController extends Controller
             }
             return redirect()->route('admin.dashboard');
         }*/
+
+        // fallback kalau role tak dikenali
+
+    /*----------------------------------dina
+        return redirect('/');
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
+    }
+}
+
+*/
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use Illuminate\Http\Request;
+
+class AuthenticatedSessionController extends Controller
+{
+    public function showLogin(): View
+    {
+        // Sentiasa tunjuk login form
+        return view('auth.login');
+    } 
+
+    public function login(LoginRequest $request): RedirectResponse
+    {
+        // Authenticate credentials
+        $request->authenticate();
+        $request->session()->regenerate();
+
+        $user = auth()->user();
+
+        if ($user->isITadmin()) {
+            return redirect()->route('admin.it.dashboard');
+        } elseif ($user->isFinanceAdmin()) {
+            return redirect()->route('admin.finance.dashboard');
+        } elseif ($user->isRunner()) {
+            return redirect()->route('staff.runner.dashboard');
+        } elseif ($user->isSalesperson()) {
+            return redirect()->route('staff.salesperson.dashboard');
+        } elseif ($user->isCustomer()) {
+            return redirect()->route('customer.dashboard');
+        }
 
         // fallback kalau role tak dikenali
         return redirect('/');

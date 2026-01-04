@@ -51,12 +51,8 @@ class BookingController extends Controller
             'bookingStatus'   => 'Pending',
         ]);
 
-<<<<<<< HEAD
-}
-}
-=======
         // corrected: redirect to a proper route instead of back()
         return redirect()->route('customer.dashboard')->with('success', 'Booking saved!');
     }
 }
->>>>>>> e23fe2e4c766eaa984ffdc702e52e92869e16be3
+

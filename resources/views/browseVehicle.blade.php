@@ -67,15 +67,9 @@
                             <div class="card-body text-center">
                                 <h5 class="card-title fw-bold">{{ $vehicle->brand }} {{ $vehicle->model }} ({{ $vehicle->year }})</h5>
                                 <p class="card-text text-muted">{{ $vehicle->description }}</p>
-<<<<<<< HEAD
-                                <p class="card-text">
-                                    <strong>RM{{ number_format($vehicle->price_per_day, 2) }}/day</strong>
-                                </p>
-                                <a href="{{ route('booking.form', $vehicle->vehicleID ) }}" class="btn btn-primary mx-auto">Book Now</a>
-=======
+
                                 <p class="card-text"><strong>RM{{ number_format($vehicle->price_per_day, 2) }}/day</strong></p>
                                 <a href="{{ route('booking.form', $vehicle->vehicleID) }}" class="btn btn-primary mx-auto">Book Now</a>
->>>>>>> e23fe2e4c766eaa984ffdc702e52e92869e16be3
                             </div>
                         </div>
                     </div>

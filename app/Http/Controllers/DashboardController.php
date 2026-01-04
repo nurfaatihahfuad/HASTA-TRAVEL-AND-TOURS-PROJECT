@@ -1,5 +1,6 @@
 <?php
 
+/* 
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
@@ -160,6 +161,121 @@ class DashboardController extends Controller
         return view('dashboard.customer', compact(
             'booking', 'totalBookings', 'totalDays', 'mostCar'
 
+        ));
+    }
+}
+
+*/
+
+
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class DashboardController extends Controller
+{
+    // ============================
+    // Admin IT Dashboard
+    // ============================
+    public function adminIT()
+    {
+        // contoh metric untuk IT admin (system overview)
+        $totalUsers   = DB::table('users')->count();
+        $totalStaff   = DB::table('staff')->count();
+        $totalVehicles= DB::table('vehicles')->count();
+
+        return view('dashboard.admin_it', compact(
+            'totalUsers','totalStaff','totalVehicles'
+        ));
+    }
+
+    // ============================
+    // Admin Finance Dashboard
+    // ============================
+    public function adminFinance()
+    {
+        // contoh metric untuk finance admin (payment overview)
+        $totalPayments   = DB::table('payment')->count();
+        $pendingPayments = DB::table('payment')->where('status','pending')->count();
+        $completedPayments = DB::table('payment')->where('status','completed')->count();
+        $totalRevenue    = DB::table('payment')->where('status','completed')->sum('amount');
+
+        return view('dashboard.admin_finance', compact(
+            'totalPayments','pendingPayments','completedPayments','totalRevenue'
+        ));
+    }
+
+    // ============================
+    // Staff Salesperson Dashboard
+    // ============================
+    public function staffSalesperson()
+    {
+        $staffID = auth()->user()->staff->staffID ?? null;
+
+        $bookings = DB::table('booking')->get();
+        $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
+        $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
+
+        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        $weeklyData   = [3,6,5,7,4,2,8]; // contoh statik
+
+        return view('dashboard.staff_salesperson', compact(
+            'bookings','statusCancelled','statusBooked','statusPending',
+            'weeklyLabels','weeklyData'
+        ));
+    }
+
+    // ============================
+    // Staff Runner Dashboard
+    // ============================
+    public function staffRunner()
+    {
+        $staffID = auth()->user()->staff->staffID ?? null;
+
+        $bookings      = DB::table('booking')->where('staffID',$staffID)->get();
+        $assignedToday = DB::table('booking')->where('staffID',$staffID)->whereDate('created_at', now())->count();
+        $damageCases   = DB::table('damage_case')->where('staffID',$staffID)->count();
+
+        $statusCancelled = DB::table('booking')->where('staffID',$staffID)->where('bookingStatus','cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('staffID',$staffID)->where('bookingStatus','booked')->count();
+        $statusPending   = DB::table('booking')->where('staffID',$staffID)->where('bookingStatus','pending')->count();
+
+        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        $weeklyData   = [2,4,3,5,6,1,7]; // contoh statik
+
+        return view('dashboard.staff_runner', compact(
+            'bookings','assignedToday','damageCases',
+            'statusCancelled','statusBooked','statusPending',
+            'weeklyLabels','weeklyData'
+        ));
+    }
+
+    // ============================
+    // Customer Dashboard
+    // ============================
+    public function customer()
+    {
+        $userId = auth()->user()->userID; // pastikan field betul ikut DB
+        $booking = DB::table('booking')->where('userID',$userId)->get();
+
+        $totalBookings = $booking->count();
+
+        // kira jumlah hari sewa guna Carbon
+        $totalDays = $booking->sum(function($b) {
+            return Carbon::parse($b->end_date)->diffInDays(Carbon::parse($b->start_date));
+        });
+
+        // cari kereta paling banyak disewa
+        $mostCar = $booking
+            ->groupBy('carModel')
+            ->sortByDesc(fn($group) => count($group))
+            ->keys()
+            ->first();
+
+        return view('dashboard.customer', compact(
+            'booking','totalBookings','totalDays','mostCar'
         ));
     }
 }
