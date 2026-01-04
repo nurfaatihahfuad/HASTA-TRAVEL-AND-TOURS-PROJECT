@@ -14,19 +14,25 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\verifypaymentController;
 use App\Http\Controllers\CustomerRegistrationController;
+use App\Http\Controllers\InspectionController;
 
-
-// Welcome page guna VehicleController@preview
+// ============================
+// Welcome & Vehicle browsing
+// ============================
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
 Route::get('/vehicles/search', [VehicleController::class, 'search'])->name('vehicles.search');
-
-// Browse-car boleh diakses tanpa login
 Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.vehicle');
 
+// ============================
 // Auth routes
+// ============================
+Route::get('/login', [AuthenticatedSessionController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Customer Registration Routes
+// ============================
+// Customer Registration
+// ============================
 Route::get('/register/customer', [CustomerRegistrationController::class, 'create'])
     ->name('customer.register')
     ->middleware('guest');
@@ -34,50 +40,59 @@ Route::get('/register/customer', [CustomerRegistrationController::class, 'create
 Route::post('/register/customer', [CustomerRegistrationController::class, 'store'])
     ->name('customer.register.store');
 
-// Successful Registration
 Route::get('/register/customer/success', [CustomerRegistrationController::class, 'success'])
-    ->name('customer.register.success'); //here
+    ->name('customer.register.success');
 
-//login
-Route::get('/login', [AuthenticatedSessionController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'login']);
+// ============================
+// Dashboard Routes (role-based)
+// ============================
 
-// Logout
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-//login route to dashboard 
+// Customer Dashboard
+Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
+    ->middleware(['auth', RoleMiddleware::class.':customer'])
+    ->name('customer.dashboard');
+    
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth', RoleMiddleware::class.':admin'])
     ->name('admin.dashboard');
 
-/*Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware(['auth', RoleMiddleware::class.':staff'])
-    ->name('staff.dashboard');*/
+// Admin IT Dashboard
+Route::get('/admin/it/dashboard', [DashboardController::class, 'adminIT'])
+    ->middleware(['auth', RoleMiddleware::class.':adminIT'])
+    ->name('admin.it.dashboard');
 
-   Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-    ->middleware(['auth', RoleMiddleware::class.':staff'])
-    ->name('staff.dashboard');
+// Admin IT Manage Users 
+Route::get('/admin/it/users', [AdminUserController::class, 'index']) 
+    ->middleware(['auth', RoleMiddleware::class.':adminIT']) 
+    ->name('admin.it.users');
 
-Route::get('/staff_salesperson/dashboard', [DashboardController::class, 'staff'])
-    ->middleware(['auth', RoleMiddleware::class.':staff'])
-    ->name('staff_salesperson.dashboard');
+// Admin Finance Dashboard
+Route::get('/admin/finance/dashboard', [DashboardController::class, 'adminFinance'])
+    ->middleware(['auth', RoleMiddleware::class.':adminFinance'])
+    ->name('admin.finance.dashboard');
 
-Route::get('/staff_runner/dashboard', [DashboardController::class, 'staff'])
-    ->middleware(['auth', RoleMiddleware::class.':staff'])
-    ->name('staff_runner.dashboard');
+// Staff Salesperson Dashboard
+Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSalesperson'])
+    ->middleware(['auth', RoleMiddleware::class.':salesperson'])
+    ->name('staff.salesperson.dashboard');
 
-Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
-    ->middleware(['auth', RoleMiddleware::class.':customer'])
-    ->name('customer.dashboard');
+// Staff Runner Dashboard
+Route::get('/staff/runner/dashboard', [DashboardController::class, 'staffRunner'])
+    ->middleware(['auth', RoleMiddleware::class.':runner'])
+    ->name('staff.runner.dashboard');
 
-// Booking routes (customer mesti login sebelum boleh book)
+// ============================
+// Booking routes (customer only)
+// ============================
 Route::middleware('auth')->group(function () {
     Route::get('/book-car/{vehicleID}', [BookingController::class, 'create'])->name('booking.form');
     Route::post('/book-car', [BookingController::class, 'store'])->name('booking.store');
 });
 
+// ============================
 // Protected routes (auth required)
-    Route::middleware('auth')->group(function () {
+// ============================
+Route::middleware('auth')->group(function () {
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -85,42 +100,54 @@ Route::middleware('auth')->group(function () {
 
     // CRUD
     Route::resource('crud', CRUDController::class);
-
-    // Browse cars
-    //Route::get('browse', [CarController::class, 'index'])->name('browse.cars');   
 });
 
     // Payment routes
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
+    // Car inspection to damage case
+    Route::post('/inspection/store', [InspectionController::class, 'store'])->name('inspection.store');
+    Route::post('/damage-case/resolve/{id}', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
 
-    // Staff dashboard: list all payments
-    Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-    // Staff action: approve or reject a specific payment
-    Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+    // Inspection page
+    Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection.index');
 
-    // Staff Management Routes (Admin only)
-    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->group(function () {
-        Route::get('/staff', [StaffController::class, 'index'])->name('index');
-        Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
-        Route::post('/staff', [StaffController::class, 'store'])->name('store');
-        Route::get('/staff/{id}', [StaffController::class, 'show'])->name('show');
-        Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])->name('edit');
-        Route::put('/staff/{id}', [StaffController::class, 'update'])->name('update');
-        Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('destroy');
-    });
+    // Damage Case page
+   Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage.index');
 
-    // Admin Management Routes
-    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admins.')->group(function () {
-        Route::get('/admins', [AdminController::class, 'index'])->name('index');
-        Route::get('/admins/create', [AdminController::class, 'create'])->name('create');
-        Route::post('/admins', [AdminController::class, 'store'])->name('store');
-        Route::get('/admins/{id}', [AdminController::class, 'show'])->name('show');
-        Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('edit');
-        Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
-        Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
-    });
+// ============================
+// Payment routes
+// ============================
+Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
+Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
 
-//require __DIR__.'/auth.php';
-//require DIR.'/auth.php';
+// Staff dashboard: verify payments
+Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
+Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+
+// ============================
+// Staff Management (Admin only)
+// ============================
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('staff.')->group(function () {
+    Route::get('/staff', [StaffController::class, 'index'])->name('index');
+    Route::get('/staff/create', [StaffController::class, 'create'])->name('create');
+    Route::post('/staff', [StaffController::class, 'store'])->name('store');
+    Route::get('/staff/{id}', [StaffController::class, 'show'])->name('show');
+    Route::get('/staff/{id}/edit', [StaffController::class, 'edit'])->name('edit');
+    Route::put('/staff/{id}', [StaffController::class, 'update'])->name('update');
+    Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('destroy');
+});
+
+// ============================
+// Admin Management (Admin only)
+// ============================
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admins.')->group(function () {
+    Route::get('/admins', [AdminController::class, 'index'])->name('index');
+    Route::get('/admins/create', [AdminController::class, 'create'])->name('create');
+    Route::post('/admins', [AdminController::class, 'store'])->name('store');
+    Route::get('/admins/{id}', [AdminController::class, 'show'])->name('show');
+    Route::get('/admins/{id}/edit', [AdminController::class, 'edit'])->name('edit');
+    Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
+    Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
+});

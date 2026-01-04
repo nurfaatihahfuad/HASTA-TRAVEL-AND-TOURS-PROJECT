@@ -110,13 +110,6 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 
     // for salesperson to verify documents
     public function verificationDocs()
@@ -164,6 +157,11 @@ class User extends Authenticatable
                $this->staff->staffRole === 'runner';
     }
 
+        public function isCustomer()
+    {
+        return $this->userType === 'customer';
+    }
+
     public function getFullRoleAttribute()
     {
         if ($this->userType === 'staff' && $this->staff) {
@@ -189,7 +187,7 @@ class User extends Authenticatable
     {
         return $this->userType === 'admin' &&
                 $this->admin &&
-                $this->admin->adminType === 'finance';
+                $this->admin->adminType === 'Finance';
     }
 
     // Booking

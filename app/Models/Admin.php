@@ -10,7 +10,7 @@ class Admin extends Model
     use HasFactory;
 
     protected $table = 'admin';
-    //protected $primaryKey = 'adminID';
+    protected $primaryKey = 'adminID';
     //protected $keyType = 'string';
     //public $incrementing = false;
     public $timestamps = false;
