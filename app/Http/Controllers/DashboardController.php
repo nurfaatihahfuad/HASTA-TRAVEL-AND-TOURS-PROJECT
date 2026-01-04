@@ -181,7 +181,7 @@ class DashboardController extends Controller
     public function adminIT()
     {
         // contoh metric untuk IT admin (system overview)
-        $totalUsers   = DB::table('users')->count();
+        $totalUsers   = DB::table('user')->count();
         $totalStaff   = DB::table('staff')->count();
         $totalVehicles= DB::table('vehicles')->count();
 

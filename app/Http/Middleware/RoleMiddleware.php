@@ -23,13 +23,32 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        $userType = Auth::user()->userType;
+        $user = Auth::user();
+        $userType = $user->userType;
 
-        // Check if user has the required role
-        if ($userType == $role) {
+        // --- Logik Baru: Check specific roles guna Model Helper ---
+        $hasAccess = false;
+
+        if ($role === 'adminIT' && $user->isITadmin()) {
+            $hasAccess = true;
+        } elseif ($role === 'adminFinance' && $user->isFinanceAdmin()) {
+            $hasAccess = true;
+        } elseif ($role === 'salesperson' && $user->isSalesperson()) {
+            $hasAccess = true;
+        } elseif ($role === 'runner' && $user->isRunner()) {
+            $hasAccess = true;
+        } elseif ($role === 'customer' && $user->isCustomer()) {
+            $hasAccess = true;
+        } elseif ($userType === $role) {
+            // Fallback jika role yang dihantar adalah basic (cth: 'admin')
+            $hasAccess = true;
+        }
+
+        if ($hasAccess) {
             Log::info('Role check passed');
             return $next($request);
         }
+        // --- End Logik Baru ---
 
         Log::warning('Role check failed', [
             'required' => $role,
@@ -47,25 +66,31 @@ class RoleMiddleware
 
         switch ($userType) {
             case 'admin':
-                return redirect('/admin/dashboard');
+                // Check specific admin sub-roles for redirection
+                if ($user->isITadmin()) {
+                    return redirect()->route('admin.it.dashboard');
+                } elseif ($user->isFinanceAdmin()) {
+                    return redirect()->route('admin.finance.dashboard');
+                }
+                return redirect('/'); // Fallback if admin type not found
+            
             case 'staff':
                 if ($user->staff) {
                     // Redirect to appropriate staff dashboard
                     if ($user->staff->staffRole === 'salesperson') {
-                        return redirect('/staff_salesperson/dashboard');
+                        return redirect()->route('staff.salesperson.dashboard');
                     } elseif ($user->staff->staffRole === 'runner') {
-                        return redirect('/staff_runner/dashboard');
+                        return redirect()->route('staff.runner.dashboard');
                     }
                 }
+                return redirect('/');
+
             case 'customer':
-                return redirect('/customer/dashboard');
+                return redirect()->route('customer.dashboard');
 
             default:
                 Auth::logout();
                 return redirect('/login')->withErrors(['role' => 'Invalid user role']);
-        }
-
-            return redirect()->route('login');
         }
 
         /*if (Auth::user()->userType !== $role) {
@@ -73,6 +98,5 @@ class RoleMiddleware
         }*/
 
         //return $next($request);
-
     }
-
+}

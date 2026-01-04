@@ -110,13 +110,6 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 
     // for salesperson to verify documents
     public function verificationDocs()
@@ -127,7 +120,7 @@ class User extends Authenticatable
     // relationship with Staff
     public function staff()
     {
-        return $this->hasOne(Staff::class, 'staffID', 'userID');
+        return $this->hasOne(Staff::class, 'userID', 'userID');
     }
 
     // Add role checking methods to User model (add these methods)
@@ -180,7 +173,7 @@ class User extends Authenticatable
     // Relationship to Admin
     public function admin()
     {
-        return $this->hasOne(Admin::class, 'adminID', 'userID');
+        return $this->hasOne(Admin::class, 'userID', 'userID');
     }
 
     public function isITadmin()
@@ -194,7 +187,7 @@ class User extends Authenticatable
     {
         return $this->userType === 'admin' &&
                 $this->admin &&
-                $this->admin->adminType === 'finance';
+                $this->admin->adminType === 'Finance';
     }
 
     // Booking
