@@ -9,12 +9,12 @@
                 <h5 class="mb-3">HASTA</h5>
                 <nav class="d-grid gap-2">
                     <a class="sidebar-link" href="#">Dashboard</a>
-                    <a class="sidebar-link" href="#">Car Inspection Checklist</a>
+                    <a class="sidebar-link" href="{{ route('inspection.index') }}">Car Inspection Checklist</a>
                     <a class="sidebar-link" href="#">Blacklisted Record</a>
                     <a class="sidebar-link" href="#">Sales Record</a>
                     <a class="sidebar-link" href="#">Payment Record</a>
                     <a class="sidebar-link" href="#">Pending Payment</a>
-                    <a class="sidebar-link" href="#">Damage Case</a>
+                    <a class="sidebar-link" href="{{ route('damage.index') }}">Damage Case</a>
                     <a class="sidebar-link" href="#">Profile</a>
                     <a class="sidebar-link" href="#">Settings</a>
                     <form method="POST" action="{{ route('logout') }}">

@@ -22,6 +22,13 @@
 
     <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');"> </div>
 
+
+      <div class="carousel-caption">
+        <h1 class="display-4 fw-bold">Reliable & Safe</h1>
+        <p class="lead">Experience worry-free rides with Hasta Travel & Tours.</p>
+        <a href="{{ route('browse.vehicle') }}" class="btn btn-primary btn-lg">Browse Cars</a>
+      </div>
+
     </div>
     <div class="carousel-item" style="background-image: url('{{ asset('img/displayPage.jpg') }}');">
       <div class="carousel-caption">
