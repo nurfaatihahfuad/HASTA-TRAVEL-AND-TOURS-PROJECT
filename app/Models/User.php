@@ -120,7 +120,7 @@ class User extends Authenticatable
     // relationship with Staff
     public function staff()
     {
-        return $this->hasOne(Staff::class, 'userID', 'userID');
+        return $this->hasOne(Staff::class, 'staffID', 'userID');
     }
 
     // Add role checking methods to User model (add these methods)
@@ -173,7 +173,7 @@ class User extends Authenticatable
     // Relationship to Admin
     public function admin()
     {
-        return $this->hasOne(Admin::class, 'userID', 'userID');
+        return $this->hasOne(Admin::class, 'adminID', 'userID');
     }
 
     public function isITadmin()
