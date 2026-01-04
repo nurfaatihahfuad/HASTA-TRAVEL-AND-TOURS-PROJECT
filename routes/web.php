@@ -197,6 +197,11 @@ Route::get('/admin/it/dashboard', [DashboardController::class, 'adminIT'])
     ->middleware(['auth', RoleMiddleware::class.':adminIT'])
     ->name('admin.it.dashboard');
 
+// Admin IT Manage Users 
+Route::get('/admin/it/users', [AdminUserController::class, 'index']) 
+    ->middleware(['auth', RoleMiddleware::class.':adminIT']) 
+    ->name('admin.it.users');
+
 // Admin Finance Dashboard
 Route::get('/admin/finance/dashboard', [DashboardController::class, 'adminFinance'])
     ->middleware(['auth', RoleMiddleware::class.':adminFinance'])
