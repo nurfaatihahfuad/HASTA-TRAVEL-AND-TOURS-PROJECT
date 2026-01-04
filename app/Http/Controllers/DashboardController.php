@@ -180,15 +180,60 @@ class DashboardController extends Controller
     // ============================
     public function adminIT()
     {
-        // contoh metric untuk IT admin (system overview)
-        $totalUsers   = DB::table('user')->count();
-        $totalStaff   = DB::table('staff')->count();
-        $totalVehicles= DB::table('vehicles')->count();
+        // System overview
+        $totalUsers    = DB::table('user')->count();
+        $totalStaff    = DB::table('staff')->count();
+        $totalVehicles = DB::table('vehicles')->count();
 
-        return view('dashboard.admin_it', compact(
-            'totalUsers','totalStaff','totalVehicles'
-        ));
+        // Booking metrics
+        $newBookings   = DB::table('booking')->where('bookingStatus','new')->count();
+        $rentedCars    = DB::table('booking')->where('bookingStatus','rented')->count();
+        $availableCars = DB::table('vehicles')->where('available',1)->count();
+
+        // Weekly booking overview (group by day of week)
+        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        $weeklyData   = [];
+        foreach ($weeklyLabels as $day) {
+            $weeklyData[] = DB::table('booking')
+                ->whereRaw('DAYNAME(created_at) = ?', [$day])
+                ->count();
+        }
+
+        // Car types distribution (group by vehicleName)
+        $carTypes = DB::table('vehicles')
+            ->select('vehicleName', DB::raw('COUNT(*) as total'))
+            ->groupBy('vehicleName')
+            ->get()
+            ->map(function($row) use ($totalVehicles) {
+                return [
+                    'label' => $row->vehicleName,
+                    'value' => round(($row->total / $totalVehicles) * 100, 1)
+                ];
+            });
+
+        // Booking status counts
+        $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
+        $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
+        $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
+
+        // ✅ Pastikan semua variable dihantar ke view
+        return view('dashboard.admin_it', [
+            'totalUsers'      => $totalUsers,
+            'totalStaff'      => $totalStaff,
+            'totalVehicles'   => $totalVehicles,
+            'newBookings'     => $newBookings,
+            'rentedCars'      => $rentedCars,
+            'availableCars'   => $availableCars,
+            'weeklyLabels'    => $weeklyLabels,
+            'weeklyData'      => $weeklyData,
+            'carTypes'        => $carTypes,
+            'statusCancelled' => $statusCancelled,
+            'statusBooked'    => $statusBooked,
+            'statusPending'   => $statusPending,
+        ]);
     }
+
+
 
     // ============================
     // Admin Finance Dashboard
