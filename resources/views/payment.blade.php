@@ -34,7 +34,7 @@
                 </div>
 
                 <div class="payment-amount">
-                    <label>Amount Should Pay (RM):</label>
+                    <label>Amount Should Pay (RM) TESTTT:</label>
                     <p class="amount-display">
                         @if($amountToPay !== null)
                             RM{{ $amountToPay }}
