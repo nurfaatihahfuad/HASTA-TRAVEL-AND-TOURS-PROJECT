@@ -16,27 +16,14 @@
         <form action="{{ route('booking.store') }}" method="POST">
             @csrf
 
-            <div class="booking-box"> 
+            <div class="page-header"> 
             <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2> 
             </div>
 
             <div>
-            <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
-            </div>
-
-            <div>
-            <input type="hidden" name="userID" value="{{ auth()->id() }}">
-            </div>
-
-            <div class = "form-group">
-                <label for="pickup_dateTime">Pick-up Date & Time: <span style="color:red">*</span></label>
-                <input type="datetime-local" name="pickup_dateTime" required>
-            </div>
-
-
-            <div class="form-group">
-                <label for="return_dateTime">Return Date & Time: <span style="color:red">*</span></label>
-                <input type="datetime-local" name="return_dateTime" required>
+                <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
+                <input type="hidden" name="pickup_dateTime" value="{{ $pickup_dateTime }}">
+                <input type="hidden" name="return_dateTime" value="{{ $return_dateTime }}">
             </div>
 
 
@@ -55,13 +42,23 @@
                 <input type="text" name="voucherCode">
             </div>
 
-             @if(isset($vehicle))
-                <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
-            @endif
-
-            <button type="submit" class="submit-btn">Submit</button>
+            <div class="button-group">
+                <button type="submit" class="submit-btn">Submit</button>
+            </div>
         </form>
 
+        @if(isset($booking))
+        <div class="booking-summary">
+            <h3>Booking Confirmed!</h3>
+                <p>Booking ID: {{ $booking->bookingID }}</p>
+                <p>Vehicle: {{ $booking->vehicle->brand }} {{ $booking->vehicle->model }}</p>
+                <p>Pickup: {{ $booking->pickup_dateTime }}</p>
+                <p>Return: {{ $booking->return_dateTime }}</p>
+            <a href="{{ route('payment.show', $booking->bookingID) }}" class="btn btn-success">
+            Proceed to Payment
+        </a>
+    </div>
+@endif
         <!-- Right: Car Info -->
         @if($vehicle)
         <div class="car-info">

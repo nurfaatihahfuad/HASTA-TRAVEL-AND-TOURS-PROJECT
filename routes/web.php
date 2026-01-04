@@ -102,8 +102,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('crud', CRUDController::class);
 });
 
-// Browse cars ? ni diperlukan ke? kalau ya bole uncomment
-    //Route::get('browse', [CarController::class, 'index'])->name('browse.cars');   
+    // Payment routes
+    Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
     // Car inspection to damage case
     Route::post('/inspection/store', [InspectionController::class, 'store'])->name('inspection.store');

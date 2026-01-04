@@ -8,6 +8,9 @@ use Carbon\Carbon;
 class Booking extends Model
 {
     protected $table = 'booking';
+    protected $primaryKey = 'bookingID';
+    public $incrementing = true; 
+    protected $keyType = 'int';
 
     protected $fillable = [
         'userID',
@@ -29,6 +32,6 @@ class Booking extends Model
 
     public function vehicle()
     {
-        return $this->belongsTo(Vehicle::class);
+        return $this->belongsTo(Vehicle::class, 'vehicleID', 'vehicleID');
     }
 }

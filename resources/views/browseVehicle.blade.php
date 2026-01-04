@@ -69,7 +69,13 @@
                                 <p class="card-text text-muted">{{ $vehicle->description }}</p>
 
                                 <p class="card-text"><strong>RM{{ number_format($vehicle->price_per_day, 2) }}/day</strong></p>
-                                <a href="{{ route('booking.form', $vehicle->vehicleID) }}" class="btn btn-primary mx-auto">Book Now</a>
+                                <a href="{{ route('booking.form', [
+                                        'vehicleID' => $vehicle->vehicleID,
+                                        'pickup_dateTime' => request('pickup_dateTime'),
+                                        'return_dateTime' => request('return_dateTime')
+                                ]) }}" class="btn btn-primary mx-auto">
+                                Book Now
+                                </a>
                             </div>
                         </div>
                     </div>

@@ -18,12 +18,12 @@
             <p>MALAYSIA NATIONAL QR</p>
         
             <h3>Booking Summary</h3>
-            <p>Car: {{ $vehicle['brand'] }} {{ $vehicle['model'] }} | Total Hours: {{ $totalHours }}</p>
+            <p>Car: {{ $booking->vehicle->vehicleName }} | Total Hours: {{ $totalHours }}</p>
             <p>Total Payment: RM{{ $totalPayment }}</p>
         </div>
 
         {{-- Form GET untuk pilih payment type dan paparkan amount --}}
-        <form action="{{ route('payment.show') }}" method="GET">
+        <form action="{{ route('payment.show', ['bookingID' => $booking->bookingID]) }}" method="GET">
             <div class="payment-row">
                 <div class="payment-type">
                     <label>Choose Payment Type:</label>
@@ -50,7 +50,7 @@
         </form>
 
         {{-- Form POST untuk submit payment proof + hantar pilihan/amount yang telah dikira --}}
-        <form action="{{ route('payment.submit') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('payment.submit', ['bookingID' => $booking->bookingID]) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="paymentType" value="{{ $paymentType }}">
             <input type="hidden" name="amount" value="{{ $amountToPay }}">
