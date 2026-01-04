@@ -41,7 +41,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('staff_runner.dashboard');
         } else if($user->isSalesperson()) {
             return redirect()->route('staff_salesperson.dashboard');
-        } else if($user->customer) {
+        } else if($user->customer()) {
             return redirect()->route('customer.dashboard');
         }
         // Block if email not verified (Laravel built-in)

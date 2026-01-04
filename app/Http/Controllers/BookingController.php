@@ -15,10 +15,14 @@ class BookingController extends Controller
     /**
      * Show the booking form to the customer.
      */
-    public function create($vehicleID): View
+    public function create($vehicleID, Request $request): View
     {
         $vehicle = Vehicle::findOrFail($vehicleID);
-        return view('booking', compact('vehicle'));
+
+        $pickup_dateTime = $request->input('pickup_dateTime');
+        $return_dateTime = $request->input('return_dateTime');
+
+        return view('booking', compact('vehicle', 'pickup_dateTime', 'return_dateTime'));
 
         //$vehicle = Vehicle::find(1);
     }
@@ -29,14 +33,12 @@ class BookingController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            // corrected: use 'id' if vehicles table PK is 'id'
-            'vehicleID'       => 'required|integer|exists:vehicles,id',
+            'vehicleID'       => 'required|integer|exists:vehicles,vehicleID',
             'pickup_dateTime' => 'required|date',
             'return_dateTime' => 'required|date|after_or_equal:pickup_dateTime',
             'pickupAddress'   => 'required|string|max:255',
             'returnAddress'   => 'required|string|max:255',
             'voucherCode'     => 'nullable|string|max:50',
-            'quantity'        => 'required|integer|min:1',
         ]);
 
         $booking = Booking::create([
@@ -46,17 +48,13 @@ class BookingController extends Controller
             'return_dateTime' => $validated['return_dateTime'],
             'pickupAddress'   => $validated['pickupAddress'],
             'returnAddress'   => $validated['returnAddress'],
-            'voucherCode'     => $validated['voucherCode'] ?? null,
-            'quantity'        => $validated['quantity'],
+            'voucherCode'     => $validated['voucherCode'],
             'bookingStatus'   => 'Pending',
         ]);
 
-<<<<<<< HEAD
-}
-}
-=======
         // corrected: redirect to a proper route instead of back()
-        return redirect()->route('customer.dashboard')->with('success', 'Booking saved!');
+        return redirect()->route('payment.show', ['bookingID' => $booking->bookingID]);
+        //return redirect()->route('payment.show', $booking->id); 
     }
 }
->>>>>>> e23fe2e4c766eaa984ffdc702e52e92869e16be3
+

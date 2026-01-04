@@ -21,6 +21,7 @@ class VehicleController extends Controller
         return view('welcome', compact('vehicles')); 
     }
 
+    /*
     public function search(Request $request) 
     {
         $pickup = $request->input('pickup_dateTime');
@@ -41,7 +42,25 @@ class VehicleController extends Controller
 
         return view('browseVehicle', compact('vehicles'));
     }
+        */
 
+    // VehicleController@search
+    public function search(Request $request)
+    {
+        $pickup_dateTime = $request->input('pickup_dateTime');
+        $return_dateTime = $request->input('return_dateTime');
 
+        $vehicles = Vehicle::where('available', 1)
+            ->whereNotIn('vehicleID', function($q) use ($pickup_dateTime, $return_dateTime) {
+                $q->select('vehicleID')
+                ->from('booking')
+                ->where(function($q2) use ($pickup_dateTime, $return_dateTime) {
+                    $q2->whereBetween('pickup_dateTime', [$pickup_dateTime, $return_dateTime])
+                    ->orWhereBetween('return_dateTime', [$pickup_dateTime, $return_dateTime]);
+                });
+            })
+            ->get();
 
+        return view('browseVehicle', compact('vehicles', 'pickup_dateTime', 'return_dateTime'));
+    }
 }

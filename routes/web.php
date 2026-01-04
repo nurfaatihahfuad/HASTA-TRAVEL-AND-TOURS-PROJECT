@@ -12,9 +12,7 @@ use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AdminController;
-
 use App\Http\Controllers\verifypaymentController;
-
 use App\Http\Controllers\CustomerRegistrationController;
 
 
@@ -56,6 +54,10 @@ Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff.dashboard');*/
 
+   Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff.dashboard');
+
 Route::get('/staff_salesperson/dashboard', [DashboardController::class, 'staff'])
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff_salesperson.dashboard');
@@ -63,7 +65,6 @@ Route::get('/staff_salesperson/dashboard', [DashboardController::class, 'staff']
 Route::get('/staff_runner/dashboard', [DashboardController::class, 'staff'])
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff_runner.dashboard');
-
 
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
@@ -90,8 +91,8 @@ Route::middleware('auth')->group(function () {
 });
 
     // Payment routes
-    Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
+    Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
 
 
     // Staff dashboard: list all payments
