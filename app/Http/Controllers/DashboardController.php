@@ -355,7 +355,7 @@ class DashboardController extends Controller
 
         // kira jumlah hari sewa guna Carbon
         $totalDays = $booking->sum(function($b) {
-            return Carbon::parse($b->end_date)->diffInDays(Carbon::parse($b->start_date));
+            return Carbon::parse($b->return_dateTime)->diffInDays(Carbon::parse($b->pickup_dateTime));
         });
 
         // cari kereta paling banyak disewa
@@ -364,6 +364,11 @@ class DashboardController extends Controller
             ->sortByDesc(fn($group) => count($group))
             ->keys()
             ->first();
+        $booking = DB::table('booking')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->where('userID', $userId)
+            ->select('booking.*', 'vehicles.vehicleName as carModel')
+            ->get();    
 
         return view('dashboard.customer', compact(
             'booking','totalBookings','totalDays','mostCar'

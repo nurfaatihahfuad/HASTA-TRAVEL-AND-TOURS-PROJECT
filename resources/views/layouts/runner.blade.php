@@ -155,6 +155,14 @@
             <a class="sidebar-link" href="#">
                 <i class="fas fa-chart-bar"></i> Pending Payment
             </a>
+
+            <a class="sidebar-link" href="{{ route('inspection.index') }}">
+                <i class="fas fa-chart-bar"></i> Car Inspection Checklist
+            </a>
+
+            <a class="sidebar-link" href="{{ route('damage_case.index') }}">
+                <i class="fas fa-chart-bar"></i> Damage Case Checklist 
+            </a>
             
             <hr>
             
