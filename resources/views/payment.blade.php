@@ -28,8 +28,8 @@
                 <div class="payment-type">
                     <label>Choose Payment Type:</label>
                     <select name="paymentType" onchange="this.form.submit()">
-                        <option value="Deposit" {{ $paymentType == 'Deposit' ? 'selected' : '' }}>Deposit Payment</option>
-                        <option value="Full" {{ $paymentType == 'Full' ? 'selected' : '' }}>Full Payment</option>
+                        <option value="Deposit Payment" {{ $paymentType == 'Deposit Payment' ? 'selected' : '' }}>Deposit Payment</option>
+                        <option value="Full Payment" {{ $paymentType == 'Full Payment' ? 'selected' : '' }}>Full Payment</option>
                     </select>
                 </div>
 

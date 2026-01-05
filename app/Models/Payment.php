@@ -23,7 +23,8 @@ class Payment extends Model
         'amountPaid',
         'receipt_file_path',
         'paymentStatus',
-        'totalAmount'
+        'totalAmount',
+        //'verifiedBy',
     ];
 
     public function booking()

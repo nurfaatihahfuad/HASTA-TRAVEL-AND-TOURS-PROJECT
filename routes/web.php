@@ -12,7 +12,6 @@ use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\verifypaymentController;
 use App\Http\Controllers\CustomerRegistrationController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\DamageCaseController;
@@ -84,6 +83,10 @@ Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSa
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff_salesperson.dashboard');
 
+//Auni Letak yg ni tau
+Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus']) 
+    ->name('booking.updateStatus');
+
 
 // ============================
 // Booking routes (customer only)
@@ -108,8 +111,7 @@ Route::middleware('auth')->group(function () {
 
     // Payment routes
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
-    //Route::post('/payment', [PaymentController::class, 'store'])->name('payment.store');
+    Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
     // Car inspection to damage case
     // Car inspection CRUD

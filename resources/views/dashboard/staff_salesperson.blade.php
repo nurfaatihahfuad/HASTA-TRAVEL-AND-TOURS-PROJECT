@@ -57,6 +57,7 @@
                             <tr>
                                 <th>Booking ID</th>
                                 <th>Car</th>
+                                 <th>Payment Proof</th>
                                 <th>Status</th>
                                 <th>Created At</th>
                             </tr>
@@ -65,10 +66,23 @@
                             @forelse($bookings as $b)
                                 <tr>
                                     <td>{{ $b->bookingID }}</td>
-                                    <td>{{ $b->carModel ?? '—' }}</td>
-                                    <td><span class="badge bg-secondary">{{ $b->bookingStatus }}</span></td>
+                                    <td>{{ $b->vehicleID }}</td>
+                                    <td>{{ '-' }}</td>
+                                    <td> <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID) }}">
+                            
+                            <!-- Yg ni Auni nak tambah button approved / rejected-->
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" name="status" value="approved" class="btn btn-success btn-sm">
+                                Approve
+                            </button>
+                            <button type="submit" name="status" value="rejected" class="btn btn-danger btn-sm">
+                                Reject
+                            </button>
+                            </form></td>
+
                                     <td>{{ $b->created_at }}</td>
-                                </tr>
+                                </tr>   
                             @empty
                                 <tr><td colspan="4">No bookings found.</td></tr>
                             @endforelse
@@ -76,7 +90,6 @@
                     </table>
                 </div>
             </div>
-        
     </div>
 </div>
 

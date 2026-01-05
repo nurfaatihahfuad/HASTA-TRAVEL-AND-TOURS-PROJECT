@@ -57,5 +57,19 @@ class BookingController extends Controller
                          ->with('success', 'Booking Complete!');
         //return redirect()->route('payment.show', $booking->id); 
     }
+
+    //Auni tambah
+    public function updateStatus(Request $request, $bookingID)
+    {
+        $booking = Booking::findOrFail($bookingID);
+        //Auni tambah ni
+        $status = $request->input('status');
+        // yg bawah ni Auni tambah
+        $booking->bookingStatus = 'approved'; // 'approved' atau 'rejected'
+        $booking->save();
+
+        return back()->with('success', "Booking {$bookingID} updated to {$request->status}");
+    }
+
 }
 
