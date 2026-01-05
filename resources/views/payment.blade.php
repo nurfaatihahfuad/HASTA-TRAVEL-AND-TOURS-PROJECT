@@ -19,7 +19,7 @@
         
             <h3>Booking Summary</h3>
             <p>Car: {{ $booking->vehicle->vehicleName }} | Total Hours: {{ $totalHours }}</p>
-            <p>Total Payment: RM{{ $totalPayment }}</p>
+            <p>Total Payment: RM{{ $totalAmount }}</p>
         </div>
 
         {{-- Form GET untuk pilih payment type dan paparkan amount --}}
@@ -52,8 +52,9 @@
         {{-- Form POST untuk submit payment proof + hantar pilihan/amount yang telah dikira --}}
         <form action="{{ route('payment.submit', ['bookingID' => $booking->bookingID]) }}" method="POST" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="bookingID" value="{{$booking->bookingID}}">
             <input type="hidden" name="paymentType" value="{{ $paymentType }}">
-            <input type="hidden" name="amount" value="{{ $amountToPay }}">
+            <input type="hidden" name="amountPaid" value="{{ $amountToPay }}">
 
             <label>Upload Payment Proof:</label>
             <input type="file" name="payment_proof" accept=".pdf,.jpeg,.jpg,.png" required>

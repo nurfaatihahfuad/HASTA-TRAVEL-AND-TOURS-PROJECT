@@ -53,7 +53,8 @@ class BookingController extends Controller
         ]);
 
         // corrected: redirect to a proper route instead of back()
-        return redirect()->route('payment.show', ['bookingID' => $booking->bookingID]);
+        return redirect()->route('payment.show', ['bookingID' => $booking->bookingID])
+                         ->with('success', 'Booking Complete!');
         //return redirect()->route('payment.show', $booking->id); 
     }
 }

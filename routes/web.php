@@ -107,6 +107,7 @@ Route::middleware('auth')->group(function () {
     // Payment routes
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
+    //Route::post('/payment', [PaymentController::class, 'store'])->name('payment.store');
 
     // Car inspection to damage case
     Route::post('/inspection/store', [InspectionController::class, 'store'])->name('inspection.store');

@@ -9,25 +9,39 @@ class Payment extends Model
 {
     use HasFactory;
 
-    protected $table = 'payments'; // default plural
-    protected $primaryKey = 'payemntID';
+    protected $table = 'payment'; 
+    protected $primaryKey = 'paymentID';
+    public $incrementing = false; 
+    protected $keyType = 'string';
+
+    public $timestamps = false;
 
     protected $fillable = [
-        'booking_id',
+        'paymentID',
+        'bookingID',
         'paymentType',
-        'amount',
+        'amountPaid',
         'receipt_file_path',
         'paymentStatus',
-        'userID',
+        'totalAmount'
     ];
 
     public function booking()
     {
-        return $this->belongsTo(Booking::class, 'booking_id');
+        return $this->belongsTo(Booking::class, 'bookingID');
     }
 
+    /*
     public function user()
     {
         return $this->belongsTo(User::class, 'userID');
     }
+    
+
+    private function generatePaymentID()
+    {
+        return 'PM' . strtoupper(uniqid()); 
+    }
+    */
+
 }
