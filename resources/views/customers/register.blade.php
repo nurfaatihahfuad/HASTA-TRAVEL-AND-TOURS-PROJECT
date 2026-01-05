@@ -15,14 +15,14 @@
         /* CSS Variables - Scoped only to this page */
         
         :root {
-            --reg-primary: #EC9A85;
+            --reg-primary: #E74A33 ;
             --reg-primary-dark: #D98B77;
             --reg-primary-light: #F9E0D9;
             --reg-primary-lightest: #FEF5F2;
         }
 
         body {
-            background-image: url("/img/registration-bg.jpg");
+            background: linear-gradient(to bottom right, #ffe9b3, #ffc7b5);
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -62,8 +62,8 @@
         }
         
         .reg-btn-primary:hover {
-            background-color: var(--reg-primary-dark) !important;
-            border-color: var(--reg-primary-dark) !important;
+            background-color: #c0392b !important;
+            border-color: #c0392b !important;
         }
         
         .reg-btn-primary:focus {
@@ -513,7 +513,7 @@
                         </button>
                     </div>
                     
-                    <!-- Login Link (Optional) -->
+                    <!-- Login Link -->
                     <div class="text-center pt-4">
                         <p class="text-gray-600">
                             Already have an account?
