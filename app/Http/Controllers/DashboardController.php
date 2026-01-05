@@ -172,6 +172,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -348,7 +349,7 @@ class DashboardController extends Controller
     // ============================
     public function customer()
     {
-        $userId = auth()->user()->userID; // pastikan field betul ikut DB
+        /*$userId = auth()->user()->userID; // pastikan field betul ikut DB
         $booking = DB::table('booking')->where('userID',$userId)->get();
 
         $totalBookings = $booking->count();
@@ -373,6 +374,65 @@ class DashboardController extends Controller
 
         return view('dashboard.customer', compact(
             'booking','totalBookings','totalDays','mostCar'
-        ));
+        ));*/
+        $user = Auth::user();
+        $customer = $user->customer;
+        
+        // Get bookings (example - adjust based on your actual Booking model)
+        $bookings = $user->bookings()->latest()->take(5)->get();
+        $upcomingBookings = $user->bookings()
+            ->where('pickup_dateTime', '>=', now())
+            ->orderBy('pickup_dateTime')
+            ->take(3)
+            ->get();
+        
+        // Calculate metrics
+        $totalBookings = $user->bookings()->count();
+        $activeBookings = $user->bookings()->where('bookingStatus', 'successful')->count();
+        
+        // Calculate total days (example logic)
+        $totalDays = $user->bookings()
+            ->where('bookingStatus', 'successful')
+            ->get()
+            ->sum(function($booking) {
+                $pickup = \Carbon\Carbon::parse($booking->pickup_dateTime);
+                $return = \Carbon\Carbon::parse($booking->return_dateTime);
+                return $return->diffInDays($pickup);
+            });
+        
+        // Most rented car
+        $mostCar = $user->bookings()
+        ->selectRaw('vehicles.vehicleName as carModel, count(*) as count')
+        ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+        ->groupBy('vehicles.vehicleName')
+        ->orderByDesc('count')
+        ->value('carModel');
+        
+        // Get statistics
+        $totalBookings = $user->bookings()->count();
+        /*$activeBookings = $user->bookings()
+            ->whereIn('status', 'successful')
+            ->count();*/
+        $completedBookings = $user->bookings()
+            ->where('bookingStatus', 'successful')
+            ->count();
+        
+        // Recent bookings
+        $recentBookings = $user->bookings()
+            ->with('vehicle')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('dashboard.customer', [
+            'customer' => $customer,
+            'bookings' => $bookings,
+            'upcomingBookings' => $upcomingBookings,
+            'totalBookings' => $totalBookings,
+            //'activeBookings' => $activeBookings,
+            'completedBookings' => $completedBookings,
+            'totalDays' => $totalDays,
+            'mostCar' => $mostCar,
+        ]);
     }
 }

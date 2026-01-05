@@ -164,7 +164,7 @@
             </a>
 
             <a class="sidebar-link @if(str_contains($currentRoute, 'vehicles.')) active @endif" 
-                href="{{ route('vehicles.index') }}">
+                href="#">
                  <i class="fas fa-car"></i> Vehicle Management
             </a>
 
