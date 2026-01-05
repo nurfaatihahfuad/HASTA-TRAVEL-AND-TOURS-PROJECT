@@ -102,6 +102,21 @@ Route::middleware('auth')->group(function () {
 
     // CRUD
     Route::resource('crud', CRUDController::class);
+
+    // ============================
+    // Vehicle Management (Admin IT only)
+    // ============================
+    // Vehicle Management (Admin IT only)
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('vehicles.')->group(function () {
+        Route::get('/vehicles', [VehicleController::class, 'indexAdmin'])->name('index');
+        Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('create');
+        Route::post('/vehicles', [VehicleController::class, 'store'])->name('store');
+        Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->name('edit');
+        Route::put('/vehicles/{id}', [VehicleController::class, 'update'])->name('update');
+        Route::delete('/vehicles/{id}', [VehicleController::class, 'destroy'])->name('destroy');
+    });
+
+
 });
 
     // Payment routes

@@ -63,4 +63,53 @@ class VehicleController extends Controller
 
         return view('browseVehicle', compact('vehicles', 'pickup_dateTime', 'return_dateTime'));
     }
+
+    public function indexAdmin()
+    {
+        // Ambil semua vehicle (tak kisah available/unavailable)
+        $vehicles = Vehicle::all();
+
+        // Hantar ke view admin/vehicle/indexVehicle.blade.php
+        return view('admin.vehicle.indexVehicle', compact('vehicles'));
+    }
+
+
+    public function store(Request $request)
+    {
+        $vehicle = new Vehicle();
+        $vehicle->vehicleName = $request->vehicleName;
+        $vehicle->type = $request->type;
+        $vehicle->status = $request->status;
+        $vehicle->available = $request->status === 'available' ? 1 : 0;
+        $vehicle->save();
+
+        return redirect()->route('vehicles.index')->with('success', 'Vehicle created successfully');
+    }
+
+    public function edit($id)
+    {
+        $vehicle = Vehicle::findOrFail($id);
+        return view('updateVehicle', compact('vehicle'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $vehicle = Vehicle::findOrFail($id);
+        $vehicle->vehicleName = $request->vehicleName;
+        $vehicle->type = $request->type;
+        $vehicle->status = $request->status;
+        $vehicle->available = $request->status === 'available' ? 1 : 0;
+        $vehicle->save();
+
+        return redirect()->route('vehicles.index')->with('success', 'Vehicle updated successfully');
+    }
+
+    public function destroy($id)
+    {
+        $vehicle = Vehicle::findOrFail($id);
+        $vehicle->delete();
+
+        return redirect()->route('vehicles.index')->with('success', 'Vehicle deleted successfully');
+    }
+
 }
