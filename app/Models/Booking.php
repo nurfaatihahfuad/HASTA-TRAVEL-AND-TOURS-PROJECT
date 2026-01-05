@@ -9,8 +9,8 @@ class Booking extends Model
 {
     protected $table = 'booking';
     protected $primaryKey = 'bookingID';
-    public $incrementing = true; 
-    protected $keyType = 'int';
+    public $incrementing = false; 
+    protected $keyType = 'string';
 
     protected $fillable = [
         'userID',
@@ -25,6 +25,16 @@ class Booking extends Model
         'updated_at',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($booking) {
+            // contoh: BK + tarikh + random number
+            $booking->bookingID = 'BK' . date('YmdHis') . rand(10, 99);
+        });
+    }
+
     public function user() 
     { 
         return $this->belongsTo(User::class, 'userID'); 
@@ -33,5 +43,10 @@ class Booking extends Model
     public function vehicle()
     {
         return $this->belongsTo(Vehicle::class, 'vehicleID', 'vehicleID');
+    }
+
+    public function payments() 
+    { 
+        return $this->hasMany(Payment::class, 'bookingID', 'bookingID'); 
     }
 }

@@ -11,6 +11,9 @@
     
 
         <div class ="booking-container" >
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
         <div class="booking-content">
         <!-- Left: Booking Form -->
         <form action="{{ route('booking.store') }}" method="POST">
@@ -76,7 +79,6 @@
         @endif
     </div>
 </div>
-
 
 </body>
 </html>
