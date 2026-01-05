@@ -2,32 +2,36 @@
 
 namespace App\Http\Controllers;
 
-namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 class VerifyPaymentController extends Controller
 {
+    private $payments = [
+        ['payment_id' => 1, 'booking_id' => 101, 'user_id' => 1, 'type' => 'Full', 'status' => 'Pending', 'verified_by' => null, 'verified_date' => null],
+        ['payment_id' => 2, 'booking_id' => 102, 'user_id' => 1, 'type' => 'Deposit', 'status' => 'Pending', 'verified_by' => null, 'verified_date' => null],
+        ['payment_id' => 3, 'booking_id' => 103, 'user_id' => 2, 'type' => 'Full', 'status' => 'Pending', 'verified_by' => null, 'verified_date' => null],
+    ];
+
     public function index()
-{
-    $payments = DB::table('payment')->get();
-    return view('verifypayment', compact('payments'));
-}
-
-    public function verify(Request $request, $paymentID)
     {
-        $action = $request->input('action');
-        $status = $action === 'Approve' ? 'Approve' : 'Rejected';
+        return view('verify.index', ['payments' => $this->payments]);
+    }
 
-        DB::table('payment')->where('paymentID', $paymentID)->update([
-            'paymentStatus' => $status,
-            'verifiedBy'    => Auth::user()->name ?? 'Staff',
-            'VerifiedTime'  => now(),
-            'updated_at'    => now(),
-        ]);
+    public function verify(Request $request)
+    {
+        $paymentID = $request->input('payment_id');
+        $status = $request->input('status');
 
-        return redirect()->back()->with('success', "Payment has been {$status}.");
+        foreach ($this->payments as &$payment) {
+            if ($payment['payment_id'] == $paymentID) {
+                $payment['status'] = $status;
+                $payment['verified_by'] = 'Admin';
+                $payment['verified_date'] = now()->toDateTimeString();
+
+                return view('verify.result', ['payment' => $payment]);
+            }
+        }
+
+        return response()->json(['error' => 'Payment not found'], 404);
     }
 }

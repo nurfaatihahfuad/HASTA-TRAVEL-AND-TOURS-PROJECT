@@ -25,11 +25,11 @@ class PaymentController extends Controller
         $paymentType = $request->input('paymentType'); 
         $amountToPay = null; 
         
-        if ($paymentType === 'Full') 
+        if ($paymentType === 'Full Payment') 
         { 
             $amountToPay = $totalAmount; 
         } 
-        elseif ($paymentType === 'Deposit') 
+        elseif ($paymentType === 'Deposit Payment') 
         { 
             $amountToPay = 20; 
         } 
@@ -41,7 +41,7 @@ class PaymentController extends Controller
         {
 
             $request->validate([
-            'paymentType' => 'required|string',
+            'paymentType' => 'required|in:Full Payment,Deposit Payment',
             'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
              ]);
 
@@ -55,7 +55,7 @@ class PaymentController extends Controller
         'paymentType' => $request->paymentType,
         'amountPaid' => $request->amountPaid,
         'receipt_file_path'  => $path,
-        'paymentStatus'     => 'submitted',
+        'paymentStatus'     => 'pending',
         'totalAmount' => $totalAmount,
         ]);
 
@@ -65,7 +65,7 @@ class PaymentController extends Controller
     public function submit(Request $request, $bookingID)
     {
         $request->validate([
-            'paymentType' => 'required|string',
+            'paymentType' => 'required|in:Full Payment,Deposit Payment',
             'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
              ]);
 
@@ -77,7 +77,7 @@ class PaymentController extends Controller
         $totalHours = $pickup->diffInHours($return);
         $totalAmount = round($totalHours * $booking->vehicle->price_per_hour);
 
-        $amount = $request->paymentType === 'Full' ? $totalAmount : 20;
+        $amount = $request->paymentType === 'Full Payment' ? $totalAmount : 20;
 
         Payment::create([ 
             'paymentID' => 'PM' . strtoupper(uniqid()), // random ID
@@ -85,7 +85,7 @@ class PaymentController extends Controller
             'paymentType' => $request->paymentType, 
             'amountPaid' => $amount, 
             'receipt_file_path' => $path, 
-            'paymentStatus' => 'submitted', 
+            'paymentStatus' => 'pending', 
             'totalAmount' => $totalAmount,
         ]);
 
