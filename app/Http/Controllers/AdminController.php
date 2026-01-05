@@ -120,7 +120,7 @@ class AdminController extends Controller
                     ->where('userType', 'admin')
                     ->firstOrFail();
         
-        return view('admin.admins.show', compact('admin'));
+        return view('admin.admins.show', compact('admins'));
     }
 
     // Show the form for editing the admin
@@ -130,7 +130,7 @@ class AdminController extends Controller
                     ->where('userType', 'admin')
                     ->firstOrFail();
         
-        return view('admin.admins.update', compact('admin'));
+        return view('admin.admins.update', compact('admins'));
     }
 
     // Update the specified admin (submit update form)
@@ -143,9 +143,9 @@ class AdminController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:user,email,' . $admin->userID . ',userID',
+            'email' => 'required|email|unique:user,email,' . $admins->userID . ',userID',
             'noHP' => 'required|string|max:15',
-            'noIC' => 'required|string|max:12|unique:user,noIC,' . $admin->userID . ',userID',
+            'noIC' => 'required|string|max:12|unique:user,noIC,' . $admins->userID . ',userID',
             'adminType' => 'required|in:finance,IT',
         ]);
 
@@ -158,7 +158,7 @@ class AdminController extends Controller
 
             Log::info('Admin updated', [
                 'updater_id' => auth()->id(),
-                'admin_id' => $admin->userID
+                'admin_id' => $admins->userID
             ]);
 
             return redirect()->route('admins.index')
