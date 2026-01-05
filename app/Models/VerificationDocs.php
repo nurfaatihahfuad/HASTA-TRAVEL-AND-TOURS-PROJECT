@@ -15,7 +15,7 @@ class VerificationDocs extends Model
     public $incrementing = false;
     
     protected $fillable = [
-        'userID',
+        'customerID',
         'ic_file_path',
         'license_file_path',
         'matric_file_path',
@@ -49,10 +49,16 @@ class VerificationDocs extends Model
     }
 
 
-    // Relationship to User
+    // Relationship with User through Customer
     public function user()
     {
-        return $this->belongsTo(User::class, 'userID', 'userID');
+        return $this->belongsTo(User::class, 'customerID', 'userID');
+    }
+
+     // UPDATED: Relationship with Customer
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customerID', 'userID');
     }
 
     // Relationship to Admin who verified (optional)

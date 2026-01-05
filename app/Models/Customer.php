@@ -14,7 +14,7 @@ class Customer extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'userID', 'referralCode', 'accountNumber', 'bankType', 'customerType'
+        'userID', 'referred_byCode', 'accountNumber', 'bankType', 'customerType'
     ];
 
     // relationship with User
@@ -44,5 +44,11 @@ class Customer extends Model
             return $this->staffCustomer;
         }
         return null;
+    }
+
+    // NEW: Relationship with VerificationDocs
+    public function verificationDocs()
+    {
+        return $this->hasOne(VerificationDocs::class, 'customerID', 'userID');
     }
 }

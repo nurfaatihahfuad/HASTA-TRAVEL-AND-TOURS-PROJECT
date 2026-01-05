@@ -170,11 +170,11 @@ class AuthenticatedSessionController extends Controller
         $user = auth()->user();
         
         \Log::info('User logged in', [
-    'id' => $user->id,
+    'userID' => $user->userID,
     'type' => $user->userType,
 ]);
 
-\Log::info('User logged in', ['id' => $user->id, 'type' => $user->userType]);
+\Log::info('User logged in', ['userID' => $user->userID, 'type' => $user->userType]);
 
         
         // Redirect based on user type and role
