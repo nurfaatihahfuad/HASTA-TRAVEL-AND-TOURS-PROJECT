@@ -143,6 +143,7 @@ class User extends Authenticatable
         return $this->userType === $role;
     }
 
+
     public function isSalesperson()
     {
         return $this->userType === 'staff' && 
@@ -176,18 +177,24 @@ class User extends Authenticatable
         return $this->hasOne(Admin::class, 'adminID', 'userID');
     }
 
+    // general admin
+    public function isAdmin()
+    {
+        return $this->userType === 'admin';
+    }
+
     public function isITadmin()
     {
         return $this->userType === 'admin' &&
                 $this->admin &&
-                $this->admin->adminType === 'IT';
+                strtolower($this->admin->adminType) === 'it';
     }
 
     public function isFinanceAdmin()
     {
         return $this->userType === 'admin' &&
                 $this->admin &&
-                $this->admin->adminType === 'Finance';
+                strtolower($this->admin->adminType) === 'finance';
     }
 
     // Booking

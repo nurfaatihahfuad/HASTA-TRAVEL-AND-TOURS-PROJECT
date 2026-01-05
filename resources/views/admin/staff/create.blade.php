@@ -1,5 +1,5 @@
 <!--CREATE new staff-->
-@extends('layouts.admin')
+@extends('layouts.it_admin')
 
 @section('title', 'Add New Staff')
 

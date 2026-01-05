@@ -1,5 +1,5 @@
 <!--List of staff for CRUD-->
-@extends('layouts.admin')
+@extends('layouts.it_admin')
 
 @section('title', 'Staff Management')
 
