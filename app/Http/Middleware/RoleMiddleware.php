@@ -29,9 +29,9 @@ class RoleMiddleware
         // --- Logik Baru: Check specific roles guna Model Helper ---
         $hasAccess = false;
 
-        if ($role === 'adminIT' && $user->isITadmin()) {
+        if ($role === 'it' && $user->isITadmin()) {
             $hasAccess = true;
-        } elseif ($role === 'adminFinance' && $user->isFinanceAdmin()) {
+        } elseif ($role === 'finance' && $user->isFinanceAdmin()) {
             $hasAccess = true;
         } elseif ($role === 'salesperson' && $user->isSalesperson()) {
             $hasAccess = true;
@@ -54,44 +54,6 @@ class RoleMiddleware
             'required' => $role,
             'actual' => $userType
         ]);
-
-        // Redirect to appropriate dashboard based on actual role
-        /*if ($userType == 'admin') {
-            return redirect('/admin/dashboard');
-        } elseif ($userType == 'staff') {
-            return redirect('/staff/dashboard');
-        } elseif ($userType == 'customer') {
-            return redirect('/customer/dashboard');
-        }*/
-
-        switch ($userType) {
-            case 'admin':
-                // Check specific admin sub-roles for redirection
-                if ($user->isITadmin()) {
-                    return redirect()->route('admin.it.dashboard');
-                } elseif ($user->isFinanceAdmin()) {
-                    return redirect()->route('admin.finance.dashboard');
-                }
-                return redirect('/'); // Fallback if admin type not found
-            
-            case 'staff':
-                if ($user->staff) {
-                    // Redirect to appropriate staff dashboard
-                    if ($user->staff->staffRole === 'salesperson') {
-                        return redirect()->route('staff.salesperson.dashboard');
-                    } elseif ($user->staff->staffRole === 'runner') {
-                        return redirect()->route('staff.runner.dashboard');
-                    }
-                }
-                return redirect('/');
-
-            case 'customer':
-                return redirect()->route('customer.dashboard');
-
-            default:
-                Auth::logout();
-                return redirect('/login')->withErrors(['role' => 'Invalid user role']);
-        }
 
         /*if (Auth::user()->userType !== $role) {
             abort(403, 'Unauthorized');
