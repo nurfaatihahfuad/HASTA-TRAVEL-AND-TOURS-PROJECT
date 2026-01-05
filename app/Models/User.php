@@ -44,6 +44,17 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+     // Add this to ensure Laravel uses userID for authentication
+    public function getAuthIdentifierName()
+    {
+        return 'userID';
+    }
+    
+    public function getAuthIdentifier()
+    {
+        return $this->userID;
+    }
+    
     // for userID prefix
     protected static function boot()
     {
@@ -105,17 +116,26 @@ class User extends Authenticatable
         return null;
     }
 
+     // VerificationDocs through Customer
+    public function verificationDocs()
+    {
+        return $this->hasOneThrough(
+            VerificationDocs::class,
+            Customer::class,
+            'userID',      // Foreign key on Customer table
+            'customerID',  // Foreign key on VerificationDocs table (references customer.userID)
+            'userID',      // Local key on User table
+            'userID'       // Local key on Customer table
+        );
+    }
+
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
 
-    // for salesperson to verify documents
-    public function verificationDocs()
-    {
-        return $this->hasOne(VerificationDocs::class, 'userID','userID');
-    }
+ 
 
     // relationship with Staff
     public function staff()

@@ -108,15 +108,16 @@ class CustomerRegistrationController extends Controller
             \Log::info('Generated UserID: ' . $user->userID);
 
             // 2. Generate referral code if not provided
-            $referralCode = $validated['referralCode'];
+            // $referred_byCode = NULL;
 
             // 3. Create Customer
             $customer = Customer::create([
                 'userID' => $user->userID,
-                'referralCode' => $referralCode,
+                'referred_byCode' => $validated['referralCode'] ?? null,
                 'accountNumber' => $validated['accountNumber'],
                 'bankType' => $validated['bankType'],
                 'customerType' => $validated['customerType'],
+                'customerStatus' => 'pending', // pending verification
             ]);
 
             // 4. Create specific customer type record
@@ -127,19 +128,18 @@ class CustomerRegistrationController extends Controller
                     'matricNo' => $validated['matricNo'],
                     'facultyID' => $validated['facultyID'],
                     'collegeID' => $validated['collegeID'],
-                    'customerStatus' => 'pending', // pending verification
+                    
                 ]);
             } else {
                 StaffCustomer::create([
                     'userID' => $user->userID,
                     'staffNo' => $validated['staffNo'],
-                    'customerStatus' => 'pending', // pending verification
                 ]);
             }
 
             // store files and create VerificationDocs record
             $verificationData = [
-                'userID' => $user->userID,
+                'customerID' => $user->userID,
                 'status' => 'pending',
             ];
 
@@ -210,6 +210,22 @@ class CustomerRegistrationController extends Controller
         return $code;
     }*/
 
+    public function authenticate()
+{
+    $this->ensureIsNotRateLimited();
+
+    // Check if user exists with email
+    $user = User::where('email', $this->email)->first();
+    
+    if (!$user || !Hash::check($this->password, $user->password)) {
+        throw ValidationException::withMessages([
+            'email' => __('auth.failed'),
+        ]);
+    }
+    
+    // Manually log in the user
+    Auth::login($user, $this->boolean('remember'));
+}
     // Show success page (optional)
     public function success()
     {

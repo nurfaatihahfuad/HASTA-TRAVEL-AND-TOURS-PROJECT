@@ -18,10 +18,10 @@
             $pendingUsers = User::whereHas('customer', function($query) {
                     $query->where('customerStatus', 'pending');
                 })
-                ->whereHas('verificationDocs', function($query) {
+                ->whereHas('customer.verificationDocs', function($query) {
                     $query->where('status', 'pending');
                 })
-                ->with(['customer', 'verificationDocs'])
+                ->with(['customer', 'customer.verificationDocs'])
                 ->get();
 
             return view('sales.verification.index', [
@@ -35,7 +35,7 @@
         */
         public function show($userID)
         {
-            $user = User::with(['customer', 'verificationDocs', 'customer.specificCustomer'])
+            $user = User::with(['customer', 'customer.verificationDocs', 'customer.specificCustomer'])
                     ->where('userID', $userID)
                     ->firstOrFail();
 
@@ -52,7 +52,7 @@
             return view('sales.verification.show', [
                 'user' => $user,
                 'customer' => $user->customer,
-                'verificationDocs' => $user->verificationDocs
+                'verificationDocs' => $user->customer->verificationDocs
             ]);
         }
 
@@ -75,12 +75,12 @@
 
             \DB::beginTransaction();
             try {
-                $user = User::with(['customer', 'verificationDocs'])
+                $user = User::with(['customer', 'customer.verificationDocs'])
                         ->where('userID', $userID)
                         ->firstOrFail();
 
                 $customer = $user->customer;
-                $verificationDocs = $user->verificationDocs;
+                //$verificationDocs = $user->verificationDocs;
                 
                 if (!$customer || !$verificationDocs) {
                     throw new \Exception('Customer or verification documents not found.');
@@ -128,7 +128,7 @@
 
             \DB::beginTransaction();
             try {
-                $user = User::with(['customer', 'verificationDocs'])
+                $user = User::with(['customer', 'customer.verificationDocs'])
                         ->where('userID', $userID)
                         ->firstOrFail();
 

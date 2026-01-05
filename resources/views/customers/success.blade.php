@@ -84,17 +84,17 @@
 
     <div class="card">
         <div class="profile-icon">👤</div>
-        <h2>Your Profile Has Been Created!</h2>
+        <h2>Welcome to HASTA Vehicle Booking System!</h2>
 
         <div class="info"><strong>{{ $user->name }}</strong></div>
-        <div class="status">Pending Registration</div>
+        <div class="status">Your Profile Has Been Created</div>
         <div class="info">E-mail: {{ $user->email }}</div>
 
         <div class="notice">
-            Notice: Account activation link will be sent to your e-mail once verification is completed.
+            Notice: You will be redirected to a login page.
         </div>
 
-        <a href="{{ route('welcome') }}" class="btn-done">DONE</a>
+        <a href="{{ route('login') }}" class="btn-done">LOG IN</a>
     </div>
 </div>
 @endsection
