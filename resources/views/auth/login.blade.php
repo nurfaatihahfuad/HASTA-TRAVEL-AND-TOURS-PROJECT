@@ -1,4 +1,4 @@
-<x-guest-layout>
+
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +9,9 @@
 
     <body>
     <div class="login-wrapper">
-        <div class="login-box">
-            <div class="login-icon">👤</div>
+        <div class="login-box"><a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="{{ asset('img/hasta.jpeg') }}" alt="Hasta Logo" style="height:60px;">
+    </a>
 
             <h1>Welcome Back!</h1>
             <p class="subtitle">Log in to your account</p>
@@ -53,28 +54,17 @@
                 <button type="submit">LOGIN</button>
             </form>
 
-            <!-- Sign up link (only if route exists) -->
-            @if (Route::has('register'))
-                <p class="signup-text">
-                    Don't have an account?
-                    <a href="{{ route('register') }}">Sign up</a>
-                </p>
-            @endif
+            <!-- Sign Up Link (Optional) -->
+                    <div class="text-center pt-4">
+                        <p class="text-gray-600">
+                            New Customer?
+                            <a href="{{ route('customer.register') }}" class="reg-text-primary font-semibold hover:underline ml-1">
+                                Register here
+                            </a>
+                        </p>
+                    </div>
         </div>
 
-        <!-- Terms -->
-        <p class="terms-text">
-            By logging in, it's deemed that you have read and agreed to
-            <a href="#">Hasta Terms of Use</a> and <a href="#">Privacy&nbsp;Policy</a>.
-        </p>
 
-        <!-- Help -->
-        <div class="help-container">
-            <a href="#" class="help-link">
-                <span>Get help</span>
-                <span class="help-icon">?</span>
-            </a>
-        </div>
     </div>
     </body>
-</x-guest-layout>

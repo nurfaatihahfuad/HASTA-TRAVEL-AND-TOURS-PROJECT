@@ -47,39 +47,41 @@ Route::get('/register/customer/success', [CustomerRegistrationController::class,
 // Dashboard Routes (role-based)
 // ============================
 
-// Customer Dashboard
+// Customer Dashboard ---ROUTE CHECKED
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
-    
+        
+// Admin 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth', RoleMiddleware::class.':admin'])
     ->name('admin.dashboard');
 
 // Admin IT Dashboard
 Route::get('/admin/it/dashboard', [DashboardController::class, 'adminIT'])
-    ->middleware(['auth', RoleMiddleware::class.':adminIT'])
-    ->name('admin.it.dashboard');
+    ->middleware(['auth', RoleMiddleware::class.':admin'])
+    ->name('admin_it.dashboard');
 
 // Admin IT Manage Users 
-Route::get('/admin/it/users', [AdminUserController::class, 'index']) 
+/*Route::get('/admin/it/users', [AdminUserController::class, 'index']) 
     ->middleware(['auth', RoleMiddleware::class.':adminIT']) 
-    ->name('admin.it.users');
+    ->name('admin.it.users');*/
 
 // Admin Finance Dashboard
 Route::get('/admin/finance/dashboard', [DashboardController::class, 'adminFinance'])
     ->middleware(['auth', RoleMiddleware::class.':adminFinance'])
-    ->name('admin.finance.dashboard');
+    ->name('admin_finance.dashboard');
 
-// Staff Salesperson Dashboard
-Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSalesperson'])
-    ->middleware(['auth', RoleMiddleware::class.':salesperson'])
-    ->name('staff.salesperson.dashboard');
-
-// Staff Runner Dashboard
+// Staff Runner Dashboard ---ROUTE CHECKED
 Route::get('/staff/runner/dashboard', [DashboardController::class, 'staffRunner'])
-    ->middleware(['auth', RoleMiddleware::class.':runner'])
-    ->name('staff.runner.dashboard');
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff_runner.dashboard');
+
+// Staff Salesperson Dashboard ---ROUTE CHECKED
+Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSalesperson'])
+    ->middleware(['auth', RoleMiddleware::class.':staff'])
+    ->name('staff_salesperson.dashboard');
+
 
 // ============================
 // Booking routes (customer only)
@@ -109,13 +111,13 @@ Route::middleware('auth')->group(function () {
 
     // Car inspection to damage case
     Route::post('/inspection/store', [InspectionController::class, 'store'])->name('inspection.store');
-    Route::post('/damage-case/resolve/{id}', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
+    //Route::post('/damage-case/resolve/{id}', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
 
     // Inspection page
     Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection.index');
 
     // Damage Case page
-   Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage.index');
+   //Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage.index');
 
 // ============================
 // Payment routes

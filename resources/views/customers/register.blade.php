@@ -15,14 +15,14 @@
         /* CSS Variables - Scoped only to this page */
         
         :root {
-            --reg-primary: #EC9A85;
+            --reg-primary: #E74A33 ;
             --reg-primary-dark: #D98B77;
             --reg-primary-light: #F9E0D9;
             --reg-primary-lightest: #FEF5F2;
         }
 
         body {
-            background-image: url("/img/registration-bg.jpg");
+            background: linear-gradient(to bottom right, #ffe9b3, #ffc7b5);
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -62,8 +62,8 @@
         }
         
         .reg-btn-primary:hover {
-            background-color: var(--reg-primary-dark) !important;
-            border-color: var(--reg-primary-dark) !important;
+            background-color: #c0392b !important;
+            border-color: #c0392b !important;
         }
         
         .reg-btn-primary:focus {
@@ -385,11 +385,11 @@
 
                             <!-- Referral Code (Optional) -->
                             <div class="md:col-span-2">
-                                <label for="referralCode" class="block text-gray-700 font-medium mb-2">Referral Code (Optional)</label>
+                                <label for="referred_byCode" class="block text-gray-700 font-medium mb-2">Referral Code (Optional)</label>
                                 <input type="text" 
-                                       id="referralCode" 
-                                       name="referralCode" 
-                                       value="{{ old('referralCode') }}"
+                                       id="referred_byCode" 
+                                       name="referred_byCode" 
+                                       value="{{ old('referred_byCode') }}"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg reg-focus-ring transition duration-300"
                                        placeholder="Enter referral code if any">
                                 <p class="mt-1 text-sm text-gray-500">If you have a referral code from an existing customer</p>
@@ -513,7 +513,7 @@
                         </button>
                     </div>
                     
-                    <!-- Login Link (Optional) -->
+                    <!-- Login Link -->
                     <div class="text-center pt-4">
                         <p class="text-gray-600">
                             Already have an account?

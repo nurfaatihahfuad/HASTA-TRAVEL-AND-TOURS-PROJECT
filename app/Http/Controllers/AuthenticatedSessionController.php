@@ -137,7 +137,7 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     } 
 
-    public function login(LoginRequest $request): RedirectResponse
+    /*public function login(LoginRequest $request): RedirectResponse
     {
         // Authenticate credentials
         $request->authenticate();
@@ -146,9 +146,11 @@ class AuthenticatedSessionController extends Controller
         $user = auth()->user();
 
         if ($user->isITadmin()) {
-            return redirect()->route('admin.it.dashboard');
+            //return redirect()->route('admin.it.dashboard');
+            return redirect()->route('admin.dashboard');
         } elseif ($user->isFinanceAdmin()) {
-            return redirect()->route('admin.finance.dashboard');
+            //return redirect()->route('admin.finance.dashboard');
+            return redirect()->route('admin.dashboard');
         } elseif ($user->isRunner()) {
             return redirect()->route('staff.runner.dashboard');
         } elseif ($user->isSalesperson()) {
@@ -158,6 +160,50 @@ class AuthenticatedSessionController extends Controller
         }
 
         // fallback kalau role tak dikenali
+        return redirect('/');
+    }*/
+        public function login(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
+
+        $user = auth()->user();
+        
+        \Log::info('User logged in', [
+    'userID' => $user->userID,
+    'type' => $user->userType,
+]);
+
+\Log::info('User logged in', ['userID' => $user->userID, 'type' => $user->userType]);
+
+        
+        // Redirect based on user type and role
+        if ($user->isCustomer()) {
+            return redirect()->route('customer.dashboard');
+        }
+        
+    
+        
+        if ($user->isSalesperson()) {
+            return redirect()->route('staff_salesperson.dashboard');
+        }
+        
+        if ($user->isRunner()) {
+            return redirect()->route('staff_runner.dashboard');
+        }
+
+        if ($user->isITadmin()) {
+            return redirect()->route('admin_it.dashboard'); // or admin.it.dashboard if you have it
+        }
+        
+        if ($user->isFinanceAdmin()) {
+            return redirect()->route('admin_finance.dashboard'); // or admin.finance.dashboard
+        }
+        
+        
+        
+        // Fallback
+        \Log::warning('No specific role matched, redirecting to home');
         return redirect('/');
     }
 

@@ -1,5 +1,5 @@
 <!--List of admins for CRUD-->
-@extends('layouts.admin')
+@extends('layouts.it_admin')
 
 @section('title', 'Admin Management')
 
@@ -14,6 +14,7 @@
         <i class="fas fa-user-plus me-2"></i> Add New Admin
     </a>
 </div>
+
 
 <!-- Stats Card -->
 <div class="row mb-4">
@@ -133,6 +134,7 @@
                         </td>
                         <td>{{ $member->email }}</td>
                         <td>
+                            
                             @if($member->admin)
                                 @if($member->admin->adminType == 'IT')
                                     <span class="badge bg-info">
