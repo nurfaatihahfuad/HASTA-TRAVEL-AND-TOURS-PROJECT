@@ -120,7 +120,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection.index');
 
     // Damage Case page
-   //Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage.index');
+    Route::get('/damage-case', function () {
+    return view('damagecase'); // letak nama view yang betul
+    })->name('damage_case.index');
+    Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case.index');
+    Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
+    ->name('damage_case.index');
 
 // ============================
 // Payment routes

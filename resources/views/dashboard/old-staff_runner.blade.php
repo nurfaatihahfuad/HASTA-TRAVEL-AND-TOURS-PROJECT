@@ -10,7 +10,7 @@
                 <h5 class="mb-3">HASTA</h5>
                 <nav class="d-grid gap-2">
                     <a class="sidebar-link" href="#">Dashboard</a>
-                    <a class="sidebar-link" href="{ route('inspection.index') }}">Car Inspection Checklist</a>
+                    <a class="sidebar-link" href="{{ route('inspection.index') }}">Car Inspection Checklist</a>
                     <a class="sidebar-link" href="#">Blacklisted Record</a>
                     <a class="sidebar-link" href="#">Sales Record</a>
                     <a class="sidebar-link" href="#">Payment Record</a>

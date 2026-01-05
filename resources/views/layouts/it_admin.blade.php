@@ -162,6 +162,12 @@
                href="{{ route('admins.index') }}">
                 <i class='fas fa-user-shield'></i> Admin Management
             </a>
+
+            <a class="sidebar-link @if(str_contains($currentRoute, 'vehicles.')) active @endif" 
+                href="{{ route('vehicles.index') }}">
+                 <i class="fas fa-car"></i> Vehicle Management
+            </a>
+
             
             <a class="sidebar-link" href="#">
                 <i class="fas fa-clipboard-check"></i> Car Inspection

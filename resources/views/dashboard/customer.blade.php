@@ -65,11 +65,10 @@
 
             @forelse($booking as $booking)
                 <div class="mb-4 border-b pb-4">
-                    <p><strong>Car:</strong> {{ $booking->carModel }}</p>
-                    <p><strong>Booking Dates:</strong> {{ $booking->start_date }} → {{ $booking->end_date }}</p>
-                    <p><strong>Route:</strong> {{ $booking->route }}</p>
-                    <p><strong>Status:</strong> {{ $booking->status }}</p>
-                    <p><strong>Cost:</strong> RM {{ $booking->cost }}</p>
+                    <p><strong>Car:</strong> {{ $booking->carModel  }}</p>
+                    <p><strong>Booking Dates:</strong> {{ $booking->pickup_dateTime }} → {{ $booking->return_dateTime }}</p>
+                
+                    
                 </div>
             @empty
                 <p>No bookings found.</p>

@@ -1,11 +1,9 @@
-<!--Runner Navbar-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Runner Dashboard') - HASTA</title>
-    
+    <title>@yield('title', 'Customer Dashboard') - HASTA</title>
     
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,7 +11,6 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Chart.js (if needed) -->
     @stack('styles')
     
     <style>
@@ -28,7 +25,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -77,14 +73,12 @@
             margin-right: 10px;
         }
         
-        /* Main content */
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 20px;
             min-height: 100vh;
         }
         
-        /* Cards */
         .section-card {
             background: white;
             padding: 20px;
@@ -117,14 +111,12 @@
             color: #28a745;
         }
         
-        /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
             }
-            
             .main-content {
                 margin-left: 0;
             }
@@ -139,34 +131,32 @@
         </div>
         
         <div class="sidebar-nav">
-            @php
-                $currentRoute = request()->route()->getName();
-            @endphp
+            @php $currentRoute = request()->route()->getName(); @endphp
             
-            <a class="sidebar-link @if($currentRoute == 'staff_runner.dashboard') active @endif" 
-               href="{{ route('staff_runner.dashboard') }}">
+            <a class="sidebar-link @if($currentRoute == 'customer.dashboard') active @endif" 
+               href="{{ route('customer.dashboard') }}">
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
             
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-clipboard-check"></i> Payment Record
+            <a class="sidebar-link @if($currentRoute == 'customer.bookings') active @endif" 
+               href="{{ route('customer.bookings') }}">
+                <i class="fas fa-history"></i> Booking History
             </a>
             
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-chart-bar"></i> Pending Payment
+            <a class="sidebar-link @if($currentRoute == 'browse.vehicle') active @endif" 
+               href="{{ route('browse.vehicle') }}">
+                <i class="fas fa-car-side"></i> Book Now
             </a>
-
-            <a class="sidebar-link" href="{{ route('inspection.index') }}">
-                <i class="fas fa-chart-bar"></i> Car Inspection Checklist
-            </a>
-
-            <a class="sidebar-link" href="{{ route('damage_case.index') }}">
-                <i class="fas fa-chart-bar"></i> Damage Case Checklist 
+            
+            <a class="sidebar-link @if($currentRoute == 'customer.payments') active @endif" 
+               href="{{ route('customer.payments') }}">
+                <i class="fas fa-credit-card"></i> Payments
             </a>
             
             <hr>
             
-            <a class="sidebar-link" href="#">
+            <a class="sidebar-link @if($currentRoute == 'customer.profile') active @endif" 
+               href="{{ route('customer.profile') }}">
                 <i class="fas fa-user"></i> Profile
             </a>
             
@@ -188,12 +178,8 @@
         @yield('content')
     </div>
     
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Chart.js (if needed) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     @stack('scripts')
 </body>
 </html>
