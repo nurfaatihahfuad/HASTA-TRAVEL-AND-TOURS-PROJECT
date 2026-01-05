@@ -43,10 +43,19 @@ class PaymentController extends Controller
             $request->validate([
             'paymentType' => 'required|in:Full Payment,Deposit Payment',
             'payment_proof' => 'required|file|mimes:jpeg,png,pdf|max:2048',
+            'bookingID' => 'required|exists:bookings,bookingID',
+            'amountPaid' => 'required|numeric',
              ]);
 
         // Simpan file ke storage/public/payments
         $path = $request->file('payment_proof')->store('payments', 'public');
+
+        // ✅ FIX: Dapatkan booking dan calculate totalAmount
+        $booking = Booking::with('vehicle')->findOrFail($request->bookingID);
+        $pickup = Carbon::parse($booking->pickup_dateTime);
+        $return = Carbon::parse($booking->return_dateTime);
+        $totalHours = $pickup->diffInHours($return);
+        $totalAmount = round($totalHours * $booking->vehicle->price_per_hour);
 
         // Simpan rekod ke DB
         Payment::create([
@@ -88,6 +97,9 @@ class PaymentController extends Controller
             'paymentStatus' => 'pending', 
             'totalAmount' => $totalAmount,
         ]);
+
+        $booking->bookingStatus = 'payment_submitted';
+        //$booking->save();
 
         return redirect()->route('customer.dashboard')->with('success', 'Payment submitted successfully!');
         /*
