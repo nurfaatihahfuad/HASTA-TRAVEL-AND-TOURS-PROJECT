@@ -14,6 +14,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerRegistrationController;
 use App\Http\Controllers\InspectionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DamageCaseController;
 use App\Http\Controllers\ReceiptController;
 
@@ -120,6 +121,37 @@ Route::middleware('auth')->group(function () {
 
     // CRUD
     Route::resource('crud', CRUDController::class);
+
+    // ============================
+    // Vehicle Management (Admin IT only)
+    // ============================
+    // Vehicle Management (Admin IT only)
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('vehicles.')->group(function () {
+        Route::get('/vehicles', [VehicleController::class, 'indexAdmin'])->name('index');
+        Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('create');
+        Route::post('/vehicles', [VehicleController::class, 'store'])->name('store');
+        Route::get('/vehicles/{id}/edit', [VehicleController::class, 'edit'])->name('edit');
+        Route::put('/vehicles/{id}', [VehicleController::class, 'update'])->name('update');
+        Route::delete('/vehicles/{id}', [VehicleController::class, 'destroy'])->name('destroy');
+    });
+    
+    // ============================
+    // Report Routes (Admin IT only)
+    // ============================
+    Route::middleware(['auth','role:admin'])->prefix('admin')->name('reports.')->group(function () {
+        // Page utama report (ada dropdown)
+        Route::get('/reports', [ReportController::class, 'index'])->name('index');
+
+        // AJAX untuk tukar kategori tanpa reload page
+        Route::get('/reports/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
+
+        // Filter untuk Total Booking
+        Route::get('/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+            ->name('total_booking.filter');
+    });
+    
+
+
 });
 
     // Payment routes

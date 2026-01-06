@@ -51,7 +51,7 @@
             </select>
         </div>
 
-        <button type="submit" class="btn btn-danger">Create Damage Case</button>
+        <button type="submit" class="btn btn-outline-secondary px-4">Create Damage Case</button>
     </form>
 </div>
 @endsection
