@@ -63,21 +63,5 @@
             }]
         }
     });
-
-    // Export ke PDF
-    function exportTableToPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("Total Booking Report", 14, 15);
-        doc.autoTable({ html: '#bookingTable' });
-        doc.save('total_booking_report.pdf');
-    }
-
-    // Export ke Excel
-    function exportTableToExcel() {
-        let table = document.getElementById("bookingTable");
-        let wb = XLSX.utils.table_to_book(table, { sheet: "Report" });
-        XLSX.writeFile(wb, "total_booking_report.xlsx");
-    }
 </script>
 @endpush

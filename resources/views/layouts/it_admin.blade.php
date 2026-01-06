@@ -230,8 +230,30 @@
 
     <!-- SheetJS untuk Excel export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    @stack('scripts')
+    
+    <script>
+    function exportTableToPDF() {
+        const doc = new window.jspdf.jsPDF();
+        doc.text("Total Booking Report", 14, 15);
 
+        const table = document.getElementById('bookingTable');
+        if (!table) { alert("Table not found"); return; }
+
+        doc.autoTable({ html: '#bookingTable' });
+        doc.save('total_booking_report.pdf');
+    }
+
+    function exportTableToExcel() {
+        const table = document.getElementById("bookingTable");
+        if (!table) { alert("Table not found"); return; }
+
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Report" });
+        XLSX.writeFile(wb, "total_booking_report.xlsx");
+    }
+    </script>
+
+    @stack('scripts')
+    
 
 
 </body>
