@@ -65,7 +65,7 @@
                             @endif
 
                             <div class="card-body text-center">
-                                <h5 class="card-title fw-bold">{{ $vehicle->brand }} {{ $vehicle->model }} ({{ $vehicle->year }})</h5>
+                                <h5 class="card-title fw-bold">{{ $vehicle->vehicleName }} ({{ $vehicle->year }})</h5>
                                 <p class="card-text text-muted">{{ $vehicle->description }}</p>
 
                                 <p class="card-text"><strong>RM{{ number_format($vehicle->price_per_day, 2) }}/day</strong></p>

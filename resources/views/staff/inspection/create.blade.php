@@ -21,12 +21,12 @@
         @csrf
 
         <div class="form-group">
-            <label for="bookingID" class="required">Vehicle</label>
-            <select name="bookingID" class="form-control reg-focus-ring" required>
+            <label for="vehicleID" class="required">Vehicle</label>
+            <select name="vehicleID" class="form-control reg-focus-ring" required>
                 <option value="">-- Choose Vehicle --</option>
                 @foreach($bookings as $b)
-                    <option value="{{ $b->bookingID }}">
-                        {{ $b->bookingID }} - Vehicle {{ $b->vehicleID }}
+                    <option value="{{ $b->vehicleID }}">
+                         {{ $b->vehicle->vehicleName }}
                     </option>
                 @endforeach
             </select>
