@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <a href="{{ route('inspection.create') }}" class="btn reg-btn-primary mb-3">+ New Inspection</a>
+    <a href="{{ route('inspection.create') }}" class="btn btn-outline-secondary px-4">+ New Inspection</a>
 
     <table class="table table-bordered reg-bg-primary-lightest">
         <thead class="reg-bg-primary-light">
@@ -20,8 +20,8 @@
                 <th>ID</th>
                 <th>Vehicle</th>
                 <th>Condition</th>
-                <th>Mileage</th>
-                <th>Fuel</th>
+                <th>Mileage (km) </th>
+                <th>Fuel (%) </th>
                 <th>Damage</th>
                 <th>Staff</th>
                 <th>Action</th>

@@ -21,9 +21,9 @@
         @csrf
 
         <div class="form-group">
-            <label for="bookingID" class="required">Booking</label>
+            <label for="bookingID" class="required">Vehicle</label>
             <select name="bookingID" class="form-control reg-focus-ring" required>
-                <option value="">-- Choose Booking --</option>
+                <option value="">-- Choose Vehicle --</option>
                 @foreach($bookings as $b)
                     <option value="{{ $b->bookingID }}">
                         {{ $b->bookingID }} - Vehicle {{ $b->vehicleID }}
@@ -38,7 +38,7 @@
         </div>
 
         <div class="form-group">
-            <label class="required">Mileage Returned</label>
+            <label class="required">Mileage Returned (km) </label>
             <input type="number" name="mileageReturned" class="form-control reg-focus-ring" required>
         </div>
 
@@ -63,7 +63,7 @@
             <input type="file" name="evidence" class="form-control reg-focus-ring">
         </div>
 
-        <button type="submit" class="btn reg-btn-primary">Submit Inspection</button>
+        <button type="submit" class="btn btn-outline-secondary px-4">Submit Inspection</button>
     </form>
 </div>
 @endsection
