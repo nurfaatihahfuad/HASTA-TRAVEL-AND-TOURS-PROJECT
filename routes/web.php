@@ -14,6 +14,8 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerRegistrationController;
 use App\Http\Controllers\InspectionController;
+use App\Http\Controllers\DamageCaseController;
+
 
 // ============================
 // Welcome & Vehicle browsing
@@ -112,19 +114,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
     // Car inspection to damage case
-    Route::post('/inspection/store', [InspectionController::class, 'store'])->name('inspection.store');
-    //Route::post('/damage-case/resolve/{id}', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
-
-    // Inspection page
-    Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection.index');
+    // Car inspection CRUD
+    Route::resource('inspection', InspectionController::class)->middleware('auth');
 
     // Damage Case page
-    Route::get('/damage-case', function () {
-    return view('damagecase'); // letak nama view yang betul
-    })->name('damage_case.index');
-    Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case.index');
-    Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
-    ->name('damage_case.index');
+    //Route::get('/damage-case', function () {
+    //return view('damagecase'); // letak nama view yang betul
+    //})->name('damage_case.index');
+    //Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case');
+    //Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
+    //->name('damage_case.index');
+    Route::resource('damagecase', DamageCaseController::class)->middleware('auth');
+    //Route::post('/damagecase/store', [DamageCaseController::class, 'store'])->name('damage.store');
+    //Route::post('/damagecase/{id}/resolve', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
 
 // ============================
 // Payment routes
