@@ -149,7 +149,7 @@
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
             
-            <a class="sidebar-link @if($currentRoute == 'staff_salesperson.dashboard') active @endif" 
+            <a class="sidebar-link"
                href="{{ route('staff_salesperson.dashboard') }}">
                 <i class="fas fa-users"></i> Customer Verification
             </a>

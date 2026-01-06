@@ -15,6 +15,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerRegistrationController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\DamageCaseController;
+use App\Http\Controllers\ReceiptController;
 
 
 // ============================
@@ -87,6 +88,18 @@ Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSa
 Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus']) 
     ->name('booking.updateStatus');
 
+// Receipt routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    // View receipt in browser
+    Route::get('/receipt/view/{bookingID}', [ReceiptController::class, 'view'])
+        ->name('receipt.view')
+        ->where('bookingID', '[A-Za-z0-9]+');
+    
+    // Download receipt
+    Route::get('/receipt/download/{bookingID}', [ReceiptController::class, 'download'])
+        ->name('receipt.download')
+        ->where('bookingID', '[A-Za-z0-9]+');
+});
 
 // ============================
 // Booking routes (customer only)

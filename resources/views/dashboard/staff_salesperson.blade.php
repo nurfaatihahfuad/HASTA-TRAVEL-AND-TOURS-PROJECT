@@ -88,7 +88,6 @@
                                                     <i class="fas fa-download"></i>
                                                 </a>
                                             </div>
-                                            
                                         @else
                                             <span class="badge bg-warning">No receipt</span>
                                         @endif

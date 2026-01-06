@@ -159,16 +159,6 @@ class DashboardController extends Controller
             ->orderBy('booking.created_at', 'desc')
             ->get();
 
-        // Debug: Check storage path - temp
-        $samplePayment = DB::table('payment')->first();
-        if ($samplePayment) {
-            echo "Storage path: " . storage_path('app/public') . "<br>";
-            echo "Public path: " . public_path('storage') . "<br>";
-            echo "Sample receipt path: " . $samplePayment->receipt_file_path . "<br>";
-            echo "File exists in storage: " . (file_exists(storage_path('app/public/' . $samplePayment->receipt_file_path)) ? 'YES' : 'NO') . "<br>";
-            echo "File exists in public: " . (file_exists(public_path('storage/' . $samplePayment->receipt_file_path)) ? 'YES' : 'NO') . "<br>";
-        }
-
         $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
         $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
         $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
