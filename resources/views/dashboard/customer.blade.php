@@ -52,7 +52,7 @@
         <div class="section-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="mb-0">Recent Bookings</h6>
-                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="#" class="btn btn-sm btn-outline-danger">View All</a>
             </div>
             
             @if($bookings && $bookings->count() > 0)
@@ -73,11 +73,10 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="bg-light rounded p-2 me-2">
-                                                <i class="fas fa-car text-primary"></i>
+                                                <i class="fas fa-car text-danger"></i>
                                             </div>
                                             <div>
                                                 <strong>{{ $booking->carModel ?? 'Unknown' }}</strong><br>
-                                                <small class="text-muted">{{ $booking->carPlate ?? '' }}</small>
                                             </div>
                                         </div>
                                     </td>
@@ -91,10 +90,9 @@
                                         @php
                                             $status = strtolower($booking->status ?? 'pending');
                                             $statusColors = [
-                                                'confirmed' => 'success',
+                                                'successful' => 'success',
                                                 'pending' => 'warning',
-                                                'cancelled' => 'danger',
-                                                'completed' => 'info'
+                                                'rejected' => 'danger'
                                             ];
                                             $color = $statusColors[$status] ?? 'secondary';
                                         @endphp
@@ -103,7 +101,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary">View</button>
+                                        <button class="btn btn-sm btn-primary">View</button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -117,7 +115,7 @@
                     </div>
                     <h5>No bookings yet</h5>
                     <p class="text-muted">Start your first car rental journey with us!</p>
-                    <a href="{{ route('browse.vehicle') }}" class="btn btn-primary">
+                    <a href="{{ route('browse.vehicle') }}" class="btn btn-danger">
                         <i class="fas fa-car me-1"></i> Book a Car
                     </a>
                 </div>
@@ -129,22 +127,22 @@
             <h6 class="mb-3">Quick Actions</h6>
             <div class="row g-2">
                 <div class="col-md-3">
-                    <a href="{{ route('browse.vehicle') }}" class="btn btn-primary w-100">
+                    <a href="{{ route('browse.vehicle') }}" class="btn btn-danger w-100">
                         <i class="fas fa-calendar-plus me-1"></i> Book Now
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="#" class="btn btn-outline-primary w-100">
+                    <a href="#" class="btn btn-outline-danger w-100">
                         <i class="fas fa-history me-1"></i> History
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="#" class="btn btn-outline-primary w-100">
+                    <a href="#" class="btn btn-outline-danger w-100">
                         <i class="fas fa-file-invoice me-1"></i> Invoices
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="#" class="btn btn-outline-primary w-100">
+                    <a href="#" class="btn btn-outline-danger w-100">
                         <i class="fas fa-question-circle me-1"></i> Help
                     </a>
                 </div>
@@ -154,43 +152,6 @@
     
     <!-- Sidebar Content -->
     <div class="col-lg-4">
-        <!-- Account Status -->
-        <div class="section-card">
-            <h6 class="mb-3">Account Status</h6>
-            <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                    <span>Verification Status</span>
-                    @if($customer && $customer->customerStatus == 'active')
-                        <span class="badge bg-success">Verified</span>
-                    @else
-                        <span class="badge bg-warning">Pending</span>
-                    @endif
-                </div>
-                @if($customer && $customer->customerStatus != 'active')
-                    <div class="alert alert-warning p-2">
-                        <small>
-                            <i class="fas fa-exclamation-circle me-1"></i>
-                            Complete verification to access all features
-                        </small>
-                    </div>
-                @endif
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between mb-1">
-                    <span>Membership</span>
-                    <span class="badge bg-info">Regular</span>
-                </div>
-                <div class="progress" style="height: 6px;">
-                    <div class="progress-bar bg-info" style="width: 60%"></div>
-                </div>
-                <small class="text-muted">60% to Gold membership</small>
-            </div>
-            
-            <a href="#" class="btn btn-outline-primary w-100">
-                <i class="fas fa-user-check me-1"></i> Upgrade Account
-            </a>
-        </div>
         
         <!-- Upcoming Bookings -->
         <div class="section-card">
@@ -250,7 +211,7 @@
                 </tr>
             @endforeach
         
-        <!-- Support Card -->
+        <!-- Support Card
         <div class="section-card bg-light">
             <h6 class="mb-3">Need Help?</h6>
             <p class="text-muted small mb-3">
@@ -264,7 +225,7 @@
                     <i class="fas fa-envelope me-1"></i> Email Support
                 </a>
             </div>
-        </div>
+        </div>-->
     </div>
 </div>
 @endsection

@@ -4,17 +4,24 @@
 <div class="container">
     <h2>Damage Case</h2>
 
+    <!-- Form create damage case -->
     <form action="{{ route('damage.store') }}" method="POST">
         @csrf
 
         <div class="mb-3">
-            <label for="inspectionid" class="form-label">Inspection ID</label>
-            <input type="text" name="inspectionid" class="form-control" required>
+            <label for="inspectionID" class="form-label">Inspection ID</label>
+            <select name="inspectionID" class="form-control" required>
+                <option value="">Select inspection ID</option>
+                @foreach($inspections as $inspection)
+                    <option value="{{ $inspection->inspectionID }}">{{ $inspection->inspectionID }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div class="mb-3">
             <label for="casetype" class="form-label">Case Type</label>
             <select name="casetype" class="form-control" required>
+                <option value="">Select damage case type</option>
                 <option value="Collision Damage">Collision Damage</option>
                 <option value="Non-Collision Damage">Non-Collision Damage</option>
                 <option value="Technical Damage">Technical Damage</option>
@@ -32,8 +39,9 @@
         <div class="mb-3">
             <label for="resolutionstatus" class="form-label">Resolution Status</label>
             <select name="resolutionstatus" class="form-control" required>
-                <option value="open">Open</option>
-                <option value="resolved">Resolved</option>
+                <option value="">Select resolution status</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Unresolved">Unresolved</option>
             </select>
         </div>
 
@@ -42,6 +50,7 @@
 
     <hr>
 
+    <!-- Senarai damage case -->
     <h3>Existing Damage Cases</h3>
     <table class="table">
         <thead>
@@ -56,13 +65,13 @@
         <tbody>
             @foreach($cases as $case)
             <tr>
-                <td>{{ $case->caseid }}</td>
+                <td>{{ $case->caseID }}</td>
                 <td>{{ $case->casetype }}</td>
                 <td>{{ $case->filledby }}</td>
                 <td>{{ $case->resolutionstatus }}</td>
                 <td>
-                    @if($case->resolutionstatus == 'open')
-                        <form action="{{ route('damage.resolve', $case->caseid) }}" method="POST">
+                    @if($case->resolutionstatus == 'Unresolved')
+                        <form action="{{ route('damage.resolve', $case->caseID) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-success">Resolve</button>
                         </form>

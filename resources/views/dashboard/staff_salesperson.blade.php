@@ -57,7 +57,13 @@
                             <tr>
                                 <th>Booking ID</th>
                                 <th>Car</th>
+                                <!--<th>Payment Proof</th>
                                 <th>Status</th>
+                                <th>Created At</th>-->
+                                <th>Payment Proof</th>
+                                <th>Payment Status</th>
+                                <th>Amount Paid</th>
+                                <th>Booking Status</th>
                                 <th>Created At</th>
                             </tr>
                         </thead>
@@ -65,18 +71,68 @@
                             @forelse($bookings as $b)
                                 <tr>
                                     <td>{{ $b->bookingID }}</td>
-                                    <td>{{ $b->carModel ?? '—' }}</td>
-                                    <td><span class="badge bg-secondary">{{ $b->bookingStatus }}</span></td>
+                                    <td>{{ $b->vehicleID }}</td>
+                                    <td>
+                                        @if(!empty($b->receipt_file_path))
+                                            <div class="btn-group btn-group-sm">
+                                                <!-- View in browser -->
+                                                <a href="{{ route('receipt.view', ['bookingID' => $b->bookingID]) }}" 
+                                                target="_blank"
+                                                class="btn btn-info">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                
+                                                <!-- Download -->
+                                                <a href="{{ route('receipt.download', ['bookingID' => $b->bookingID]) }}"
+                                                class="btn btn-outline-primary">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                        @else
+                                            <span class="badge bg-warning">No receipt</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($b->paymentStatus)
+                                            <span class="badge 
+                                                @if($b->paymentStatus == 'approved') bg-success
+                                                @elseif($b->paymentStatus == 'pending') bg-warning
+                                                @elseif($b->paymentStatus == 'rejected') bg-danger
+                                                @else bg-secondary @endif">
+                                                {{ $b->paymentStatus ?? 'N/A' }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-secondary">No payment</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(isset($b->amountPaid) && $b->amountPaid)
+                                            RM {{ number_format($b->amountPaid, 2) }}
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID) }}">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" name="status" value="approved" class="btn btn-success btn-sm">
+                                                Approve
+                                            </button>
+                                            <button type="submit" name="status" value="rejected" class="btn btn-danger btn-sm">
+                                                Reject
+                                            </button>
+                                        </form>
+                                    </td>
                                     <td>{{ $b->created_at }}</td>
-                                </tr>
-                            @empty
+                                </tr> 
+                                @empty
                                 <tr><td colspan="4">No bookings found.</td></tr>
-                            @endforelse
+                            @endforelse  
                         </tbody>
                     </table>
                 </div>
             </div>
-        
     </div>
 </div>
 

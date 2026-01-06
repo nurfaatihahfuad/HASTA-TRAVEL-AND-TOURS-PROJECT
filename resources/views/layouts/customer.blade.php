@@ -9,6 +9,9 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -18,10 +21,10 @@
     <style>
         :root {
             --sidebar-width: 250px;
-            --primary-color: #4a6cf7;
-            --secondary-color: #3a56d5;
-            --customer-primary: #4a6cf7;
-            --customer-secondary: #3a56d5;
+            --primary-color: #dc3545;
+            --secondary-color: #c82333;
+            --customer-primary: #dc3545;
+            --customer-secondary: #c82333;
         }
         
         body {
@@ -46,14 +49,14 @@
         }
         
         .sidebar-header {
-            padding: 20px;
+            padding: 15px;
             border-bottom: 1px solid #e9ecef;
         }
         
-        .sidebar-header h5 {
-            color: var(--customer-primary);
-            font-weight: 600;
-            margin: 0;
+        .sidebar-logo {
+            max-height: 60px;
+            width: auto;
+            object-fit: contain;
         }
         
         .sidebar-nav {
@@ -117,19 +120,6 @@
             color: #212529;
         }
         
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-        }
-        
         /* Profile Section in Sidebar */
         .profile-sidebar {
             padding: 20px;
@@ -178,22 +168,76 @@
             color: #92400e;
         }
         
-        /* Footer - Kept from app_noHeader */
-        .footer {
-            background-color: #343a40;
-            color: white;
-            padding: 20px 0;
+        /* Footer Styles */
+        .footer-main {
+            background-color: #f8f9fa;
+            padding: 3rem 0;
             margin-top: auto;
             margin-left: var(--sidebar-width);
+            border-top: 1px solid #dee2e6;
         }
         
-        .footer-content {
-            padding: 0 20px;
+        .footer-main a {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.3s;
         }
         
+        .footer-main a:hover {
+            color: var(--customer-primary);
+        }
+        
+        .footer-main h6 {
+            color: #212529;
+            font-weight: 600;
+        }
+        
+        .footer-main ul.list-unstyled li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-main .small {
+            color: #6c757d;
+        }
+        
+        .footer-main .d-flex.gap-2 a {
+            color: #495057;
+            transition: color 0.3s;
+        }
+        
+        .footer-main .d-flex.gap-2 a:hover {
+            color: var(--customer-primary);
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .footer {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
                 margin-left: 0;
+                padding: 15px;
+            }
+            
+            .footer-main {
+                margin-left: 0;
+            }
+            
+            .sidebar-logo {
+                max-height: 50px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .sidebar-header {
+                padding: 10px;
+            }
+            
+            .sidebar-logo {
+                max-height: 45px;
             }
         }
     </style>
@@ -202,7 +246,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h5><i class="fas fa-car me-2"></i>HASTA</h5>
+            <h6><i class="fas fa-car me-2"></i>HASTA</h6>
         </div>
         
         <!-- Profile Info in Sidebar -->
@@ -269,17 +313,60 @@
         @yield('content')
     </div>
     
-    <!-- Footer (from app_noHeader) -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>HASTA Car Rental</h5>
-                    <p>Your trusted partner for car rentals</p>
+    <!-- Footer -->
+    <footer class="footer-main">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-md-3">
+                    <img src="{{ asset('img/hasta.jpeg') }}" style="max-width:150px; height: auto;" alt="HASTA Logo">
+                    <p class="fw-semibold mb-1 mt-2">Hasta Travel & Tours Sdn. Bhd</p>
+                    <small class="d-block">SSM : 1359376T</small>
+                    <small class="d-block">MOTAC : KPK/LN 10181</small>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <p>&copy; {{ date('Y') }} HASTA. All rights reserved.</p>
-                    <p>Contact: info@hasta.com | +60 12-345 6789</p>
+
+                <div class="col-md-2">
+                    <h6 class="fw-bold border-bottom pb-1 mb-3">Company</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Testimonials</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-2">
+                    <h6 class="fw-bold border-bottom pb-1 mb-3">Services</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#">Car Rental</a></li>
+                        @if(Route::has('services.tours'))
+                            <li><a href="#">Tours</a></li>
+                        @endif
+                    </ul>
+                </div>
+
+                <div class="col-md-2">
+                    <h6 class="fw-bold border-bottom pb-1 mb-3">Support</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3">
+                    <h6 class="fw-bold">Need any help?</h6>
+                    <p class="small"><i class="bi bi-whatsapp"></i> +60 11-1090 0700</p>
+                    <p class="small"><i class="bi bi-envelope"></i> hastatraveltours@gmail.com</p>
+                    <div class="d-flex gap-2 fs-5 mt-2">
+                        <a href="https://www.instagram.com/hastatraveltours/?hl=en" target="_blank"><i class="bi bi-instagram"></i></a>
+                        <a href="https://www.facebook.com/hastatraveltour/" target="_blank"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="row mt-4 pt-3 border-top">
+                <div class="col-12 text-center">
+                    <p class="small text-muted mb-0">&copy; {{ date('Y') }} Hasta Travel & Tours Sdn. Bhd. All rights reserved.</p>
                 </div>
             </div>
         </div>

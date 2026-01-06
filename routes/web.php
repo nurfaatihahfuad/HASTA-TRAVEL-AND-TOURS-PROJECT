@@ -12,10 +12,12 @@ use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\verifypaymentController;
 use App\Http\Controllers\CustomerRegistrationController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DamageCaseController;
+use App\Http\Controllers\ReceiptController;
+
 
 // ============================
 // Welcome & Vehicle browsing
@@ -83,6 +85,22 @@ Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSa
     ->middleware(['auth', RoleMiddleware::class.':staff'])
     ->name('staff_salesperson.dashboard');
 
+//Auni Letak yg ni tau
+Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus']) 
+    ->name('booking.updateStatus');
+
+// Receipt routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    // View receipt in browser
+    Route::get('/receipt/view/{bookingID}', [ReceiptController::class, 'view'])
+        ->name('receipt.view')
+        ->where('bookingID', '[A-Za-z0-9]+');
+    
+    // Download receipt
+    Route::get('/receipt/download/{bookingID}', [ReceiptController::class, 'download'])
+        ->name('receipt.download')
+        ->where('bookingID', '[A-Za-z0-9]+');
+});
 
 // ============================
 // Booking routes (customer only)
@@ -138,26 +156,22 @@ Route::middleware('auth')->group(function () {
 
     // Payment routes
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
-    Route::post('/payment/{bookingID}', [PaymentController::class, 'submit'])->name('payment.submit');
-    //Route::post('/payment', [PaymentController::class, 'store'])->name('payment.store');
-
-    // Verify Payment Routes
-    Route::get('/verify', [VerifyPaymentController::class, 'index'])->name('payment.index');
+    Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
     // Car inspection to damage case
-    Route::post('/inspection/store', [InspectionController::class, 'store'])->name('inspection.store');
-    //Route::post('/damage-case/resolve/{id}', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
-
-    // Inspection page
-    Route::get('/inspection', [InspectionController::class, 'index'])->name('inspection.index');
+    // Car inspection CRUD
+    Route::resource('inspection', InspectionController::class)->middleware('auth');
 
     // Damage Case page
-    Route::get('/damage-case', function () {
-    return view('damagecase'); // letak nama view yang betul
-    })->name('damage_case.index');
-    Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case.index');
-    Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
-    ->name('damage_case.index');
+    //Route::get('/damage-case', function () {
+    //return view('damagecase'); // letak nama view yang betul
+    //})->name('damage_case.index');
+    //Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case');
+    //Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
+    //->name('damage_case.index');
+    Route::resource('damagecase', DamageCaseController::class)->middleware('auth');
+    //Route::post('/damagecase/store', [DamageCaseController::class, 'store'])->name('damage.store');
+    //Route::post('/damagecase/{id}/resolve', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
 
 // ============================
 // Payment routes

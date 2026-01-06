@@ -160,7 +160,7 @@
                 <i class="fas fa-chart-bar"></i> Car Inspection Checklist
             </a>
 
-            <a class="sidebar-link" href="{{ route('damage_case.index') }}">
+            <a class="sidebar-link" href="{{ route('damagecase.index') }}">
                 <i class="fas fa-chart-bar"></i> Damage Case Checklist 
             </a>
             

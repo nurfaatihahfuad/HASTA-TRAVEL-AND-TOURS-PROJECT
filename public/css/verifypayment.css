@@ -1,66 +1,65 @@
-/* Table container */
-.table-container {
-  margin: 2rem auto;
-  max-width: 1000px;
-  padding: 1rem;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+.verify-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-/* Table styling */
-table.pending-payments {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: 'Segoe UI', sans-serif;
+.verify-table th,
+.verify-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
 }
 
-table.pending-payments th,
-table.pending-payments td {
-  padding: 12px 16px;
-  border: 1px solid #dee2e6;
-  text-align: center;
+.verify-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
 }
 
-table.pending-payments thead {
-  background-color: #f8f9fa;
-  font-weight: bold;
+.verify-table tr:hover {
+    background-color: #f5f5f5;
 }
 
-table.pending-payments tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 2px;
 }
 
-/* Status badge */
-td.status {
-  font-weight: bold;
-  color: #ffc107;
+.btn-success {
+    background-color: #28a745;
+    color: white;
 }
 
-/* Action buttons */
-.btn-approve {
-  background-color: #198754;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  margin-right: 5px;
-  cursor: pointer;
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
 }
 
-.btn-reject {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
 }
 
-.btn-approve:hover {
-  background-color: #157347;
+.status-submitted {
+    background-color: #ffc107;
+    color: #000;
 }
 
-.btn-reject:hover {
-  background-color: #bb2d3b;
+.status-approved {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-rejected {
+    background-color: #dc3545;
+    color: white;
+}
+
+.container {
+    padding: 20px;
 }
