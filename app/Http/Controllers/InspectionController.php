@@ -29,33 +29,43 @@ class InspectionController extends Controller
     public function edit($id)
     {
         $inspection = Inspection::findOrFail($id);
-        return vpubliciew('staff.inspection.update', compact('inspection'));
+        return view('staff.inspection.update', compact('inspection'));
     }
 
     public function store(Request $request)
 {
     $validated = $request->validate([
-        'bookingID'       => 'required|integer|exists:booking,bookingID',
+        'vehicleID'       => 'required|integer|exists:vehicles,vehicleID',
         'carCondition'    => 'required|string',
         'mileageReturned' => 'required|integer',
         'fuelLevel'       => 'required|integer',
         'damageDetected'  => 'required|boolean',
         'remark'          => 'nullable|string',
-        'evidence'        => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+        'evidence'        => 'required|file|mimes:jpg,jpeg,png|max:2048',
     ]);
 
-    // Auto isi vehicleID & staffID
-    $booking = Booking::findOrFail($validated['bookingID']);
-    $validated['vehicleID'] = $booking->vehicleID;
-    $validated['staffID']   = Auth::user()->userID;
+    // Upload evidence file (now required)
+    $evidencePath = $request->file('evidence')->store('evidence', 'public');
+
+
+    $inspectionData = [
+            'vehicleID'      => $validated['vehicleID'], // Get vehicleID from booking
+            'staffID'        => Auth::user()->userID,
+            'carCondition'   => $validated['carCondition'],
+            'mileageReturned'=> $validated['mileageReturned'],
+            'fuelLevel'      => $validated['fuelLevel'],
+            'damageDetected' => $validated['damageDetected'],
+            'remark'         => $validated['remark'],
+            'evidence'       => $evidencePath,
+        ];
 
     // Simpan evidence file kalau ada
-    if ($request->hasFile('evidence')) {
+    /*if ($request->hasFile('evidence')) {
         $validated['evidence'] = $request->file('evidence')->store('evidence', 'public');
-    }
+    }*/
 
     // Simpan inspection
-    $inspection = Inspection::create($validated);
+    $inspection = Inspection::create($inspectionData);
 
     // 🚀 Auto create damage case kalau damageDetected = true
      // 🚀 Kalau damageDetected = true, terus redirect ke damage case create
@@ -75,6 +85,7 @@ public function update(Request $request, $id)
     $inspection = Inspection::findOrFail($id);
 
     $validated = $request->validate([
+        'vehicleID'      => 'required|integer|exists:vehicles,vehicleID',
         'carCondition'    => 'required|string',
         'mileageReturned' => 'required|integer',
         'fuelLevel'       => 'required|integer',
