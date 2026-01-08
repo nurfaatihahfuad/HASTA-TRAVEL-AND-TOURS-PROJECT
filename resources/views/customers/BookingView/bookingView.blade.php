@@ -11,19 +11,33 @@
 
         <div class="summary-card">
             <p><strong>Booking ID:</strong> {{ $booking->bookingID }}</p>
-            <p><strong>Car:</strong> {{ $booking->vehicleName }} {{ $booking->plateNo }}</p>
+            <p><strong>Customer Name:</strong> {{ $booking->user->name }}</p>
+            <p><strong>User ID:</strong> {{ $booking->userID }}</p>
+            <p><strong>Car:</strong> {{ $booking->vehicle->vehicleName }} ({{ $booking->vehicle->plateNo }})</p>
             <p><strong>Pick-up Time:</strong> {{ \Carbon\Carbon::parse($booking->pickup_dateTime)->format('d M Y, h:i A') }}</p>
             <p><strong>Return Time:</strong> {{ \Carbon\Carbon::parse($booking->return_dateTime)->format('d M Y, h:i A') }}</p>
             <p><strong>Total Price:</strong> RM{{ number_format($totalPayment, 2) }}</p>
-            <td>{{ ucfirst($booking->bookingStatus) }}</td>
+            <p><strong>Status:</strong> {{ ucfirst($booking->bookingStatus) }}</p>
         </div>
+
 
         <h2>Payment Details</h2>
         @if($payment)
             <p><strong>Payment ID:</strong> {{ $payment->paymentID }}</p>
             <p><strong>Payment Type:</strong> {{ $payment->paymentType }}</p>
             <p><strong>Amount Paid:</strong> RM{{ number_format($payment->amountPaid, 2) }}</p>
-            <p><strong>Status:</strong> {{ ucfirst($payment->paymentStatus) }}</p>
+
+            @if($payment->paymentType === 'Deposit Payment') 
+            <div class="qr-section">
+                <img src="{{ asset('img/payment.png') }}" alt="QR Code" width="150" height="150"> 
+                <form action="{{ route('payment.uploadReceipt', $payment->paymentID) }}" method="POST" enctype="multipart/form-data"> 
+                @csrf 
+                <input type="file" name="receipt_file" required> 
+                <button type="submit" class="btn btn-primary">Upload Receipt</button> 
+            </form> 
+            </div> 
+            @endif
+
             @if($payment->file_path)
                 <p><strong>Proof File:</strong> 
                     <a href="{{ asset('storage/' . $payment->file_path) }}" target="_blank">View Proof</a>
@@ -39,7 +53,7 @@
             </div>
         @endif
 
-        <button class="btn-print" onclick="window.print()">Print Receipt</button>
+        <!--<button class="btn-print" onclick="window.print()">Print Receipt</button> -->
     </div>
 </body>
 </html>

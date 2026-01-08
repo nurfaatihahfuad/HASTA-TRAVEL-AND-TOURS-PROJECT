@@ -100,6 +100,9 @@ Route::put('/booking/{bookingID}/reject', [BookingController::class, 'reject'])-
 // Route untuk tunjuk summary payment/booking 
 Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSummary'])
         ->name('booking.summary');
+Route::post('/payment/{paymentID}/upload-receipt', [PaymentController::class, 'uploadReceipt'])
+    ->name('payment.uploadReceipt');
+
 
 
 // Receipt routes

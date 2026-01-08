@@ -72,8 +72,11 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center">
                                             <div>
-                                                <strong>{{ $booking->vehicleID }}</strong><br>
+                                                <strong>{{ $booking->vehicle->vehicleName }}</strong><br>
+                                                <small>{{ $booking->vehicle->plateNo }}</small>
+                                            </div>
                                             </div>
                                         </div>
                                     </td>
@@ -99,6 +102,7 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View</a>
+                                        <!--<a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">Cancelled</a> -->
                                     </td>
                                 </tr>
                             @endforeach
