@@ -45,7 +45,7 @@
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
 
         {{-- Header shared --}}
-        @include('components.header')
+        @include('components.header2')
 
         {{-- Page Heading (optional) --}}
         @if (isset($header))
