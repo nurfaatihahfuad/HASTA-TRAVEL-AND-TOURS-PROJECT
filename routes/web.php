@@ -91,7 +91,10 @@ Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStat
     ->name('booking.updateStatus');
 
 // Nak approve payment
+//Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
 Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
+Route::put('/booking/{bookingID}/reject', [BookingController::class, 'reject'])->name('booking.reject');
+
 
 
 // Route untuk tunjuk summary payment/booking 

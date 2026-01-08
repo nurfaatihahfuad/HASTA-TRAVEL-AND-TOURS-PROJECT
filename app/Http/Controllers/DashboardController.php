@@ -358,8 +358,6 @@ public function verifyBookings()
                     ->where('userID', $userID)
                     ->orderBy('created_at', 'desc')
                     ->get();
-
         return view('customer.dashboard', compact('bookings'));
     }
-
 }

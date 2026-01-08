@@ -85,22 +85,20 @@
                                     </td>
                                     <td>
                                         @php
-                                            $status = strtolower($booking->status ?? 'pending');
-                                            $statusColors = [
-                                                'successful' => 'success',
-                                                'pending' => 'warning',
-                                                'rejected' => 'danger'
-                                            ];
-                                            $color = $statusColors[$status] ?? 'secondary';
+                                        $status = strtolower($booking->bookingStatus ?? 'pending');
+                                        $statusColors = [
+                                            'successful' => 'success',
+                                            'pending' => 'warning',
+                                            'rejected' => 'danger'
+                                        ];
+                                        $color = $statusColors[$status] ?? 'secondary';
                                         @endphp
                                         <span class="badge bg-{{ $color }}">
                                             {{ ucfirst($status) }}
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View
-
-                                        </a>
+                                        <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View</a>
                                     </td>
                                 </tr>
                             @endforeach
