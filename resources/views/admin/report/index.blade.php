@@ -23,7 +23,7 @@
         <label class="form-label fw-bold">Filter by Month & Year</label>
         <div class="row g-2">
             <div class="col-md-3">
-                <select id="monthFilter" class="form-select bg-danger text-white">
+                <select id="monthFilter" class="form-select filter-select">
                     <option disabled selected>Choose Month</option>
                     @for($m=1; $m<=12; $m++)
                         <option value="{{ $m }}">{{ date('F', mktime(0,0,0,$m,1)) }}</option>
@@ -31,7 +31,7 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <select id="yearFilter" class="form-select bg-danger text-white">
+                <select id="yearFilter" class="form-select filter-select">
                     <option disabled selected>Choose Year</option>
                     @for($y=date('Y'); $y>=2020; $y--)
                         <option value="{{ $y }}">{{ $y }}</option>

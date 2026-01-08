@@ -1,3 +1,57 @@
+<!-- Tambah Account bank dgn jenis bank dalam booking,
+     Total price yg dh sewa
+     Owner kereta diperlukan utk setiap kereta
+     Kena masukkan gambar kereta awal ii
+     Buat drop down list: office, college, faculty, others
+     Delivery: office free, faculty: 15, college: 10
+     nombor account: nombor dgn jenis bank, tak nak sengkang, deposit 50, full campur total terus dgn deposit
+     swap kalau tak available kereta
+     Kena letak loceng
+     BookingID- BOLEH TEKAN TGK DETAIL KERETA, NAMA CUSTOMER, KERETA, PICKUP, RETURN
+     ADMIN BOLEH VIEW SEMUA DASHBOARD
+
+     TAMBAH OTHERS BOLEH INPUT LAGI
+     TAMBAH EDIT GAMBAR
+     VEHCILE NAME, NOM PLATE
+     DELETE TAK LEH RETIREVE
+     EDIT JER LAH
+
+     Masukkan sekali car yg dh booking
+     vehicle, tuh inspection tuh ada return, pickup
+     crud tuh dekat customer
+     booking tuh buat dalam view
+     runner tak yah dashboard
+     salesperson, masuk dalam dashboard 
+     kereta apa, nama customer, total rm, pickup, unpaid = deposit, booking, paid = merah
+     rental aggreement, bawah ada upload rental aggreement download then upload yg dh tandatangan
+     dia kena generate sekali time dh booking
+     commission dalam extra jon buat luar waktu kerja
+
+     customer dgn masuk dalam booking
+     deposit, 1 bar RM10 - finance check return car deposit
+     hold bagi reason and kalau deposit tuh kena pulangkan balik
+     customer boleh terus access
+
+     dashboard staff: view: car available, date dgn masa
+     staff maintnance: nak check car availability
+     nak tahu kereta tuh 
+     all booking kena buat tuh
+     staff access tuh boleh check yg mcm check limit minyak supaya nak tahu pasal deposit ke tak mcm tuh?
+
+    kena cuba jugak
+    
+    Dashboard gabung jer semua then nanti boleh filter jer 
+    kalau ada delete tuh dia mcm boleh kena retrieve
+    Mana ii button boleh tekan
+    Hah tuh jer lah
+    guna email student@graduate.utm
+ -->
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

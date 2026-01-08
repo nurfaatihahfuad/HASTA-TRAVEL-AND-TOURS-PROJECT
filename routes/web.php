@@ -25,6 +25,7 @@ use App\Http\Controllers\ReceiptController;
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
 Route::get('/vehicles/search', [VehicleController::class, 'search'])->name('vehicles.search');
 Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.vehicle');
+Route::get('/admin/vehicles', [VehicleController::class, 'indexAdmin'])->name('vehicles.index');
 
 // ============================
 // Auth routes
@@ -88,6 +89,11 @@ Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSa
 //Auni Letak yg ni tau
 Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus']) 
     ->name('booking.updateStatus');
+
+// Route untuk tunjuk summary payment/booking 
+Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSummary'])
+        ->name('booking.summary');
+
 
 // Receipt routes
 Route::middleware(['auth', 'verified'])->group(function () {

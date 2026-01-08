@@ -85,37 +85,40 @@
         }
         
         /* Cards */
-        .section-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
+        .section-card { background: linear-gradient(135deg, #ffffff, #f8f9fa); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #e3e3e3; transition: all 0.3s ease; }
         
-        .metric-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
+        .section-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
         
-        .metric-title {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
+        .metric-card { background: linear-gradient(135deg, #ffffff, #f8f9fa); padding: 20px; border-radius: 10px; border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; transition: all 0.3s ease; } 
         
-        .metric-value {
-            font-size: 2rem;
+        .metric-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); } .metric-title { font-size: 0.95rem; color: #6c757d; margin-bottom: 6px; font-weight: 500; } 
+        
+        .metric-value { font-size: 2.2rem; font-weight: 700; color: #212529; }
+        
+        .card-title {
             font-weight: 600;
-            color: #212529;
+            color: #dc3545;
         }
-        
+
+        .card-body small {
+            font-size: 0.85rem;
+        }
+
         .metric-delta {
             font-size: 0.8rem;
             color: #28a745;
         }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .table td img {
+            object-fit: cover;
+            height: 60px;
+            width: 80px;
+        }
+
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -129,6 +132,20 @@
                 margin-left: 0;
             }
         }
+
+        .filter-select {
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        border: 2px solid #dc3545; /* merah brand */
+        color: #212529; /* tulisan gelap */
+        font-weight: 500;
+        transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            box-shadow: 0 0 8px rgba(220,53,69,0.4);
+            border-color: #dc3545;
+        }
+        
     </style>
 </head>
 <body>
