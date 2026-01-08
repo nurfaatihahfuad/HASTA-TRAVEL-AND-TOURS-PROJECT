@@ -1,4 +1,4 @@
-@extends('layouts.runner')
+@extends('layouts.salesperson')
 @section('title', 'Damage Case List')
 @section('content')
 <div class="container">

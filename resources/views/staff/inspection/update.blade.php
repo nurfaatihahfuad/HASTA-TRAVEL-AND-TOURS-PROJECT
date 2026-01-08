@@ -1,5 +1,4 @@
-@extends('layouts.app')
-@extends('layouts.runner')
+@extends('layouts.salesperson')
 @section('title', 'Update Damage Case')
 @section('content')
 <div class="container min-h-screen">

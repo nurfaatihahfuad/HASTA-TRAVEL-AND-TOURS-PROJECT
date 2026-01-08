@@ -1,6 +1,5 @@
-@extends('layouts.app')
-@extends('layouts.runner')
-@section('title', 'Update Damage Case')
+@extends('layouts.customer')
+@section('title', 'Edit Inspection')
 @section('content')
 <div class="container min-h-screen">
     <h2 class="reg-text-primary-dark">Edit Inspection</h2>
@@ -26,7 +25,7 @@
         </div>
 
         <div class="form-group">
-            <label class="required">Mileage Returned (km) </label>
+            <label class="required">Mileage Returned (km)</label>
             <input type="number" name="mileageReturned" class="form-control reg-focus-ring" value="{{ $inspection->mileageReturned }}" required>
         </div>
 

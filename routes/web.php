@@ -167,16 +167,35 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
-    // Car inspection to damage case
-    // Car inspection CRUD
-    Route::resource('inspection', InspectionController::class)
-    ->except(['create'])
-    ->middleware('auth');
+    // ============================
+    // Inspection Routes
+    // ============================
 
-    // Damage Case page
-    Route::resource('damagecase', DamageCaseController::class)
-    ->except(['create'])
-    ->middleware('auth');
+    // Customer boleh index, create, store, edit, update
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+        Route::resource('inspection', InspectionController::class)
+            ->only(['index','create','store','edit','update']);
+    });
+
+    // Staff hanya index, edit, update
+    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+        Route::resource('inspection', InspectionController::class)
+            ->only(['index','edit','update']);
+    });
+
+
+    // ============================
+    // Damage Case Routes
+    // ============================
+
+    // Staff hanya index, create, store, edit, update
+    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+        Route::resource('damagecase', DamageCaseController::class)
+            ->only(['index','edit','update','show']); 
+            // tambah 'create','store','destroy' kalau staff perlu
+        Route::post('damagecase/{caseID}/resolve', [DamageCaseController::class, 'resolve'])
+        ->name('damagecase.resolve');
+    });
 
 // ============================
 // Payment routes

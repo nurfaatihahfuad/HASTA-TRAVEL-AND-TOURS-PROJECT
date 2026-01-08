@@ -1,5 +1,4 @@
-@extends('layouts.app')
-@extends('layouts.runner')
+@extends('layouts.salesperson')
 @section('title', 'Inspection Management')
 @section('content')
 <div class="container min-h-screen">
@@ -11,8 +10,6 @@
             {{ session('success') }}
         </div>
     @endif
-
-    <a href="{{ route('inspection.create') }}" class="btn btn-outline-secondary px-4">+ New Inspection</a>
 
     <table class="table table-bordered reg-bg-primary-lightest">
         <thead class="reg-bg-primary-light">
@@ -39,11 +36,7 @@
                     <td>{{ $insp->staffID }}</td>
                     <td>
                         <a href="{{ route('inspection.edit', $insp->inspectionID) }}" class="btn btn-sm btn-warning">Edit</a>
-                        <form action="{{ route('inspection.destroy', $insp->inspectionID) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
+                       
                     </td>
                 </tr>
             @endforeach
