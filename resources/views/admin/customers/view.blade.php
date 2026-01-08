@@ -93,7 +93,7 @@
                         <label class="small text-muted mb-1">Phone Number</label>
                         <div class="d-flex align-items-center">
                             <i class="fas fa-phone text-danger me-2"></i>
-                            <span>{{ $customer->noHP }}</span>
+                            <span>+60 {{ $customer->noHP }}</span>
                         </div>
                     </div>
                     @endif

@@ -117,7 +117,7 @@ class CustomerRegistrationController extends Controller
                 'accountNumber' => $validated['accountNumber'],
                 'bankType' => $validated['bankType'],
                 'customerType' => $validated['customerType'],
-                'customerStatus' => 'pending', // pending verification
+                'customerStatus' => 'active'
             ]);
 
             // 4. Create specific customer type record
@@ -140,7 +140,7 @@ class CustomerRegistrationController extends Controller
             // store files and create VerificationDocs record
             $verificationData = [
                 'customerID' => $user->userID,
-                'status' => 'pending',
+                'status' => 'active',
             ];
 
             // Store IC Copy

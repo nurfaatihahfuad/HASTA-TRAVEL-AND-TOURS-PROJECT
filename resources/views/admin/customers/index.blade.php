@@ -147,7 +147,7 @@
                                     @if($customer->noHP)
                                         <div>
                                             <i class="fas fa-phone text-muted me-1" style="font-size: 0.8rem;"></i>
-                                            <small class="text-muted">{{ $customer->noHP }}</small>
+                                            <small class="text-muted">+60 {{ $customer->noHP }}</small>
                                         </div>
                                     @endif
                                 </td>
