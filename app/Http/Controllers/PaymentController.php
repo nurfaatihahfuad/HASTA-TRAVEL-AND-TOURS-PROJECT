@@ -70,7 +70,26 @@ class PaymentController extends Controller
 
         return redirect()->route('customer.dashboard')->with('success', 'Payment uploaded!');
     }
-    
+
+    public function bookingSummary($bookingID)
+    {
+        $booking = Booking::with('vehicle')->findOrFail($bookingID);
+
+        //$payment = Payment::where('bookingID', $bookingID)->latest()->first();
+
+        $payment = Payment::where('bookingID', $bookingID)
+                  ->orderBy('paymentID', 'desc')
+                  ->first();
+
+
+        $pickup = \Carbon\Carbon::parse($booking->pickup_dateTime);
+        $return = \Carbon\Carbon::parse($booking->return_dateTime);
+        $totalHours = $pickup->diffInHours($return);
+        $totalPayment = round($totalHours * $booking->vehicle->price_per_hour);
+
+        return view('customers.BookingView.bookingView', compact('booking','payment','totalHours','totalPayment'));
+    }
+
     public function submit(Request $request, $bookingID)
     {
         $request->validate([

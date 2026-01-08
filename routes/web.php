@@ -89,6 +89,11 @@ Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSa
 Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus']) 
     ->name('booking.updateStatus');
 
+// Route untuk tunjuk summary payment/booking 
+Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSummary'])
+        ->name('booking.summary');
+
+
 // Receipt routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // View receipt in browser
