@@ -160,18 +160,14 @@ Route::middleware('auth')->group(function () {
 
     // Car inspection to damage case
     // Car inspection CRUD
-    Route::resource('inspection', InspectionController::class)->middleware('auth');
+    Route::resource('inspection', InspectionController::class)
+    ->except(['create'])
+    ->middleware('auth');
 
     // Damage Case page
-    //Route::get('/damage-case', function () {
-    //return view('damagecase'); // letak nama view yang betul
-    //})->name('damage_case.index');
-    //Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case');
-    //Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
-    //->name('damage_case.index');
-    Route::resource('damagecase', DamageCaseController::class)->middleware('auth');
-    //Route::post('/damagecase/store', [DamageCaseController::class, 'store'])->name('damage.store');
-    //Route::post('/damagecase/{id}/resolve', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
+    Route::resource('damagecase', DamageCaseController::class)
+    ->except(['create'])
+    ->middleware('auth');
 
 // ============================
 // Payment routes
