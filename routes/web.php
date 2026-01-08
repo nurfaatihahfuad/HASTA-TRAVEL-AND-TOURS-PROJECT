@@ -25,6 +25,7 @@ use App\Http\Controllers\ReceiptController;
 Route::get('/', [VehicleController::class, 'preview'])->name('welcome');
 Route::get('/vehicles/search', [VehicleController::class, 'search'])->name('vehicles.search');
 Route::get('/browseVehicle', [VehicleController::class, 'index'])->name('browse.vehicle');
+Route::get('/admin/vehicles', [VehicleController::class, 'indexAdmin'])->name('vehicles.index');
 
 // ============================
 // Auth routes
