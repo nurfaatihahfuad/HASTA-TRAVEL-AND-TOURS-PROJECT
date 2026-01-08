@@ -129,6 +129,20 @@
                 margin-left: 0;
             }
         }
+
+        .filter-select {
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        border: 2px solid #dc3545; /* merah brand */
+        color: #212529; /* tulisan gelap */
+        font-weight: 500;
+        transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            box-shadow: 0 0 8px rgba(220,53,69,0.4);
+            border-color: #dc3545;
+        }
+        
     </style>
 </head>
 <body>
