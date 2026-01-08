@@ -53,11 +53,16 @@
                         </span>
                     </td>
                     <td>
-                        <form method="POST" action="{{ route('paymentverify.update', $payment->paymentID) }}">
-                            @csrf
-                            @method('PUT')
-                            <button name="status" value="approved" class="btn btn-success">Approve</button>
-                            <button name="status" value="rejected" class="btn btn-danger">Reject</button>
+                        <form action="{{ route('booking.approve', $booking->bookingID) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+
+                        <form action="{{ route('booking.reject', $booking->bookingID) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                         </form>
                     </td>
                 </tr>

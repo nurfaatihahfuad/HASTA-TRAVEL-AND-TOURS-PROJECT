@@ -31,7 +31,7 @@ class PaymentController extends Controller
         } 
         elseif ($paymentType === 'Deposit Payment') 
         { 
-            $amountToPay = 20; 
+            $amountToPay = 50; 
         } 
         return view('payment', compact('booking', 'totalHours', 'totalAmount', 'paymentType', 'amountToPay')); 
         //return redirect()->route('customer.dashboard')->with('success', 'Payment saved!');
@@ -105,7 +105,7 @@ class PaymentController extends Controller
         $totalHours = $pickup->diffInHours($return);
         $totalAmount = round($totalHours * $booking->vehicle->price_per_hour);
 
-        $amount = $request->paymentType === 'Full Payment' ? $totalAmount : 20;
+        $amount = $request->paymentType === 'Full Payment' ? $totalAmount : 50;
 
         Payment::create([ 
             'paymentID' => 'PM' . strtoupper(uniqid()), // random ID

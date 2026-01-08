@@ -65,21 +65,28 @@ class BookingController extends Controller
         //Auni tambah ni
         $status = $request->input('status');
         // yg bawah ni Auni tambah
-        $booking->bookingStatus = 'successful'; // 'approved' atau 'rejected'
+        $booking->bookingStatus = $status; // 'approved' atau 'rejected'
         $booking->save();
 
         return back()->with('success', "Booking {$bookingID} updated to {$request->status}");
     }
 
-    public function approve($bookingID)
+        public function approve($bookingID)
     {
         $booking = Booking::findOrFail($bookingID);
-        $booking->bookingStatus = 'successful'; // atau 'Approved' ikut DB
+        $booking->bookingStatus = 'successful'; // ikut ENUM dalam DB
         $booking->save();
 
         return redirect()->back()->with('success', 'Booking has been approved.');
     }
 
+    public function reject($bookingID)
+    {
+        $booking = Booking::findOrFail($bookingID);
+        $booking->bookingStatus = 'rejected'; // ikut ENUM dalam DB
+        $booking->save();
 
+        return redirect()->back()->with('success', 'Booking has been rejected.');
+    }
 }
 

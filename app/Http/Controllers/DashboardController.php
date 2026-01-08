@@ -355,11 +355,10 @@ public function verifyBookings()
     {
         $userID = auth()->id();
 
-        $bookings = Booking::with('vehicle')
-                    ->where('userID', $userID)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
-
+       $bookings = Booking::with('vehicle') 
+                    ->where('userID', $userID) 
+                    ->orderBy('created_at', 'desc') ->get();
+                    
         return view('customer.dashboard', compact('bookings'));
     }
 
