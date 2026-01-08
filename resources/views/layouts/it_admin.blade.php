@@ -167,7 +167,17 @@
             
             <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
                href="#">
+                <i class="fas fa-users"></i> Booking
+            </a>
+
+            <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
+               href="#">
                 <i class="fas fa-users"></i> Customer Information
+            </a>
+
+            <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
+               href="#">
+                <i class="fas fa-users"></i> Blacklisted Customer
             </a>
             
             <a class="sidebar-link @if(str_contains($currentRoute, 'staff.')) active @endif" 
@@ -205,10 +215,6 @@
             
             <a class="sidebar-link" href="#">
                 <i class="fas fa-money-bill-wave"></i> Deposit Record
-            </a>
-            
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-university"></i> Bank Statement
             </a>
             
             <hr>
