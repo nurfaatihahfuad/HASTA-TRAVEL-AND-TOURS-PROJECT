@@ -18,32 +18,6 @@
         </select>
     </div>
 
-    <!-- Filter Section -->
-    <div class="mb-3 p-3 bg-light border rounded">
-        <label class="form-label fw-bold">Filter by Month & Year</label>
-        <div class="row g-2">
-            <div class="col-md-3">
-                <select id="monthFilter" class="form-select filter-select">
-                    <option disabled selected>Choose Month</option>
-                    @for($m=1; $m<=12; $m++)
-                        <option value="{{ $m }}">{{ date('F', mktime(0,0,0,$m,1)) }}</option>
-                    @endfor
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select id="yearFilter" class="form-select filter-select">
-                    <option disabled selected>Choose Year</option>
-                    @for($y=date('Y'); $y>=2020; $y--)
-                        <option value="{{ $y }}">{{ $y }}</option>
-                    @endfor
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-danger w-100" id="filterBtn">Filter</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Report Content -->
     <div id="report-content">
         <p>Please select a category to view report.</p>
@@ -53,26 +27,37 @@
 
 @push('scripts')
 <script>
-    // Dropdown category
+    // Simpan kategori semasa
+    let currentCategory = null;
+
     document.getElementById('reportCategory').addEventListener('change', function() {
-        let category = this.value;
-        fetch(`/admin/reports/${category}/ajax`)
+        currentCategory = this.value;
+        fetch(`/admin/reports/${currentCategory}/ajax`)
             .then(response => response.text())
             .then(html => {
                 document.getElementById('report-content').innerHTML = html;
             });
     });
 
-    // Filter by month + year (Total Booking only)
     document.getElementById('filterBtn').addEventListener('click', function() {
         let month = document.getElementById('monthFilter').value;
         let year = document.getElementById('yearFilter').value;
 
-        fetch(`/admin/reports/total_booking/filter?month=${month}&year=${year}`)
+        if (!currentCategory) {
+            alert('Please select a category first');
+            return;
+        }
+
+        let url = `/admin/reports/${currentCategory}/filter?month=${month}&year=${year}`;
+        fetch(url)
             .then(response => response.text())
             .then(html => {
                 document.getElementById('report-content').innerHTML = html;
             });
     });
+
 </script>
 @endpush
+
+
+

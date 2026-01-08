@@ -11,7 +11,6 @@ class ReportController extends Controller
 {
     public function index()
     {
-        // Default view kosong (hanya container #report-content)
         return view('admin.report.index');
     }
 
@@ -19,9 +18,20 @@ class ReportController extends Controller
     {
         switch ($category) {
             case 'total_booking':
-                $data = Booking::all();
+                $data = DB::table('booking')
+                    ->join('user', 'booking.userID', '=', 'user.userID')
+                    ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+                    ->select(
+                        'booking.bookingID',
+                        'booking.userID',
+                        'user.name',
+                        'vehicles.vehicleName',
+                        'booking.pickup_dateTime',
+                        'booking.return_dateTime',
+                        'booking.bookingStatus'
+                    )
+                    ->get();
 
-                // Kira summary untuk chart
                 $summary = [
                     'total'     => $data->count(),
                     'completed' => $data->where('bookingStatus','completed')->count(),
@@ -29,7 +39,6 @@ class ReportController extends Controller
                     'cancelled' => $data->where('bookingStatus','cancelled')->count(),
                 ];
 
-                // Return partial view sahaja untuk AJAX inject
                 return view('admin.report.partials.total_booking', compact('data','summary'));
 
             case 'revenue':
@@ -37,33 +46,91 @@ class ReportController extends Controller
                 return view('admin.report.partials.revenue', compact('data'));
 
             case 'top_college':
-                $data = User::select('college', DB::raw('COUNT(*) as total'))
-                            ->groupBy('college')
-                            ->orderByDesc('total')
-                            ->get();
+                $data = DB::table('booking')
+                    ->join('user', 'booking.userID', '=', 'user.userID')
+                    ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+                    ->join('customer', 'user.userID', '=', 'customer.userID')
+                    ->join('studentCustomer', 'customer.userID', '=', 'studentCustomer.userID')
+                    ->join('college', 'studentCustomer.collegeID', '=', 'college.collegeID')
+                    ->select(
+                        'booking.bookingID',
+                        'booking.userID',
+                        'user.name',
+                        'college.collegeName',
+                        'vehicles.vehicleName',
+                        'booking.pickup_dateTime',
+                        'booking.return_dateTime',
+                        'booking.bookingStatus'
+                    )
+                    ->orderBy('college.collegeName', 'asc')
+                    ->get();
+
                 return view('admin.report.partials.top_college', compact('data'));
 
             case 'blacklisted':
-                $data = User::where('blacklisted',1)->get();
+                $data = User::where('blacklisted', 1)->get();
                 return view('admin.report.partials.blacklisted', compact('data'));
         }
     }
 
-    public function filterTotalBooking(Request $request)
+    public function filterTopCollege(Request $request)
     {
-        $query = Booking::query();
+        $query = DB::table('booking')
+            ->join('user', 'booking.userID', '=', 'user.userID')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->join('customer', 'user.userID', '=', 'customer.userID')
+            ->join('studentCustomer', 'customer.userID', '=', 'studentCustomer.userID')
+            ->join('college', 'studentCustomer.collegeID', '=', 'college.collegeID');
 
         if ($request->month) {
-            $query->whereMonth('pickup_dateTime', $request->month);
+            $query->whereMonth('booking.pickup_dateTime', $request->month);
         }
 
         if ($request->year) {
-            $query->whereYear('pickup_dateTime', $request->year);
+            $query->whereYear('booking.pickup_dateTime', $request->year);
         }
 
-        $data = $query->get();
+        $data = $query->select(
+                'booking.bookingID',
+                'booking.userID',
+                'user.name',
+                'college.collegeName',
+                'vehicles.vehicleName',
+                'booking.pickup_dateTime',
+                'booking.return_dateTime',
+                'booking.bookingStatus'
+            )
+            ->orderBy('college.collegeName')
+            ->get();
 
-        // Kira summary untuk chart
+        return view('admin.report.partials.top_college', compact('data'));
+    }
+
+    public function filterTotalBooking(Request $request)
+    {
+        $query = DB::table('booking')
+            ->join('user', 'booking.userID', '=', 'user.userID')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID');
+
+        if ($request->month) {
+            $query->whereMonth('booking.pickup_dateTime', $request->month);
+        }
+
+        if ($request->year) {
+            $query->whereYear('booking.pickup_dateTime', $request->year);
+        }
+
+        $data = $query->select(
+                'booking.bookingID',
+                'booking.userID',
+                'user.name',
+                'vehicles.vehicleName',
+                'booking.pickup_dateTime',
+                'booking.return_dateTime',
+                'booking.bookingStatus'
+            )
+            ->get();
+
         $summary = [
             'total'     => $data->count(),
             'completed' => $data->where('bookingStatus','completed')->count(),
@@ -71,7 +138,6 @@ class ReportController extends Controller
             'cancelled' => $data->where('bookingStatus','cancelled')->count(),
         ];
 
-        // Return partial view sahaja
         return view('admin.report.partials.total_booking', compact('data','summary'));
     }
 }

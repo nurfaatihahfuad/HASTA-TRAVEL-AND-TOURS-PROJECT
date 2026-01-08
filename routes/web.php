@@ -106,6 +106,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/receipt/download/{bookingID}', [ReceiptController::class, 'download'])
         ->name('receipt.download')
         ->where('bookingID', '[A-Za-z0-9]+');
+
+    Route::get('/admin/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+        ->name('reports.total_booking.filter');
+    
 });
 
 // Payment Pending Verification Page for Staff
@@ -157,6 +161,10 @@ Route::middleware('auth')->group(function () {
         // Filter untuk Total Booking
         Route::get('/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
+
+        Route::get('/reports/top_college/filter', [ReportController::class, 'filterTopCollege'])
+            ->name('top_college.filter');
+        
     });
     
 
