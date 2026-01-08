@@ -26,7 +26,7 @@
         </div>
 
         <div class="form-group">
-            <label class="required">Mileage Returned</label>
+            <label class="required">Mileage Returned (km) </label>
             <input type="number" name="mileageReturned" class="form-control reg-focus-ring" value="{{ $inspection->mileageReturned }}" required>
         </div>
 
@@ -58,7 +58,7 @@
             @endif
         </div>
 
-        <button type="submit" class="btn reg-btn-primary">Update Inspection</button>
+        <button type="submit" class="btn btn-outline-secondary px-4">Update Inspection</button>
     </form>
 </div>
 @endsection

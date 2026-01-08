@@ -53,7 +53,7 @@
             </select>
         </div>
 
-        <button type="submit" class="btn reg-btn-primary">Update Damage Case</button>
+        <button type="submit" class="btn btn-outline-secondary px-4">Update Damage Case</button>
     </form>
 </div>
 @endsection
