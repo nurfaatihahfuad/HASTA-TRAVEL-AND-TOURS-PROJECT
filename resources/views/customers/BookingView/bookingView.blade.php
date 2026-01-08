@@ -15,6 +15,7 @@
             <p><strong>Pick-up Time:</strong> {{ \Carbon\Carbon::parse($booking->pickup_dateTime)->format('d M Y, h:i A') }}</p>
             <p><strong>Return Time:</strong> {{ \Carbon\Carbon::parse($booking->return_dateTime)->format('d M Y, h:i A') }}</p>
             <p><strong>Total Price:</strong> RM{{ number_format($totalPayment, 2) }}</p>
+            <td>{{ ucfirst($booking->bookingStatus) }}</td>
         </div>
 
         <h2>Payment Details</h2>
