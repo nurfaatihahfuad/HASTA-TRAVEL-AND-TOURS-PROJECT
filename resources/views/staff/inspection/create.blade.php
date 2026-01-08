@@ -1,4 +1,3 @@
-
 @extends('layouts.runner')
 @section('title', 'Add New Inspection')
 @section('content')
@@ -16,7 +15,6 @@
         </div>
     @endif
 
-    {{-- Form create inspection --}}
     <form action="{{ route('inspection.store') }}" method="POST" enctype="multipart/form-data" class="p-3 reg-bg-primary-light rounded">
         @csrf
 
@@ -25,9 +23,11 @@
             <select name="vehicleID" class="form-control reg-focus-ring" required>
                 <option value="">-- Choose Vehicle --</option>
                 @foreach($bookings as $b)
-                    <option value="{{ $b->vehicleID }}">
-                         {{ $b->vehicle->vehicleName }}
-                    </option>
+                    @if($b->vehicle) {{-- pastikan vehicle wujud --}}
+                        <option value="{{ $b->vehicleID }}">
+                             {{ $b->vehicle->vehicleName }} (Booking: {{ $b->bookingID }})
+                        </option>
+                    @endif
                 @endforeach
             </select>
         </div>
@@ -38,7 +38,7 @@
         </div>
 
         <div class="form-group">
-            <label class="required">Mileage Returned (km) </label>
+            <label class="required">Mileage Returned (km)</label>
             <input type="number" name="mileageReturned" class="form-control reg-focus-ring" required>
         </div>
 

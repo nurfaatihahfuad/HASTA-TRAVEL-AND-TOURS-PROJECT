@@ -1,4 +1,3 @@
-@extends('layouts.app')
 @extends('layouts.runner')
 @section('title', 'Inspection Management')
 @section('content')
