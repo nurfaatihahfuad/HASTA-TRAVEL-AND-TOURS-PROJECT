@@ -102,6 +102,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->where('bookingID', '[A-Za-z0-9]+');
 });
 
+// Payment Pending Verification Page for Staff
+Route::get('/staff/payment/record', [DashboardController::class, 'verifyBookings'])
+        ->name('record.payment');
 // ============================
 // Booking routes (customer only)
 // ============================
@@ -182,6 +185,7 @@ Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.sub
 // Staff dashboard: verify payments
 Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
 Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+
 
 // ============================
 // Staff Management (Admin only)

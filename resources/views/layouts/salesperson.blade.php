@@ -95,10 +95,12 @@
         }
         
         .metric-card {
-            background: #f8f9fa;
+            background: white;
             padding: 15px;
             border-radius: 8px;
             text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
         
         .metric-title {
@@ -149,17 +151,8 @@
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
             
-            <a class="sidebar-link"
-               href="{{ route('staff_salesperson.dashboard') }}">
-                <i class="fas fa-users"></i> Customer Verification
-            </a>
-            
-            <a class="sidebar-link" href="#">
+            <a class="sidebar-link" href="{{ route('record.payment') }}">
                 <i class="fas fa-clipboard-check"></i> Payment Record
-            </a>
-            
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-chart-bar"></i> Pending Payment
             </a>
             
             <hr>

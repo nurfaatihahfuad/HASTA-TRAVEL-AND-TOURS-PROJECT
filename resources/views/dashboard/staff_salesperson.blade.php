@@ -11,23 +11,20 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <div class="metric-card">
-                        <div class="metric-title">Assigned today</div>
-                        <div class="metric-value"></div>
-                        <div class="metric-delta">↑ 4.1%</div>
+                        <div class="metric-title">New Booking Today</div>
+                        <div class="metric-value">{{ $bookingsToday }}</div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="metric-card">
-                        <div class="metric-title">Pending payments</div>
-                        <div class="metric-value"></div>
-                        <div class="metric-delta">↑ 2.5%</div>
+                        <div class="metric-title">Pending Payments</div>
+                        <div class="metric-value">{{ $statusPending }}</div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="metric-card">
-                        <div class="metric-title">Cancelled bookings</div>
+                        <div class="metric-title">Cancelled Bookings</div>
                         <div class="metric-value">{{ $statusCancelled }}</div>
-                        <div class="metric-delta">↓ 1.2%</div>
                     </div>
                 </div>
             </div>
@@ -55,11 +52,9 @@
                     <table class="table table-sm align-middle">
                         <thead>
                             <tr>
-                                <th>Booking ID</th>
-                                <th>Car</th>
-                                <!--<th>Payment Proof</th>
-                                <th>Status</th>
-                                <th>Created At</th>-->
+                                <th>Customer Name</th>
+                                <th>Vehicle</th>
+                                <th>Plate No</th>
                                 <th>Payment Proof</th>
                                 <th>Payment Status</th>
                                 <th>Amount Paid</th>
@@ -68,10 +63,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($bookings as $b)
+                            @foreach($latestBookings as $b)
                                 <tr>
-                                    <td>{{ $b->bookingID }}</td>
-                                    <td>{{ $b->vehicleID }}</td>
+                                    <td>{{ $b->name }}</td>
+                                    <td>{{ $b->vehicleName }}</td>
+                                    <td>{{ $b->plateNo }}</td>
                                     <td>
                                         @if(!empty($b->receipt_file_path))
                                             <div class="btn-group btn-group-sm">
@@ -126,9 +122,8 @@
                                     </td>
                                     <td>{{ $b->created_at }}</td>
                                 </tr> 
-                                @empty
-                                <tr><td colspan="4">No bookings found.</td></tr>
-                            @endforelse  
+                            
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
