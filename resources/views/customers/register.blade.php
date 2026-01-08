@@ -628,7 +628,7 @@
                         if (field === 'facultyID') fieldName = 'faculty';
                         if (field === 'collegeID') fieldName = 'residential college';
 
-                        errorMsg.push('Please fill in ${fieldName}');
+                        errorMsg.push(`Please fill in ${fieldName}`);
                     }
                     /*if (!document.getElementById(field).value.trim()) {
                         e.preventDefault();
@@ -642,8 +642,8 @@
                 for (let field of fileFields) {
                     const element = document.getElementById(field);
                     if (element && (!element.files || element.files.length === 0)) {
-                        errorMessages.push(`Please upload ${field.replace('_', ' ')}`);
-                        if (errorMessages.length === 1) {
+                        errorMsg.push(`Please upload ${field.replace('_', ' ')}`);
+                        if (errorMsg.length === 1) {
                             element.closest('.border-dashed').scrollIntoView({ behavior: 'smooth' });
                         }
                     }

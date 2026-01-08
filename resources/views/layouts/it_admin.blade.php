@@ -170,12 +170,12 @@
                 <i class="fas fa-users"></i> Booking
             </a>
 
-            <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
-               href="#">
+            <a class="sidebar-link @if($currentRoute == 'admin.customers.index') active @endif" 
+               href="{{ route('admin.customers.index') }}">
                 <i class="fas fa-users"></i> Customer Information
             </a>
 
-            <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
+            <a class="sidebar-link @if($currentRoute == 'customers.index') active @endif" 
                href="#">
                 <i class="fas fa-users"></i> Blacklisted Customer
             </a>

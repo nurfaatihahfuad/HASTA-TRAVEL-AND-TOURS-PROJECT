@@ -129,6 +129,31 @@ document.addEventListener('DOMContentLoaded', () => {
         options: { responsive: true }
     });
 });
+
+function confirmStatusChange(userId) {
+    if (confirm('Are you sure you want to change this customer\'s status?')) {
+        // Create a form and submit it
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ url('admin/customers') }}/" + userId + "/toggle-status";
+        
+        var csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+        
+        var methodField = document.createElement('input');
+        methodField.type = 'hidden';
+        methodField.name = '_method';
+        methodField.value = 'POST';
+        form.appendChild(methodField);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
 </script>
 @endpush
 @endsection
