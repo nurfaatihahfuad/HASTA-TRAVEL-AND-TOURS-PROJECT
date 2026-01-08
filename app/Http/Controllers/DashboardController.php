@@ -260,6 +260,17 @@ class DashboardController extends Controller
         ->groupBy('vehicles.vehicleName')
         ->orderByDesc('count')
         ->value('carModel');
+
+        // Most rented car with details
+        $mostRentedVehicle = $user->bookings()
+            ->selectRaw('vehicles.*, count(*) as rental_count')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->groupBy('vehicles.vehicleID', 'vehicles.vehicleName', 
+                    'vehicles.plateNo', 'vehicles.year','vehicles.price_per_day','price_per_hour',
+                    'vehicles.available','vehicles.image_url','vehicles.description',
+                    'vehicles.created_at','vehicles.updated_at')
+            ->orderByDesc('rental_count')
+            ->first();
         
         // Get statistics
         $totalBookings = $user->bookings()->count();

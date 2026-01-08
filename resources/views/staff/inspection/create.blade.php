@@ -1,4 +1,3 @@
-
 @extends('layouts.runner')
 @section('title', 'Add New Inspection')
 @section('content')

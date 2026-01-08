@@ -98,36 +98,11 @@
         .customer-fields {
             transition: all 0.3s ease;
         }
-
-        .top-home-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #dc3545;
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            z-index: 1000;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        }
-        
-        .top-home-btn:hover {
-            background: #c82333;
-            transform: scale(1.1);
-        }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl w-full bg-white rounded-lg shadow-xl overflow-hidden">
-            <a href="/" class="top-home-btn">
-            <i class="fas fa-home"></i>
-            </a>
             <!-- Header -->
             <div class="reg-bg-primary text-white py-6 px-8">
                 <h2 class="text-3xl font-bold text-center">Customer Registration</h2>

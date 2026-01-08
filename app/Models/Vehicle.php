@@ -12,7 +12,7 @@ class Vehicle extends Model
 
     protected $fillable = [
         'vehicleName', 'plateNo', 'year',
-        'price_per_day', 'available', 'image_url', 
+        'price_per_day', 'price_per_hour','available', 'image_url', 
         'description', 'created_at' , 'updated_at', 'image_url'
     ];
 

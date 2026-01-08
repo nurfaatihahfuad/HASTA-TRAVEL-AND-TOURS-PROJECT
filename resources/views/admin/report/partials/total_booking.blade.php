@@ -1,6 +1,18 @@
 <div class="section-card">
     <h4><i class="fas fa-list-alt me-2"></i> Total Booking Report</h4>
 
+    <!-- Charts side by side -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h5><i class="fas fa-chart-pie me-2"></i> Booking Status Overview</h5>
+            <canvas id="bookingPieChart" height="120"></canvas>
+        </div>
+        <div class="col-md-6">
+            <h5><i class="fas fa-chart-bar me-2"></i> Booking Summary</h5>
+            <canvas id="bookingBarChart" height="120"></canvas>
+        </div>
+    </div>
+
     <!-- Table -->
     <table id="bookingTable" class="table table-striped table-hover align-middle">
         <thead class="table-dark">
@@ -39,9 +51,6 @@
         </tbody>
     </table>
 
-    <!-- Chart -->
-    <canvas id="bookingChart" height="100"></canvas>
-
     <!-- Export Buttons -->
     <div class="mt-3">
         <button class="btn btn-outline-danger" onclick="exportTableToPDF()">Export PDF</button>
@@ -51,16 +60,60 @@
 
 @push('scripts')
 <script>
-    // Chart.js untuk summary
-    const ctx = document.getElementById('bookingChart').getContext('2d');
-    new Chart(ctx, {
+
+    // Pie Chart
+    const pieCtx = document.getElementById('bookingPieChart').getContext('2d');
+    new Chart(pieCtx, {
         type: 'pie',
+        data: {
+            labels: ['Completed', 'Pending', 'Cancelled'],
+            datasets: [{
+                data: [
+                    {{ $summary['completed'] }},
+                    {{ $summary['pending'] }},
+                    {{ $summary['cancelled'] }}
+                ],
+                backgroundColor: ['#28a745','#ffc107','#dc3545']
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                title: {
+                    display: true,
+                    text: 'Total Bookings: {{ $summary['total'] }}'
+                }
+            }
+        }
+    });
+
+    // Bar Chart
+    const barCtx = document.getElementById('bookingBarChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
         data: {
             labels: ['Total', 'Completed', 'Pending', 'Cancelled'],
             datasets: [{
-                data: [{{ $summary['total'] }}, {{ $summary['completed'] }}, {{ $summary['pending'] }}, {{ $summary['cancelled'] }}],
+                label: 'Bookings',
+                data: [
+                    {{ $summary['total'] }},
+                    {{ $summary['completed'] }},
+                    {{ $summary['pending'] }},
+                    {{ $summary['cancelled'] }}
+                ],
                 backgroundColor: ['#0d6efd','#28a745','#ffc107','#dc3545']
             }]
+        },
+        options: {
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Booking Summary'
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
         }
     });
 </script>
