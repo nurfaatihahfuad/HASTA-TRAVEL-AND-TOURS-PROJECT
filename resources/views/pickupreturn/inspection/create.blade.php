@@ -1,4 +1,4 @@
-@extends('layouts.runner')
+@extends('layouts.salesperson')
 @section('title', 'Add New Inspection')
 @section('content')
 <div class="container min-h-screen">

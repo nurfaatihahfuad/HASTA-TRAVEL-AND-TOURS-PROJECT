@@ -349,4 +349,17 @@ public function verifyBookings()
             'mostCar' => $mostCar,
         ]);
     }
+
+    public function customerDashboard()
+    {
+        $userID = auth()->id();
+
+        $bookings = Booking::with('vehicle')
+                    ->where('userID', $userID)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+        return view('customer.dashboard', compact('bookings'));
+    }
+
 }
