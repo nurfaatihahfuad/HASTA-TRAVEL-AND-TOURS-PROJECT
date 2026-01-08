@@ -73,7 +73,7 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div>
-                                                <strong>{{ $booking->vehicle->vehicleName ?? 'Unknown' }}</strong><br>
+                                                <strong>{{ $booking->vehicleID }}</strong><br>
                                             </div>
                                         </div>
                                     </td>
@@ -98,7 +98,9 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary">View</button>
+                                        <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View
+
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach

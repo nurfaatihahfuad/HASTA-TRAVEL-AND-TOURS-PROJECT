@@ -189,7 +189,7 @@ class AuthenticatedSessionController extends Controller
         }
         
         if ($user->isRunner()) {
-            return redirect()->route('staff_runner.dashboard');
+            return redirect()->route('staff_salesperson.dashboard');
         }
 
         if ($user->isITadmin()) {

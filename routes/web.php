@@ -90,6 +90,11 @@ Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSa
 Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus']) 
     ->name('booking.updateStatus');
 
+// Route untuk tunjuk summary payment/booking 
+Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSummary'])
+        ->name('booking.summary');
+
+
 // Receipt routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // View receipt in browser
@@ -103,6 +108,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->where('bookingID', '[A-Za-z0-9]+');
 });
 
+// Payment Pending Verification Page for Staff
+Route::get('/staff/payment/record', [DashboardController::class, 'verifyBookings'])
+        ->name('record.payment');
 // ============================
 // Booking routes (customer only)
 // ============================
@@ -183,6 +191,7 @@ Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.sub
 // Staff dashboard: verify payments
 Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
 Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+
 
 // ============================
 // Staff Management (Admin only)
