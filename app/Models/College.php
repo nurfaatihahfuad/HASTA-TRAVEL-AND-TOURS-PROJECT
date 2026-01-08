@@ -13,6 +13,8 @@ class College extends Model
     protected $table = 'college';
     protected $primaryKey = 'collegeID';
     public $timestamps = false;
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'collegeID', 'collegeName'

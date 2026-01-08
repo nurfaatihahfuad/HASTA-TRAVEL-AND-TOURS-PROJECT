@@ -90,6 +90,10 @@ Route::get('/staff/salesperson/dashboard', [DashboardController::class, 'staffSa
 Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus']) 
     ->name('booking.updateStatus');
 
+// Nak approve payment
+Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
+
+
 // Route untuk tunjuk summary payment/booking 
 Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSummary'])
         ->name('booking.summary');
@@ -175,20 +179,35 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
-    // Car inspection to damage case
-    // Car inspection CRUD
-    Route::resource('inspection', InspectionController::class)->middleware('auth');
+    // ============================
+    // Inspection Routes
+    // ============================
 
-    // Damage Case page
-    //Route::get('/damage-case', function () {
-    //return view('damagecase'); // letak nama view yang betul
-    //})->name('damage_case.index');
-    //Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case');
-    //Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
-    //->name('damage_case.index');
-    Route::resource('damagecase', DamageCaseController::class)->middleware('auth');
-    //Route::post('/damagecase/store', [DamageCaseController::class, 'store'])->name('damage.store');
-    //Route::post('/damagecase/{id}/resolve', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
+    // Customer boleh index, create, store, edit, update
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+        Route::resource('inspection', InspectionController::class)
+            ->only(['index','create','store','edit','update']);
+    });
+
+    // Staff hanya index, edit, update
+    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+        Route::resource('inspection', InspectionController::class)
+            ->only(['index','edit','update']);
+    });
+
+
+    // ============================
+    // Damage Case Routes
+    // ============================
+
+    // Staff hanya index, create, store, edit, update
+    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+        Route::resource('damagecase', DamageCaseController::class)
+            ->only(['index','edit','update','show']); 
+            // tambah 'create','store','destroy' kalau staff perlu
+        Route::post('damagecase/{caseID}/resolve', [DamageCaseController::class, 'resolve'])
+        ->name('damagecase.resolve');
+    });
 
 // ============================
 // Payment routes
