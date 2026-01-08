@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
+use App\Models\Vehicle;
 
 class DashboardController extends Controller
 {
@@ -144,33 +145,82 @@ class DashboardController extends Controller
         /*$bookings = Booking::with(['payments', 'vehicle'])
             ->orderBy('created_at', 'desc')
             ->get();*/
-        // Try different column names
-        $bookings = DB::table('booking')
+        // Try different column names SINI
+        $latestBookings = DB::table('booking')
             ->leftJoin('payment', function($join) {
                 $join->on('booking.bookingID', '=', 'payment.bookingID');
             })
+            ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->leftJoin('user', 'booking.userID', '=', 'user.userID')
             ->select(
                 'booking.*',
+                'user.name',
+                'vehicles.vehicleName',
+                'vehicles.plateNo',
                 'payment.receipt_file_path',
                 'payment.paymentStatus',
                 'payment.paymentStatus as payment_status', // try both
                 'payment.amountPaid'
             )
             ->orderBy('booking.created_at', 'desc')
+            ->limit(5) // Only show 5 recent for dashboard
             ->get();
 
         $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
         $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
         $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
+        $bookingsToday = DB::table('booking')->whereDate('created_at', now())->count();
 
         $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
         $weeklyData   = [3,6,5,7,4,2,8]; // contoh statik
 
         return view('dashboard.staff_salesperson', compact(
-            'bookings','statusCancelled','statusBooked','statusPending',
+            'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
     }
+
+    // Display bookings for verification (Staff)
+    /**
+ * Display all bookings for verification (dedicated page)
+ */
+public function verifyBookings()
+{
+    // Get all bookings with filters
+    $bookings = DB::table('booking')
+        ->leftJoin('payment', function($join) {
+            $join->on('booking.bookingID', '=', 'payment.bookingID');
+        })
+        ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+        ->leftJoin('user', 'booking.userID', '=', 'user.userID')
+        ->select(
+            'booking.*',
+            'user.name',
+            'vehicles.vehicleName',
+            'vehicles.plateNo',
+            'payment.receipt_file_path',
+            'payment.paymentStatus',
+            'payment.amountPaid',
+            'booking.created_at as booking_date'
+        )
+        ->orderBy('booking.created_at', 'desc')
+        ->paginate(20); // Use pagination for better performance
+
+    // Statistics for the verification page
+    $totalBookings = DB::table('booking')->count();
+    $pendingVerification = DB::table('booking')
+        ->leftJoin('payment', 'booking.bookingID', '=', 'payment.bookingID')
+        ->where('payment.paymentStatus', 'pending')
+        ->orWhereNull('payment.paymentStatus')
+        ->count();
+    
+
+    return view('staff.payment.record', compact(
+        'bookings',
+        'totalBookings',
+        'pendingVerification'
+    ));
+}
 
     // ============================
     // Staff Runner Dashboard

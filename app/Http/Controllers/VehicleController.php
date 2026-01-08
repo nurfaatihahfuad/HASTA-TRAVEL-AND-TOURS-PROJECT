@@ -7,98 +7,130 @@ use App\Models\Vehicle;
 
 class VehicleController extends Controller
 {
+    // Untuk customer browse (hanya available)
     public function index()
-    {   
-        // Ambil semua vehicle yang available
-        $vehicles = Vehicle::where('available', 1)->get();
-
-        // Hantar ke view browseVehicle.blade.php
+    {
+        $vehicles = Vehicle::where('available', 1)->get(); // hanya available
         return view('browseVehicle', compact('vehicles'));
     }
 
-    public function preview() {
-        $vehicles = Vehicle::where('available', 1)->get(); 
+    // Preview untuk homepage
+    public function preview()
+    {
+        $vehicles = Vehicle::where('available', 1)->get();
         return view('welcome', compact('vehicles')); 
     }
 
-    /*
-    public function search(Request $request) 
+    // Search availability
+    public function search(Request $request)
     {
         $pickup = $request->input('pickup_dateTime');
         $return = $request->input('return_dateTime');
 
-        // Kalau tak isi tarikh langsung, jangan hantar apa-apa
         if (empty($pickup) || empty($return)) {
             return view('browseVehicle', ['vehicles' => collect()]);
         }
 
-        // Ambil semua kereta yang available & tak clash dengan booking
         $vehicles = Vehicle::where('available', 1)
             ->whereDoesntHave('bookings', function($q) use ($pickup, $return) {
                 $q->where('pickup_dateTime', '<', $return)
-                ->where('return_dateTime', '>', $pickup);
+                  ->where('return_dateTime', '>', $pickup);
             })
             ->get();
 
-        return view('browseVehicle', compact('vehicles'));
-    }
-        */
-
-    // VehicleController@search
-    public function search(Request $request)
-    {
-        $pickup_dateTime = $request->input('pickup_dateTime');
-        $return_dateTime = $request->input('return_dateTime');
-
-        $vehicles = Vehicle::where('available', 1)
-            ->whereNotIn('vehicleID', function($q) use ($pickup_dateTime, $return_dateTime) {
-                $q->select('vehicleID')
-                ->from('booking')
-                ->where(function($q2) use ($pickup_dateTime, $return_dateTime) {
-                    $q2->whereBetween('pickup_dateTime', [$pickup_dateTime, $return_dateTime])
-                    ->orWhereBetween('return_dateTime', [$pickup_dateTime, $return_dateTime]);
-                });
-            })
-            ->get();
-
-        return view('browseVehicle', compact('vehicles', 'pickup_dateTime', 'return_dateTime'));
+        return view('browseVehicle', compact('vehicles', 'pickup', 'return'));
     }
 
-    public function indexAdmin()
+    // Untuk admin
+    public function indexAdmin(Request $request)
     {
-        // Ambil semua vehicle (tak kisah available/unavailable)
-        $vehicles = Vehicle::all();
+        $filter = $request->query('filter');
 
-        // Hantar ke view admin/vehicle/indexVehicle.blade.php
+        if ($filter === 'available') {
+            $vehicles = Vehicle::where('available', 1)->get();
+        } elseif ($filter === 'unavailable') {
+            $vehicles = Vehicle::where('available', 0)->get();
+        } else {
+            $vehicles = Vehicle::all();
+        }
+
         return view('admin.vehicle.indexVehicle', compact('vehicles'));
     }
 
 
-    public function store(Request $request)
+    public function create()
     {
-        $vehicle = new Vehicle();
-        $vehicle->vehicleName = $request->vehicleName;
-        $vehicle->type = $request->type;
-        $vehicle->status = $request->status;
-        $vehicle->available = $request->status === 'available' ? 1 : 0;
-        $vehicle->save();
-
-        return redirect()->route('vehicles.index')->with('success', 'Vehicle created successfully');
+        return view('admin.vehicle.createVehicle');
     }
 
     public function edit($id)
     {
         $vehicle = Vehicle::findOrFail($id);
-        return view('updateVehicle', compact('vehicle'));
+        return view('admin.vehicle.updateVehicle', compact('vehicle'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'vehicleName' => 'required|string',
+            'plateNo' => 'required|string|unique:vehicles',
+            'year' => 'required|integer',
+            'price_per_day' => 'required|numeric',
+            'price_per_hour' => 'required|numeric',
+            'status' => 'required|in:available,unavailable',
+            'image' => 'nullable|image|max:2048',
+            'description' => 'nullable|string',
+        ]);
+
+        $vehicle = new Vehicle();
+        $vehicle->vehicleName = $request->vehicleName;
+        $vehicle->plateNo = $request->plateNo;
+        $vehicle->year = $request->year;
+        $vehicle->price_per_day = $request->price_per_day;
+        $vehicle->price_per_hour = $request->price_per_hour;
+        $vehicle->available = $request->status === 'available' ? 1 : 0;
+        $vehicle->description = $request->description;
+
+        if ($request->hasFile('image')) {
+            $filename = time().'_'.$request->file('image')->getClientOriginalName();
+            $request->file('image')->move(public_path('img'), $filename);
+            $vehicle->image_url = $filename;
+        }
+
+        $vehicle->save();
+
+        return redirect()->route('vehicles.index')->with('success', 'Vehicle created successfully');
     }
 
     public function update(Request $request, $id)
     {
         $vehicle = Vehicle::findOrFail($id);
+
+        $request->validate([
+            'vehicleName' => 'required|string',
+            'plateNo' => 'required|string|unique:vehicles,plateNo,' . $vehicle->vehicleID . ',vehicleID',
+            'year' => 'required|integer',
+            'price_per_day' => 'required|numeric',
+            'price_per_hour' => 'required|numeric',
+            'status' => 'required|in:available,unavailable',
+            'image' => 'nullable|image|max:2048',
+            'description' => 'nullable|string',
+        ]);
+
         $vehicle->vehicleName = $request->vehicleName;
-        $vehicle->type = $request->type;
-        $vehicle->status = $request->status;
+        $vehicle->plateNo = $request->plateNo;
+        $vehicle->year = $request->year;
+        $vehicle->price_per_day = $request->price_per_day;
+        $vehicle->price_per_hour = $request->price_per_hour;
         $vehicle->available = $request->status === 'available' ? 1 : 0;
+        $vehicle->description = $request->description;
+
+        if ($request->hasFile('image')) {
+            $filename = time().'_'.$request->file('image')->getClientOriginalName();
+            $request->file('image')->move(public_path('img'), $filename);
+            $vehicle->image_url = $filename;
+        }
+
         $vehicle->save();
 
         return redirect()->route('vehicles.index')->with('success', 'Vehicle updated successfully');
@@ -111,5 +143,4 @@ class VehicleController extends Controller
 
         return redirect()->route('vehicles.index')->with('success', 'Vehicle deleted successfully');
     }
-
 }

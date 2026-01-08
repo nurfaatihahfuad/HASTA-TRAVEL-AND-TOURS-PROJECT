@@ -46,3 +46,4 @@ class Payment extends Model
     */
 
 }
+
