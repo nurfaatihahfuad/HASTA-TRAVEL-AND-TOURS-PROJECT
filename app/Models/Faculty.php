@@ -13,6 +13,8 @@ class Faculty extends Model
     protected $table = 'faculty';
     protected $primaryKey = 'facultyID';
     public $timestamps = false;
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'facultyID', 'facultyName'

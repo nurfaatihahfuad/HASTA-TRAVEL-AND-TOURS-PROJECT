@@ -281,6 +281,14 @@
                href="#">
                 <i class="fas fa-history"></i> Booking History
             </a>
+
+            <a class="sidebar-link" href="{{ route('inspection.index') }}">
+                <i class="fas fa-chart-bar"></i> Car Inspection Checklist
+            </a>
+
+            <a class="sidebar-link" href="{{ route('damagecase.index') }}">
+                <i class="fas fa-chart-bar"></i> Damage Case Checklist 
+            </a>
             
             <a class="sidebar-link @if($currentRoute == 'customer.profile') active @endif" 
                href="#">

@@ -1,4 +1,4 @@
-@extends('layouts.salesperson')
+@extends('layouts.customer')
 @section('title', 'Inspection Management')
 @section('content')
 <div class="container min-h-screen">
@@ -11,14 +11,19 @@
         </div>
     @endif
 
+    {{-- Customer sahaja boleh create --}}
+    @if(Auth::user()->userType === 'customer')
+        <a href="{{ route('inspection.create') }}" class="btn btn-outline-secondary px-4">+ New Inspection</a>
+    @endif
+
     <table class="table table-bordered reg-bg-primary-lightest">
         <thead class="reg-bg-primary-light">
             <tr>
                 <th>ID</th>
                 <th>Vehicle</th>
                 <th>Condition</th>
-                <th>Mileage (km) </th>
-                <th>Fuel (%) </th>
+                <th>Mileage (km)</th>
+                <th>Fuel (%)</th>
                 <th>Damage</th>
                 <th>Staff</th>
                 <th>Action</th>
@@ -35,8 +40,17 @@
                     <td>{{ $insp->damageDetected ? 'Yes' : 'No' }}</td>
                     <td>{{ $insp->staffID }}</td>
                     <td>
+                        {{-- Customer & Staff boleh edit --}}
                         <a href="{{ route('inspection.edit', $insp->inspectionID) }}" class="btn btn-sm btn-warning">Edit</a>
-                       
+
+                        {{-- Staff sahaja boleh delete --}}
+                        @if(Auth::user()->userType === 'staff')
+                            <form action="{{ route('inspection.destroy', $insp->inspectionID) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        @endif
                     </td>
                 </tr>
             @endforeach

@@ -72,8 +72,8 @@ class CustomerRegistrationController extends Controller
         // Add conditional validation based on customer type
         if ($request->customerType === 'student') {
             $validationRules['matricNo'] = 'required|string|max:50|unique:studentcustomer,matricNo';
-            $validationRules['facultyID'] = 'required|string';
-            $validationRules['collegeID'] = 'required|string';
+            $validationRules['facultyID'] = 'required|string|exists:faculty,facultyID';
+            $validationRules['collegeID'] = 'required|string|exists:college,collegeID';
         } else {
             $validationRules['staffNo'] = 'required|string|max:50|unique:staffcustomer,staffNo';
         }
