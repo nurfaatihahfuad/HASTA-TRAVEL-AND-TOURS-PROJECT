@@ -50,7 +50,6 @@ class PaymentController extends Controller
         // Simpan file ke storage/public/payments
         $path = $request->file('payment_proof')->store('payments', 'public');
 
-        // ✅ FIX: Dapatkan booking dan calculate totalAmount
         $booking = Booking::with('vehicle')->findOrFail($request->bookingID);
         $pickup = Carbon::parse($booking->pickup_dateTime);
         $return = Carbon::parse($booking->return_dateTime);

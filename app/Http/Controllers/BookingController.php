@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\Vehicle;
-use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -23,8 +21,6 @@ class BookingController extends Controller
         $return_dateTime = $request->input('return_dateTime');
 
         return view('booking', compact('vehicle', 'pickup_dateTime', 'return_dateTime'));
-
-        //$vehicle = Vehicle::find(1);
     }
 
     /**
@@ -36,11 +32,11 @@ class BookingController extends Controller
             'vehicleID'       => 'required|integer|exists:vehicles,vehicleID',
             'pickup_dateTime' => 'required|date',
             'return_dateTime' => 'required|date|after_or_equal:pickup_dateTime',
-            'pickupAddress'   => 'required|string|max:255',
-            'returnAddress'   => 'required|string|max:255',
-            'voucherCode'     => 'nullable|string|max:50',
-            'pickup_other_location' => 'nullable|string|max:255',
-            'return_other_location' => 'nullable|string|max:255',
+            'pickupAddress'   => 'required|string|max:100',
+            'returnAddress'   => 'required|string|max:100',
+            'voucherCode'     => 'nullable|integer',
+            'pickup_other_location' => 'nullable|string|max:100',
+            'return_other_location' => 'nullable|string|max:100',
         ]);
 
         // Override pickupAddress if "others" or "staff_office"
@@ -63,31 +59,32 @@ class BookingController extends Controller
             'pickupAddress'   => $pickupAddress,
             'returnAddress'   => $returnAddress,
             'voucherCode'     => $validated['voucherCode'],
-            'bookingStatus'   => 'Pending',
+            'bookingStatus'   => 'pending', // Sesuai dengan ENUM: 'pending'
         ]);
 
         return redirect()->route('payment.show', ['bookingID' => $booking->bookingID])
                         ->with('success', 'Booking Complete!');
     }
 
-
-    //Auni tambah
-    public function updateStatus(Request $request, $bookingID)
+    public function updateStatus(Request $request, $bookingID): RedirectResponse
     {
+        $request->validate([
+            'status' => 'required|string|in:pending,successful,rejected',
+        ]);
+
         $booking = Booking::findOrFail($bookingID);
-        //Auni tambah ni
-        $status = $request->input('status');
-        // yg bawah ni Auni tambah
-        $booking->bookingStatus = $status; // 'approved' atau 'rejected'
+        $status = strtolower(trim($request->input('status')));
+        
+        $booking->bookingStatus = $status;
         $booking->save();
 
-        return back()->with('success', "Booking {$bookingID} updated to {$request->status}");
+        return back()->with('success', "Booking {$bookingID} updated to " . ucfirst($status));
     }
 
         public function approve($bookingID)
     {
         $booking = Booking::findOrFail($bookingID);
-        $booking->bookingStatus = 'successful'; // ikut ENUM dalam DB
+        $booking->bookingStatus = 'successful'; // atau 'Approved' ikut DB
         $booking->save();
 
         return redirect()->back()->with('success', 'Booking has been approved.');
@@ -101,5 +98,16 @@ class BookingController extends Controller
 
         return redirect()->back()->with('success', 'Booking has been rejected.');
     }
-}
 
+    /**
+     * Reset booking to pending (additional method if needed)
+     */
+    public function resetToPending($bookingID): RedirectResponse
+    {
+        $booking = Booking::findOrFail($bookingID);
+        $booking->bookingStatus = 'pending';
+        $booking->save();
+
+        return redirect()->back()->with('success', 'Booking has been reset to pending status.');
+    }
+}
