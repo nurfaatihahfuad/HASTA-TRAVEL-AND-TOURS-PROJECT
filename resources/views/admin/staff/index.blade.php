@@ -162,17 +162,17 @@
                                    title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button type="button" 
+                                <!--<button type="button" 
                                         class="btn btn-outline-danger" 
                                         title="Delete"
                                         data-bs-toggle="modal" 
                                         data-bs-target="#deleteModal{{ $member->userID }}">
                                     <i class="fas fa-trash"></i>
-                                </button>
+                                </button>-->
                             </div>
                             
                             <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteModal{{ $member->userID }}" tabindex="-1">
+                            <!--<div class="modal fade" id="deleteModal{{ $member->userID }}" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -193,7 +193,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </td>
                     </tr>
                 @empty
