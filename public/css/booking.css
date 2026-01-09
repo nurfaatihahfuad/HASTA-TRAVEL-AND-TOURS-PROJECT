@@ -1,18 +1,9 @@
 /* Global */
 body {
     margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: #f8f9fa;
-    display: flex;
-    flex-direction: column; /* Ubah ke column untuk susun menegak */
-    align-items: center; /* Pusatkan semua kandungan */
-    min-height: 100vh;
-    background-image: url("/img/registration-bg.jpg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom right, #ffe9b3, #ffc7b5);
+    color: #333;
 }
 
 /* Page header (tajuk di luar kotak) */
@@ -36,7 +27,7 @@ body {
     width: 100%;
     margin: 20px auto 50px; /* Auto untuk kiri-kanan akan pusatkan */
     background: white;
-    border: 2px solid #EC9A85;
+    border: 2px solid #c82333;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
@@ -87,7 +78,7 @@ select {
 input[type="text"]:focus,
 select:focus {
     outline: none;
-    border-color: #EC9A85;
+    border-color: #c82333;
     box-shadow: 0 0 0 2px rgba(236, 154, 133, 0.2);
 }
 
@@ -102,7 +93,7 @@ select:focus {
     flex: 1;
     min-width: 0;
     background-color: #fff;
-    border: 2px solid #EC9A85;
+    border: 2px solid #c82333;
     border-radius: 10px;
     padding: 25px;
     text-align: left;
@@ -113,7 +104,7 @@ select:focus {
     color: #333;
     font-size: 24px;
     margin-bottom: 10px;
-    border-bottom: 2px solid #EC9A85;
+    border-bottom: 2px solid #c82333;
     padding-bottom: 10px;
 }
 
@@ -177,7 +168,7 @@ select:focus {
 .submit-btn {
     width: 100%;
     padding: 14px;
-    background-color: #EC9A85;
+    background-color: #c82333;
     color: white;
     border: none;
     border-radius: 5px;
@@ -188,7 +179,7 @@ select:focus {
 }
 
 .submit-btn:hover {
-    background-color: #E68A75;
+    background-color: #c82333;
 }
 
 /* Required indicator */

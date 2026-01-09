@@ -128,7 +128,7 @@
             @if($vehicle)
                 <div class="car-info">
                     <h2>{{ $vehicle->vehicleName }}</h2>
-                    <p class="price">RM{{ $vehicle->price_per_day }}/hour</p>
+                    <p class="price">RM{{ $vehicle->price_per_day }}/day</p>
                     <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->vehicleName }}" class="car-image">
                     
                     <div class="vehicle-details">
