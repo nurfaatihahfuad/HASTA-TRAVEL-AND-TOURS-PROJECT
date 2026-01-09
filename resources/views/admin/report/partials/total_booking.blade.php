@@ -1,120 +1,216 @@
 <div class="section-card">
-    <h4><i class="fas fa-list-alt me-2"></i> Total Booking Report</h4>
+    <h5 class="mb-3">Total Booking Report</h5>
 
-    <!-- Charts side by side -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h5><i class="fas fa-chart-pie me-2"></i> Booking Status Overview</h5>
-            <canvas id="bookingPieChart" height="120"></canvas>
+    @if(!empty($isPdf))
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                color: #333;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 12px;
+            }
+            th, td {
+                border: 1px solid #000;
+                padding: 6px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+        </style>
+    @endif
+
+    @if(empty($isPdf))
+        <!-- Filter form -->
+        <form id="filterForm" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <select name="month" class="form-select">
+                    <option value="">Select Month</option>
+                    @for($m = 1; $m <= 12; $m++)
+                        <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="year" class="form-select">
+                    <option value="">Select Year</option>
+                    @for($y = now()->year; $y >= now()->year - 5; $y--)
+                        <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-2"></i> Filter
+                </button>
+            </div>
+        </form>
+
+        <!-- Summary cards -->
+        <div class="row mb-4" id="summaryCards">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6>Total</h6>
+                        <p class="fs-5 mb-0" id="totalCount">{{ $summary['total'] ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6>Completed</h6>
+                        <p class="fs-5 mb-0 text-success" id="completedCount">{{ $summary['completed'] ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6>Pending</h6>
+                        <p class="fs-5 mb-0 text-warning" id="pendingCount">{{ $summary['pending'] ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6>Cancelled</h6>
+                        <p class="fs-5 mb-0 text-danger" id="cancelledCount">{{ $summary['cancelled'] ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-6">
-            <h5><i class="fas fa-chart-bar me-2"></i> Booking Summary</h5>
-            <canvas id="bookingBarChart" height="120"></canvas>
+
+        <!-- Export buttons -->
+        <div class="mb-3">
+            <a href="{{ route('reports.total_booking.exportPdf', ['month' => request('month'), 'year' => request('year')]) }}" 
+               class="btn btn-danger me-2">
+                <i class="fas fa-file-pdf me-1"></i> Export to PDF
+            </a>
+            <a href="{{ route('reports.total_booking.exportExcel', ['month' => request('month'), 'year' => request('year')]) }}" 
+               class="btn btn-success">
+                <i class="fas fa-file-excel me-1"></i> Export to Excel
+            </a>
         </div>
-    </div>
+    @endif
 
-    <!-- Table -->
-    <table id="bookingTable" class="table table-striped table-hover align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Booking ID</th>
-                <th>Customer</th>
-                <th>Vehicle</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Total Hours</th>
-                <th>Total Price (RM)</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($data as $booking)
-            <tr>
-                <td>{{ $booking->bookingID }}</td>
-                <td>{{ $booking->user->name ?? 'N/A' }}</td>
-                <td>{{ $booking->vehicle->vehicleName ?? 'N/A' }}</td>
-                <td>{{ \Carbon\Carbon::parse($booking->pickup_dateTime)->format('d/m/Y H:i') }}</td>
-                <td>{{ \Carbon\Carbon::parse($booking->return_dateTime)->format('d/m/Y H:i') }}</td>
-                <td>{{ $booking->totalHours }}</td>
-                <td>{{ number_format($booking->totalPrice, 2) }}</td>
-                <td>
-                    <span class="badge 
-                        @if($booking->bookingStatus == 'completed') bg-success 
-                        @elseif($booking->bookingStatus == 'pending') bg-warning 
-                        @elseif($booking->bookingStatus == 'cancelled') bg-danger 
-                        @else bg-secondary @endif">
-                        {{ ucfirst($booking->bookingStatus) }}
-                    </span>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    <!-- Export Buttons -->
-    <div class="mt-3">
-        <button class="btn btn-outline-danger" onclick="exportTableToPDF()">Export PDF</button>
-        <button class="btn btn-outline-success" onclick="exportTableToExcel()">Export Excel</button>
+    <!-- Booking Table -->
+    <div class="table-responsive">
+        <table class="table table-hover" @if(!empty($isPdf)) style="border: 1px solid #000;" @endif>
+            <thead class="table-light">
+                <tr>
+                    <th>Booking ID</th>
+                    <th>User ID</th>
+                    <th>Customer Name</th>
+                    <th>Vehicle Name</th>
+                    <th>Booking Period</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                @forelse($data as $row)
+                    <tr>
+                        <td>{{ $row->bookingID }}</td>
+                        <td>{{ $row->userID }}</td>
+                        <td>{{ $row->name }}</td>
+                        <td>{{ $row->vehicleName }}</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($row->pickup_dateTime)->format('d M Y H:i') }}
+                            - {{ \Carbon\Carbon::parse($row->return_dateTime)->format('d M Y H:i') }}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ $row->bookingStatus === 'completed' ? 'success' : ($row->bookingStatus === 'pending' ? 'warning' : 'secondary') }}">
+                                {{ ucfirst($row->bookingStatus) }}
+                            </span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <div class="text-muted">
+                                <p class="mb-0">No bookings found for the selected filter</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </div>
 
-@push('scripts')
+@if(empty($isPdf))
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById('filterForm');
+    const tbody = document.getElementById('reportTableBody');
 
-    // Pie Chart
-    const pieCtx = document.getElementById('bookingPieChart').getContext('2d');
-    new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Completed', 'Pending', 'Cancelled'],
-            datasets: [{
-                data: [
-                    {{ $summary['completed'] }},
-                    {{ $summary['pending'] }},
-                    {{ $summary['cancelled'] }}
-                ],
-                backgroundColor: ['#28a745','#ffc107','#dc3545']
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { position: 'bottom' },
-                title: {
-                    display: true,
-                    text: 'Total Bookings: {{ $summary['total'] }}'
-                }
-            }
-        }
-    });
+    const totalCount = document.getElementById('totalCount');
+    const completedCount = document.getElementById('completedCount');
+    const pendingCount = document.getElementById('pendingCount');
+    const cancelledCount = document.getElementById('cancelledCount');
 
-    // Bar Chart
-    const barCtx = document.getElementById('bookingBarChart').getContext('2d');
-    new Chart(barCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Total', 'Completed', 'Pending', 'Cancelled'],
-            datasets: [{
-                label: 'Bookings',
-                data: [
-                    {{ $summary['total'] }},
-                    {{ $summary['completed'] }},
-                    {{ $summary['pending'] }},
-                    {{ $summary['cancelled'] }}
-                ],
-                backgroundColor: ['#0d6efd','#28a745','#ffc107','#dc3545']
-            }]
-        },
-        options: {
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Booking Summary'
-                }
-            },
-            scales: {
-                y: { beginAtZero: true }
+    if (!form || !tbody) return;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const params = new URLSearchParams(new FormData(form));
+
+        fetch("{{ url('/admin/reports/total_booking/filter') }}?" + params, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(result => {
+            const data = result.data;
+            const summary = result.summary;
+
+            // Update table
+            tbody.innerHTML = '';
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="text-muted">
+                            <p class="mb-0">No bookings found for the selected filter</p>
+                        </div>
+                    </td>
+                </tr>`;
+            } else {
+                data.forEach(row => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${row.bookingID}</td>
+                            <td>${row.userID}</td>
+                            <td>${row.name}</td>
+                            <td>${row.vehicleName}</td>
+                            <td>${row.pickup_dateTime} - ${row.return_dateTime}</td>
+                            <td>
+                                <span class="badge bg-${row.bookingStatus === 'completed' ? 'success' : (row.bookingStatus === 'pending' ? 'warning' : 'secondary')}">
+                                    ${row.bookingStatus.charAt(0).toUpperCase() + row.bookingStatus.slice(1)}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
             }
-        }
+
+            // Update summary cards
+            totalCount.textContent = summary.total;
+            completedCount.textContent = summary.completed;
+            pendingCount.textContent = summary.pending;
+            cancelledCount.textContent = summary.cancelled;
+        })
+        .catch(() => alert('Something went wrong. Please try again.'));
     });
+});
 </script>
-@endpush
+@endif

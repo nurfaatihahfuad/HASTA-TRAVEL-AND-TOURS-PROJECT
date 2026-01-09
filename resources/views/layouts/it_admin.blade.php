@@ -203,19 +203,6 @@
                 href="{{ route('reports.index') }}">
                 <i class="fas fa-chart-bar"></i> Report
             </a>
-
-            
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-receipt"></i> Sales Record
-            </a>
-            
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-credit-card"></i> Payment Record
-            </a>
-            
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-money-bill-wave"></i> Deposit Record
-            </a>
             
             <hr>
             

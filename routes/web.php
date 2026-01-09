@@ -157,15 +157,19 @@ Route::middleware('auth')->group(function () {
     // ============================
     // Report Routes (Admin IT only)
     // ============================
-    Route::middleware(['auth','role:admin'])->prefix('admin')->name('reports.')->group(function () {
+    Route::middleware(['auth','role:admin'])
+    ->prefix('admin/reports')
+    ->name('reports.')
+    ->group(function () {
+
         // Page utama report (ada dropdown)
-        Route::get('/reports', [ReportController::class, 'index'])->name('index');
+        Route::get('/', [ReportController::class, 'index'])->name('index');
 
         // AJAX untuk tukar kategori tanpa reload page
-        Route::get('/reports/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
+        Route::get('/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
 
         // Filter untuk Total Booking
-        Route::get('/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+        Route::get('/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
 
         // Filter untuk Top College
