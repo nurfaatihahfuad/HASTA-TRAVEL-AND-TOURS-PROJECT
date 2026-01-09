@@ -172,10 +172,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
 
+        // Filter untuk Top College
         Route::get('/reports/top_college/filter', [ReportController::class, 'filterTopCollege'])
             ->name('top_college.filter');
-        
+
+        // ✅ Export routes (corrected)
+        Route::get('/reports/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
+            ->name('top_college.exportPdf');
+
+        Route::get('/reports/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
+            ->name('top_college.exportExcel');
     });
+
     
 
 
