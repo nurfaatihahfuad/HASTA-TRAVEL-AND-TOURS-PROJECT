@@ -219,8 +219,8 @@ Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show')
 Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
 
 // Staff dashboard: verify payments
-Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
+//Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
+//Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
 
 // ============================
@@ -264,6 +264,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     });
 });
 
-// Admin change customer status
-Route::post('/admin/customers/{userId}/toggle-status', [DashboardController::class, 'toggleCustomerStatus'])
-    ->name('admin.customers.toggle-status');
+// Admin blacklist customer 
+Route::post('/admin/customers/{userId}/blacklist', [DashboardController::class, 'toggleCustomerStatus'])
+    ->name('admin.customers.blacklist');
+// Blacklisted customers list
+Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustomers'])->name('admin.blacklisted.index');

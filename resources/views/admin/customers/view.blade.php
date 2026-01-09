@@ -38,10 +38,11 @@
                     
                     <!-- Status Badge -->
                     <span class="badge 
-                        @if($customer->status == 'active') bg-success
-                        @elseif($customer->status == 'inactive') bg-warning
-                        @else bg-danger @endif mb-3">
-                        {{ ucfirst($customer->status) }}
+                        @if($customer->customerStatus == 'active') bg-success
+                        @elseif($customer->customerStatus == 'inactive') bg-warning
+                        @elseif($customer->customerStatus == 'blacklisted') bg-danger
+                        @else bg-secondary @endif mb-3">
+                        {{ ucfirst($customer->customerStatus) }}
                     </span>
                     
                     <!-- Quick Stats -->
@@ -73,6 +74,66 @@
                     </div>
                 </div>
             </div>
+
+            @if($customer->status == 'blacklisted' && $customer->blacklistData)
+            <!-- Blacklist Information Card -->
+            <div class="card border-danger mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-ban me-2"></i> Blacklist Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="small text-muted mb-1">Blacklist ID</label>
+                                <div class="fw-bold">{{ $customer->blacklistData->blacklistID }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="small text-muted mb-1">Admin ID</label>
+                                <div class="fw-bold">{{ $customer->blacklistData->adminID }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-muted mb-1">Reason</label>
+                        <div class="border rounded p-3 bg-light">
+                            {{ $customer->blacklistData->reason }}
+                        </div>
+                    </div>
+                    
+                    @if(isset($customer->blacklistData->admin_name))
+                    <div class="mb-3">
+                        <label class="small text-muted mb-1">Blacklisted By</label>
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" 
+                                style="width: 32px; height: 32px;">
+                                <span class="text-white fw-bold">
+                                    {{ substr($customer->blacklistData->admin_name, 0, 1) }}
+                                </span>
+                            </div>
+                            <div>
+                                <div class="fw-medium">{{ $customer->blacklistData->admin_name }}</div>
+                                <small class="text-muted">Admin ID: {{ $customer->blacklistData->adminID }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    @elseif($customer->blacklistData->adminID)
+                    <div class="mb-3">
+                        <label class="small text-muted mb-1">Blacklisted By</label>
+                        <div class="text-muted">
+                            Admin ID: {{ $customer->blacklistData->adminID }}
+                            <br>
+                            <small>(Admin name not available)</small>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        @endif
 
             <!-- Contact Information -->
             <div class="card mb-4">
@@ -119,15 +180,13 @@
                         </button>-->
                         <!-- Blacklist Button (Only show if customer is active) -->
                         @if($customer->status == 'active')
-                            <form method="POST" action="{{ route('admin.customers.toggle-status', $customer->userID) }}">
-                                @csrf
-                                <button type="submit" 
-                                        class="btn btn-dark w-100"
-                                        onclick="return confirmPermanentBlacklist('{{ $customer->name }}')">
-                                    <i class="fas fa-ban me-1"></i>
-                                    Permanently Blacklist Customer
-                                </button>
-                            </form>
+                            <button type="button" 
+                                    class="btn btn-dark w-100"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#blacklistModal">
+                                <i class="fas fa-ban me-1"></i>
+                                Permanently Blacklist Customer
+                            </button>
                         @elseif($customer->status == 'blacklisted')
                             <!-- Show disabled button for blacklisted customers -->
                             <button type="button" class="btn btn-dark w-100" disabled>
@@ -306,6 +365,59 @@
         </div>
     </div>
 </div>
+
+<!-- Blacklist Modal -->
+<div class="modal fade" id="blacklistModal" tabindex="-1" aria-labelledby="blacklistModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('admin.customers.blacklist', $customer->userID) }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="blacklistModalLabel">
+                        <i class="fas fa-ban text-danger me-2"></i>
+                        Blacklist Customer
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning: This is a permanent action!</strong>
+                        <ul class="mb-0 mt-2 small">
+                            <li>Customer will be permanently banned</li>
+                            <li>They cannot make any future bookings</li>
+                            <li>This action cannot be undone</li>
+                        </ul>
+                    </div>
+                    
+                    <p class="mb-3">
+                        You are about to blacklist <strong>{{ $customer->name }}</strong> (ID: {{ $customer->userID }}).
+                    </p>
+                    
+                    <div class="mb-3">
+                        <label for="reason" class="form-label required">Reason for Blacklisting</label>
+                        <textarea class="form-control" 
+                                  id="reason" 
+                                  name="reason" 
+                                  rows="4" 
+                                  placeholder="Enter detailed reason for blacklisting this customer..."
+                                  required
+                                  minlength="10"
+                                  maxlength="100"></textarea>
+                        <div class="form-text">Minimum 10 characters, maximum 100 characters.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-ban me-1"></i> Confirm Blacklist
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('styles')
@@ -338,9 +450,30 @@
         })
     })
 
-    function confirmPermanentBlacklist(customerName) {
-        return confirm(`⚠️ PERMANENT ACTION ⚠️\n\nBlacklist ${customerName}?\n\n❌ This action CANNOT be undone\n❌ Customer will be permanently banned\n❌ They cannot make any future bookings`);
-    }
+    // Optional: Add client-side validation for blacklist modal
+    document.getElementById('blacklistModal').addEventListener('shown.bs.modal', function () {
+        document.getElementById('reason').focus();
+    });
     
+    // Optional: Show character count for reason
+    const reasonTextarea = document.getElementById('reason');
+    if (reasonTextarea) {
+        reasonTextarea.addEventListener('input', function() {
+            const charCount = this.value.length;
+            const minChars = 10;
+            const maxChars = 100;
+            
+            if (charCount < minChars) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (charCount > maxChars) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    }
 </script>
 @endpush

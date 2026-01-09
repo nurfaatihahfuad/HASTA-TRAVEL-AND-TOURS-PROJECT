@@ -11,8 +11,8 @@ class Admin extends Model
 
     protected $table = 'admin';
     protected $primaryKey = 'adminID';
-    //protected $keyType = 'string';
-    //public $incrementing = false;
+    protected $keyType = 'string';
+    public $incrementing = false;
     public $timestamps = false;
     
     protected $fillable = [
@@ -29,5 +29,11 @@ class Admin extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'adminID', 'userID');
+    }
+
+    // Relationship to BlacklistedCust
+    public function blacklistedCusts()
+    {
+        return $this->hasMany(BlacklistedCust::class, 'adminID', 'adminID');
     }
 }

@@ -207,14 +207,14 @@ class User extends Authenticatable
     {
         return $this->userType === 'admin' &&
                 $this->admin &&
-                strtolower($this->admin->adminType) === 'it';
+                $this->admin->adminType === 'IT';
     }
 
     public function isFinanceAdmin()
     {
         return $this->userType === 'admin' &&
                 $this->admin &&
-                strtolower($this->admin->adminType) === 'finance';
+                $this->admin->adminType === 'finance';
     }
 
     // Booking
