@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Vehicle;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -354,12 +355,211 @@ public function verifyBookings()
     {
         $userID = auth()->id();
 
-        $bookings = Booking::with('vehicle')
-                    ->where('userID', $userID)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
-
+       $bookings = Booking::with('vehicle') 
+                    ->where('userID', $userID) 
+                    ->orderBy('created_at', 'desc') ->get();
+                    
         return view('customer.dashboard', compact('bookings'));
     }
 
+    public function manageCustomers(Request $request)
+    {
+        // Query for customers with join to customer table
+        $query = DB::table('user')
+            ->join('customer', 'user.userID', '=', 'customer.userID') // Join with customer table
+            ->select(
+                'user.userID',
+                'user.name',
+                'user.email',
+                'user.noHP',
+                'customer.customerStatus as status', // Get status from customer table
+            );
+
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('user.name', 'like', "%{$search}%")
+                ->orWhere('user.email', 'like', "%{$search}%")
+                ->orWhere('user.noHP', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply status filter (now from customer table)
+        if ($request->filled('status')) {
+            $query->where('customer.customerStatus', $request->status);
+        }
+
+        // Order and paginate
+        $customers = $query
+            ->paginate(20)
+            ->withQueryString();
+
+        // Get booking statistics for each customer
+        foreach ($customers as $customer) {
+            $bookingStats = DB::table('booking')
+                ->select(
+                    DB::raw('COUNT(*) as total_bookings'),
+                    DB::raw('SUM(CASE WHEN bookingStatus = "successful" THEN 1 ELSE 0 END) as successful_bookings'),
+                    DB::raw('MAX(created_at) as last_booking_date')
+                )
+                ->where('userID', $customer->userID)
+                ->first();
+            
+            $customer->total_bookings = $bookingStats->total_bookings ?? 0;
+            $customer->successful_bookings = $bookingStats->successful_bookings ?? 0;
+            $customer->last_booking_date = $bookingStats->last_booking_date;
+        }
+
+        // Statistics (updated to use customer table)
+        $totalCustomers = DB::table('customer')->count();
+        $activeCustomers = DB::table('customer')->where('customerStatus', 'active')->count();
+
+        return view('admin.customers.index', compact(
+            'customers',
+            'totalCustomers',
+            'activeCustomers'
+        ));
+    }
+
+    // View single customer details
+    public function viewCustomer($userId)
+    {
+        $customer = DB::table('user')
+            ->join('customer', 'user.userID', '=', 'customer.userID')
+            ->select('user.*', 'customer.*', 'customer.customerStatus as status')
+            ->where('user.userID', $userId)
+            ->first();
+
+        if (!$customer) {
+            abort(404, 'Customer not found');
+        }
+
+        // Get customer bookings
+        $bookings = DB::table('booking')
+            ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->leftJoin('payment', 'booking.bookingID', '=', 'payment.bookingID')
+            ->select(
+                'booking.*',
+                'vehicles.vehicleName',
+                'vehicles.plateNo',
+                'payment.paymentStatus',
+                'payment.amountPaid',
+                'payment.receipt_file_path'
+            )
+            ->where('booking.userID', $userId)
+            ->orderBy('booking.created_at', 'desc')
+            ->get();
+
+        // Get statistics for this customer
+        $totalBookings = $bookings->count();
+        $totalSpent = $bookings->sum('amountPaid');
+        $favoriteCar = $bookings->groupBy('vehicleName')
+            ->sortByDesc(function($group) {
+                return $group->count();
+            })
+            ->keys()
+            ->first();
+
+        return view('admin.customers.view', compact(
+            'customer',
+            'bookings',
+            'totalBookings',
+            'totalSpent',
+            'favoriteCar'
+        ));
+    }
+
+    // Edit customer
+    public function editCustomer($userId)
+    {
+        $customer = DB::table('user')
+            ->join('customer', 'user.userID', '=', 'customer.userID')
+            ->select('user.*', 'customer.*', 'customer.customerStatus as status')
+            ->where('user.userID', $userId)
+            ->first();
+        
+        if (!$customer) {
+            abort(404);
+        }
+
+        return view('admin.customers.edit', compact('customer'));
+    }
+
+    // Update customer
+    public function updateCustomer(Request $request, $userId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:user,email,' . $userId . ',userID',
+            'noHP' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'status' => 'required|in:active,inactive,suspended',
+        ]);
+
+        // Start transaction for updating both tables
+        DB::beginTransaction();
+
+        try {
+            // Update user table
+            DB::table('user')
+                ->where('userID', $userId)
+                ->update([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'noHP' => $request->noHP,
+                ]);
+
+            // Update customer table
+            DB::table('customer')
+                ->where('userID', $userId)
+                ->update([
+                    'customerStatus' => $request->status // Update customerStatus
+                ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.customers.view', $userId)
+                ->with('success', 'Customer updated successfully!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to update customer: ' . $e->getMessage());
+        }
+    }
+
+    // Toggle customer status
+    public function toggleCustomerStatus($userId)
+    {
+        $customer = DB::table('customer')
+            ->where('userID', $userId)
+            ->first();
+
+        if (!$customer) {
+            abort(404);
+        }
+
+        // Check if customer is already blacklisted
+        if ($customer->customerStatus == 'blacklisted') {
+            return back()->with('error', 'This customer is permanently blacklisted and cannot be activated.');
+        }
+
+        // Only allow changing from active to blacklisted
+        if ($customer->customerStatus == 'active') {
+            $newStatus = 'blacklisted';
+            
+            DB::table('customer')
+                ->where('userID', $userId)
+                ->update([
+                    'customerStatus' => $newStatus
+                ]);
+
+            return back()->with('success', 'Customer has been permanently blacklisted.');
+        }
+
+        // If not active, show appropriate message
+        return back()->with('error', 'Only active customers can be blacklisted. Current status: ' . $customer->customerStatus);
+    }
+
 }
+

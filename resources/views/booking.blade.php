@@ -47,11 +47,6 @@
     guna email student@graduate.utm
  -->
 
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,9 +56,6 @@
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
 </head>
 <body>
-
-    
-
         <div class ="booking-container" >
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>

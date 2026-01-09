@@ -167,17 +167,17 @@
             
             <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
                href="#">
-                <i class="fas fa-users"></i> Booking
+                <i class="fas fa-calendar-check"></i> Booking
             </a>
 
-            <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
-               href="#">
-                <i class="fas fa-users"></i> Customer Information
+            <a class="sidebar-link @if($currentRoute == 'admin.customers.index') active @endif" 
+               href="{{ route('admin.customers.index') }}">
+                <i class="	fa fa-drivers-license"></i> Customer Information
             </a>
 
-            <a class="sidebar-link @if($currentRoute == 'customer.index') active @endif" 
+            <a class="sidebar-link @if($currentRoute == 'customers.index') active @endif" 
                href="#">
-                <i class="fas fa-users"></i> Blacklisted Customer
+                <i class="fa fa-user-times"></i> Blacklisted Customer
             </a>
             
             <a class="sidebar-link @if(str_contains($currentRoute, 'staff.')) active @endif" 

@@ -72,8 +72,11 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center">
                                             <div>
-                                                <strong>{{ $booking->vehicleID }}</strong><br>
+                                                <strong>{{ $booking->vehicle->vehicleName }}</strong><br>
+                                                <small>{{ $booking->vehicle->plateNo }}</small>
+                                            </div>
                                             </div>
                                         </div>
                                     </td>
@@ -85,22 +88,21 @@
                                     </td>
                                     <td>
                                         @php
-                                            $status = strtolower($booking->status ?? 'pending');
-                                            $statusColors = [
-                                                'successful' => 'success',
-                                                'pending' => 'warning',
-                                                'rejected' => 'danger'
-                                            ];
-                                            $color = $statusColors[$status] ?? 'secondary';
+                                        $status = strtolower($booking->bookingStatus ?? 'pending');
+                                        $statusColors = [
+                                            'successful' => 'success',
+                                            'pending' => 'warning',
+                                            'rejected' => 'danger'
+                                        ];
+                                        $color = $statusColors[$status] ?? 'secondary';
                                         @endphp
                                         <span class="badge bg-{{ $color }}">
                                             {{ ucfirst($status) }}
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View
-
-                                        </a>
+                                        <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View</a>
+                                        <!--<a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">Cancelled</a> -->
                                     </td>
                                 </tr>
                             @endforeach

@@ -91,12 +91,18 @@ Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStat
     ->name('booking.updateStatus');
 
 // Nak approve payment
+//Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
 Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
+Route::put('/booking/{bookingID}/reject', [BookingController::class, 'reject'])->name('booking.reject');
+
 
 
 // Route untuk tunjuk summary payment/booking 
 Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSummary'])
         ->name('booking.summary');
+Route::post('/payment/{paymentID}/upload-receipt', [PaymentController::class, 'uploadReceipt'])
+    ->name('payment.uploadReceipt');
+
 
 
 // Receipt routes
@@ -245,3 +251,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admins.')->gro
     Route::put('/admins/{id}', [AdminController::class, 'update'])->name('update');
     Route::delete('/admins/{id}', [AdminController::class, 'destroy'])->name('destroy');
 });
+
+// ============================
+// Customer Management (Admin only)
+// ============================
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::prefix('admin/customers')->name('admin.customers.')->group(function () {
+        Route::get('/', [DashboardController::class, 'manageCustomers'])->name('index');
+        Route::get('/create', [DashboardController::class, 'createCustomer'])->name('create');
+        Route::post('/', [DashboardController::class, 'storeCustomer'])->name('store');
+        Route::get('/{id}', [DashboardController::class, 'viewCustomer'])->name('show');
+        Route::get('/{id}/edit', [DashboardController::class, 'editCustomer'])->name('edit');
+        Route::put('/{id}', [DashboardController::class, 'updateCustomer'])->name('update');
+        Route::delete('/{id}', [DashboardController::class, 'deleteCustomer'])->name('destroy');
+    });
+});
+
+// Admin change customer status
+Route::post('/admin/customers/{userId}/toggle-status', [DashboardController::class, 'toggleCustomerStatus'])
+    ->name('admin.customers.toggle-status');
