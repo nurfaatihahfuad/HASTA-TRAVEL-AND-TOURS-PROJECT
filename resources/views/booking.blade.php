@@ -1,52 +1,3 @@
-<!-- Tambah Account bank dgn jenis bank dalam booking,
-     Total price yg dh sewa
-     Owner kereta diperlukan utk setiap kereta
-     Kena masukkan gambar kereta awal ii
-     Buat drop down list: office, college, faculty, others
-     Delivery: office free, faculty: 15, college: 10
-     nombor account: nombor dgn jenis bank, tak nak sengkang, deposit 50, full campur total terus dgn deposit
-     swap kalau tak available kereta
-     Kena letak loceng
-     BookingID- BOLEH TEKAN TGK DETAIL KERETA, NAMA CUSTOMER, KERETA, PICKUP, RETURN
-     ADMIN BOLEH VIEW SEMUA DASHBOARD
-
-     TAMBAH OTHERS BOLEH INPUT LAGI
-     TAMBAH EDIT GAMBAR
-     VEHCILE NAME, NOM PLATE
-     DELETE TAK LEH RETIREVE
-     EDIT JER LAH
-
-     Masukkan sekali car yg dh booking
-     vehicle, tuh inspection tuh ada return, pickup
-     crud tuh dekat customer
-     booking tuh buat dalam view
-     runner tak yah dashboard
-     salesperson, masuk dalam dashboard 
-     kereta apa, nama customer, total rm, pickup, unpaid = deposit, booking, paid = merah
-     rental aggreement, bawah ada upload rental aggreement download then upload yg dh tandatangan
-     dia kena generate sekali time dh booking
-     commission dalam extra jon buat luar waktu kerja
-
-     customer dgn masuk dalam booking
-     deposit, 1 bar RM10 - finance check return car deposit
-     hold bagi reason and kalau deposit tuh kena pulangkan balik
-     customer boleh terus access
-
-     dashboard staff: view: car available, date dgn masa
-     staff maintnance: nak check car availability
-     nak tahu kereta tuh 
-     all booking kena buat tuh
-     staff access tuh boleh check yg mcm check limit minyak supaya nak tahu pasal deposit ke tak mcm tuh?
-
-    kena cuba jugak
-    
-    Dashboard gabung jer semua then nanti boleh filter jer 
-    kalau ada delete tuh dia mcm boleh kena retrieve
-    Mana ii button boleh tekan
-    Hah tuh jer lah
-    guna email student@graduate.utm
- -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,75 +7,162 @@
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
 </head>
 <body>
-        <div class ="booking-container" >
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-        <div class="booking-content">
-        <!-- Left: Booking Form -->
-        <form action="{{ route('booking.store') }}" method="POST">
-            @csrf
-
-            <div class="page-header"> 
-            <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2> 
-            </div>
-
-            <div>
-                <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
-                <input type="hidden" name="pickup_dateTime" value="{{ $pickup_dateTime }}">
-                <input type="hidden" name="return_dateTime" value="{{ $return_dateTime }}">
-            </div>
-
-
-            <div class="form-group">
-                <label for="pickup_location">Pick-up Location: (Can be change)<span style="color:red">*</span></label>
-                <input type="text" name="pickupAddress" value="UTM Mall" required>
-            </div>
-
-            <div class="form-group">
-                <label for="return_location">Return Location: (Can be change)<span style="color:red">*</span></label>
-                <input type="text" name="returnAddress" value="UTM Mall" required>
-            </div>
+    <div class="page-header">
+        <h2 class="text-3xl font-bold text-center">Book Your Vehicle</h2>
+    </div>
     
-            <div class="form-group">
-                <label for="voucherCode">Voucher Code:</label>
-                <input type="text" name="voucherCode">
-            </div>
-
-            <div class="button-group">
-                <button type="submit" class="submit-btn">Submit</button>
-            </div>
-        </form>
-
-        @if(isset($booking))
-        <div class="booking-summary">
-            <h3>Booking Confirmed!</h3>
-                <p>Booking ID: {{ $booking->bookingID }}</p>
-                <p>Vehicle: {{ $booking->vehicle->brand }} {{ $booking->vehicle->model }}</p>
-                <p>Pickup: {{ $booking->pickup_dateTime }}</p>
-                <p>Return: {{ $booking->return_dateTime }}</p>
-            <a href="{{ route('payment.show', $booking->bookingID) }}" class="btn btn-success">
-            Proceed to Payment
-        </a>
-    </div>
-@endif
-        <!-- Right: Car Info -->
-        @if($vehicle)
-        <div class="car-info">
-            <h2>{{ $vehicle->vehicleName }}</h2> <!-- Ganti brand + model -->
-            <p>RM{{ $vehicle->price_per_day }}/hour</p> <!-- Masih sama -->
-            <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->vehicleName }}" class="car-image">
-
-            <ul>
-                <li>✅ Plate No: {{ $vehicle->plateNo }}</li>
-                <li>✅ Year: {{ $vehicle->year }}</li>
-                <li>✅ Description: {{ $vehicle->description }}</li>
-                <li>❌ No smoking</li>
-            </ul>
-        </div>
+    <div class="booking-container">
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-    </div>
-</div>
 
+        <div class="booking-content">
+            <!-- Left Column: Booking Form -->
+            <div class="booking-form">
+                <form action="{{ route('booking.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
+
+                    <!-- Pickup DateTime (read-only) -->
+                    <div class="form-group">
+                        <label for="pickup_dateTime">Pick-up Date & Time<span style="color:red">*</span></label>
+                        <input type="text" 
+                            value="{{ \Carbon\Carbon::parse($pickup_dateTime)->format('d M Y, h:i A') }}" 
+                            readonly class="readonly-field">
+                        <input type="hidden" name="pickup_dateTime" value="{{ $pickup_dateTime }}">
+                    </div>
+
+                    <!-- Return DateTime (read-only) -->
+                    <div class="form-group">
+                        <label for="return_dateTime">Return Date & Time<span style="color:red">*</span></label>
+                        <input type="text" 
+                            value="{{ \Carbon\Carbon::parse($return_dateTime)->format('d M Y, h:i A') }}" 
+                            readonly class="readonly-field">
+                        <input type="hidden" name="return_dateTime" value="{{ $return_dateTime }}">
+                    </div>
+
+                    <!-- Pickup Location Dropdown -->
+                    <div class="form-group">
+                        <label for="pickup_location">Pick-up Location<span style="color:red">*</span></label>
+                        <select name="pickupAddress" id="pickup_location" class="form-control" required>
+                            <option value="kolej_9_10">Kolej 9 & 10</option>
+                            <option value="kolej_dato_onn">Kolej Dato Onn Jaafar</option>
+                            <option value="kolej_endon">Kolej Datin Seri Endon</option>
+                            <option value="kolej_perdana">Kolej Perdana</option>
+                            <option value="kolej_rahman_putra">Kolej Rahman Putra</option>
+                            <option value="kolej_tuanku_canselor">Kolej Tuanku Canselor</option>
+                            <option value="kolej_tun_dr_ismail">Kolej Tun Dr Ismail</option>
+                            <option value="kolej_tun_fatimah">Kolej Tun Fatimah</option>
+                            <option value="kolej_tun_hussein_on">Kolej Tun Hussein On</option>
+                            <option value="kolej_tun_razak">Kolej Tun Razak</option>
+                            <option value="faculty_bes">Faculty of Built Environment and Surveying</option>
+                            <option value="faculty_ai">Faculty of Artificial Intelligence</option>
+                            <option value="faculty_computing">Faculty of Computing</option>
+                            <option value="faculty_electrical">Faculty of Electrical Engineering</option>
+                            <option value="faculty_education">Faculty of Educational Sciences and Technology</option>
+                            <option value="faculty_civil">Faculty of Civil Engineering</option>
+                            <option value="faculty_mechanical">Faculty of Mechanical Engineering</option>
+                            <option value="faculty_chemical">Faculty of Chemical & Energy Engineering</option>
+                            <option value="faculty_management">Faculty of Management</option>
+                            <option value="faculty_science">Faculty of Science</option>
+                            <option value="faculty_social">Faculty of Social Sciences and Humanities</option>
+                            <option value="others">Others</option>
+                        </select>
+                    </div>
+
+                    <!-- Pickup Others input -->
+                    <div class="form-group" id="pickup_others" style="display:none;">
+                        <label for="pickup_other_location">Please specify pick-up location:</label>
+                        <input type="text" name="pickup_other_location" class="form-control">
+                    </div>
+
+                    <!-- Return Location Dropdown -->
+                    <div class="form-group">
+                        <label for="return_location">Return Location<span style="color:red">*</span></label>
+                        <select name="returnAddress" id="return_location" class="form-control" required>
+                            <option value="kolej_9_10">Kolej 9 & 10</option>
+                            <option value="kolej_dato_onn">Kolej Dato Onn Jaafar</option>
+                            <option value="kolej_endon">Kolej Datin Seri Endon</option>
+                            <option value="kolej_perdana">Kolej Perdana</option>
+                            <option value="kolej_rahman_putra">Kolej Rahman Putra</option>
+                            <option value="kolej_tuanku_canselor">Kolej Tuanku Canselor</option>
+                            <option value="kolej_tun_dr_ismail">Kolej Tun Dr Ismail</option>
+                            <option value="kolej_tun_fatimah">Kolej Tun Fatimah</option>
+                            <option value="kolej_tun_hussein_on">Kolej Tun Hussein On</option>
+                            <option value="kolej_tun_razak">Kolej Tun Razak</option>
+                            <option value="faculty_bes">Faculty of Built Environment and Surveying</option>
+                            <option value="faculty_ai">Faculty of Artificial Intelligence</option>
+                            <option value="faculty_computing">Faculty of Computing</option>
+                            <option value="faculty_electrical">Faculty of Electrical Engineering</option>
+                            <option value="faculty_education">Faculty of Educational Sciences and Technology</option>
+                            <option value="faculty_civil">Faculty of Civil Engineering</option>
+                            <option value="faculty_mechanical">Faculty of Mechanical Engineering</option>
+                            <option value="faculty_chemical">Faculty of Chemical & Energy Engineering</option>
+                            <option value="faculty_management">Faculty of Management</option>
+                            <option value="faculty_science">Faculty of Science</option>
+                            <option value="faculty_social">Faculty of Social Sciences and Humanities</option>
+                            <option value="others">Others</option>
+                        </select>
+                    </div>
+
+                    <!-- Return Others input -->
+                    <div class="form-group" id="return_others" style="display:none;">
+                        <label for="return_other_location">Please specify return location:</label>
+                        <input type="text" name="return_other_location" class="form-control">
+                    </div>
+
+                    <!-- Voucher -->
+                    <div class="form-group">
+                        <label for="voucherCode">Voucher Code:</label>
+                        <input type="text" name="voucherCode">
+                    </div>
+
+                    <!-- Submit button -->
+                    <div class="button-group">
+                        <button type="submit" class="submit-btn">Submit Booking</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column: Vehicle Details -->
+            @if($vehicle)
+                <div class="car-info">
+                    <h2>{{ $vehicle->vehicleName }}</h2>
+                    <p class="price">RM{{ $vehicle->price_per_day }}/hour</p>
+                    <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->vehicleName }}" class="car-image">
+                    
+                    <div class="vehicle-details">
+                        <h3>Vehicle Details</h3>
+                        <ul>
+                            <li>✅ Plate No: {{ $vehicle->plateNo }}</li>
+                            <li>✅ Year: {{ $vehicle->year }}</li>
+                            <li>✅ Description: {{ $vehicle->description }}</li>
+                            <li>❌ No smoking allowed</li>
+                        </ul>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <script>
+        // Toggle pickup others input
+        document.getElementById('pickup_location').addEventListener('change', function() {
+            if (this.value === 'others') {
+                document.getElementById('pickup_others').style.display = 'block';
+            } else {
+                document.getElementById('pickup_others').style.display = 'none';
+            }
+        });
+
+        // Toggle return others input
+        document.getElementById('return_location').addEventListener('change', function() {
+            if (this.value === 'others') {
+                document.getElementById('return_others').style.display = 'block';
+            } else {
+                document.getElementById('return_others').style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
