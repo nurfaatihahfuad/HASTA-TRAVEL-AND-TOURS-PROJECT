@@ -60,9 +60,17 @@ class ReportController extends Controller
 
     public function filterTopCollege(Request $request)
     {
-        $data = $this->getTopCollegeData($request);
-        return view('admin.report.partials.top_college', compact('data'));
+        $month = $request->month;
+        $year = $request->year;
+    
+        $data = Booking::where('collegeName', '!=', null)
+            ->when($month, fn($q) => $q->whereMonth('pickup_dateTime', $month))
+            ->when($year, fn($q) => $q->whereYear('pickup_dateTime', $year))
+            ->get();
+    
+        return response()->json($data);
     }
+    
 
     public function filterTotalBooking(Request $request)
     {
@@ -96,7 +104,10 @@ class ReportController extends Controller
             'cancelled' => $data->where('bookingStatus','cancelled')->count(),
         ];
 
-        return view('admin.report.partials.total_booking', compact('data','summary'));
+        return response()->json([
+            'data' => $data,
+            'summary' => $summary
+        ]);
     }
 
     public function exportTopCollegePdf(Request $request)
@@ -136,7 +147,6 @@ class ReportController extends Controller
         return Response::download($tempPath)->deleteFileAfterSend(true);
     }
 
-
     // Helper to reuse query
     private function getTopCollegeData(Request $request)
     {
@@ -166,4 +176,89 @@ class ReportController extends Controller
 
         return $query->orderBy('college.collegeName')->get();
     }
+
+    public function exportTotalBookingPdf(Request $request)
+    {
+        $query = DB::table('booking')
+            ->join('user', 'booking.userID', '=', 'user.userID')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->select(
+                'booking.bookingID',
+                'booking.userID',
+                'user.name',
+                'vehicles.vehicleName',
+                'booking.pickup_dateTime',
+                'booking.return_dateTime',
+                'booking.bookingStatus'
+            );
+
+        if ($request->month) {
+            $query->whereMonth('booking.pickup_dateTime', $request->month);
+        }
+        if ($request->year) {
+            $query->whereYear('booking.pickup_dateTime', $request->year);
+        }
+
+        $data = $query->get();
+
+        $summary = [
+            'total'     => $data->count(),
+            'completed' => $data->where('bookingStatus','completed')->count(),
+            'pending'   => $data->where('bookingStatus','pending')->count(),
+            'cancelled' => $data->where('bookingStatus','cancelled')->count(),
+        ];
+
+        // Pass flag isPdf supaya Blade boleh hide UI elemen
+        $pdf = Pdf::loadView('admin.report.partials.total_booking', [
+            'data' => $data,
+            'summary' => $summary,
+            'isPdf' => true
+        ]);
+
+        return $pdf->download('TotalBookingReport.pdf');
+    }
+
+    public function exportTotalBookingExcel(Request $request)
+    {
+        $query = DB::table('booking')
+            ->join('user', 'booking.userID', '=', 'user.userID')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->select(
+                'booking.bookingID',
+                'booking.userID',
+                'user.name',
+                'vehicles.vehicleName',
+                'booking.pickup_dateTime',
+                'booking.return_dateTime',
+                'booking.bookingStatus'
+            );
+
+        if ($request->month) {
+            $query->whereMonth('booking.pickup_dateTime', $request->month);
+        }
+        if ($request->year) {
+            $query->whereYear('booking.pickup_dateTime', $request->year);
+        }
+
+        $data = $query->get();
+
+        $rows = [];
+        foreach ($data as $item) {
+            $rows[] = [
+                'Booking ID' => $item->bookingID,
+                'User ID'    => $item->userID,
+                'Name'       => $item->name,
+                'Vehicle'    => $item->vehicleName,
+                'Pickup'     => $item->pickup_dateTime,
+                'Return'     => $item->return_dateTime,
+                'Status'     => $item->bookingStatus,
+            ];
+        }
+
+        $tempPath = storage_path('app/temp_total_booking.xlsx');
+        SimpleExcelWriter::create($tempPath)->addRows($rows);
+
+        return Response::download($tempPath)->deleteFileAfterSend(true);
+    }
+
 }

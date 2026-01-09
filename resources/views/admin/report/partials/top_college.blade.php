@@ -1,7 +1,6 @@
 <div class="section-card">
     <h5 class="mb-3">Top College Booking Report</h5>
 
-    {{-- Hide filter form & export buttons when rendering PDF --}}
     @if(!empty($isPdf))
         <style>
             table {
@@ -21,7 +20,6 @@
     @endif
 
     @if(empty($isPdf))
-        <!-- Filter form (month/year) -->
         <form id="filterForm" class="row g-3 mb-4">
             <div class="col-md-3">
                 <select name="month" class="form-select">
@@ -62,8 +60,7 @@
         </div>
     @endif
 
-    <!-- Booking Table -->
-    <div id="reportTableContainer" class="table-responsive">
+    <div class="table-responsive">
         <table class="table table-hover" @if(!empty($isPdf)) style="border: 1px solid #000;" @endif>
             <thead class="table-light">
                 <tr>
@@ -76,7 +73,7 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="reportTableBody">
             @forelse($data as $row)
                 <tr>
                     <td>{{ $row->bookingID }}</td>
@@ -109,18 +106,53 @@
     </div>
 </div>
 
-<!-- AJAX Script -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById('filterForm');
+    const tbody = document.getElementById('reportTableBody');
+
+    if (!form || !tbody) return;
+
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        fetch("{{ route('reports.top_college.filter') }}?" + new URLSearchParams(new FormData(form)), {
+
+        const params = new URLSearchParams(new FormData(form));
+
+        fetch("{{ url('/admin/reports/top_college/filter') }}?" + params, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('reportTableContainer').innerHTML = html;
+        .then(response => response.json())
+        .then(data => {
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="text-muted">
+                            <i class="fas fa-info-circle fa-2x mb-2"></i>
+                            <p class="mb-0">No bookings found for the selected filter</p>
+                        </div>
+                    </td>
+                </tr>`;
+            } else {
+                data.forEach(row => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${row.bookingID}</td>
+                            <td>${row.userID}</td>
+                            <td>${row.name}</td>
+                            <td>${row.collegeName}</td>
+                            <td>${row.vehicleName}</td>
+                            <td>${row.pickup_dateTime} - ${row.return_dateTime}</td>
+                            <td>
+                                <span class="badge bg-${row.bookingStatus === 'completed' ? 'success' : (row.bookingStatus === 'pending' ? 'warning' : 'secondary')}">
+                                    ${row.bookingStatus.charAt(0).toUpperCase() + row.bookingStatus.slice(1)}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
         })
         .catch(() => alert('Something went wrong. Please try again.'));
     });
