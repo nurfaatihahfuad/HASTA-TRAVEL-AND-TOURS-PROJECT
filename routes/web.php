@@ -121,6 +121,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/receipt/download/{bookingID}', [ReceiptController::class, 'download'])
         ->name('receipt.download')
         ->where('bookingID', '[A-Za-z0-9]+');
+
+    Route::get('/admin/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+        ->name('reports.total_booking.filter');
+    
 });
 
 // Payment Pending Verification Page for Staff
@@ -162,17 +166,40 @@ Route::middleware('auth')->group(function () {
     // ============================
     // Report Routes (Admin IT only)
     // ============================
-    Route::middleware(['auth','role:admin'])->prefix('admin')->name('reports.')->group(function () {
+    Route::middleware(['auth','role:admin'])
+    ->prefix('admin/reports')
+    ->name('reports.')
+    ->group(function () {
+
         // Page utama report (ada dropdown)
-        Route::get('/reports', [ReportController::class, 'index'])->name('index');
+        Route::get('/', [ReportController::class, 'index'])->name('index');
 
         // AJAX untuk tukar kategori tanpa reload page
-        Route::get('/reports/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
+        Route::get('/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
 
         // Filter untuk Total Booking
-        Route::get('/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+        Route::get('/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
+
+        // Filter untuk Top College
+        Route::get('/top_college/filter', [ReportController::class, 'filterTopCollege'])
+            ->name('top_college.filter');
+
+        // ✅ Export routes
+        Route::get('/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
+            ->name('top_college.exportPdf');
+
+        Route::get('/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
+            ->name('top_college.exportExcel');
+
+        Route::get('/total_booking/export-pdf', [ReportController::class, 'exportTotalBookingPdf'])
+            ->name('total_booking.exportPdf');
+
+        Route::get('/total_booking/export-excel', [ReportController::class, 'exportTotalBookingExcel'])
+            ->name('total_booking.exportExcel');
     });
+
+
     
 
 
@@ -221,7 +248,6 @@ Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.sub
 // Staff dashboard: verify payments
 //Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
 //Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
-
 
 // ============================
 // Staff Management (Admin only)

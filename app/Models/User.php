@@ -2,66 +2,66 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Override default Laravel expectation
      */
+    protected $table = 'user';        // table sebenar dalam DB
+    protected $primaryKey = 'userID'; // PK sebenar
+    protected $keyType = 'string';    // kalau PK bukan integer
+    public $incrementing = false;     // kalau PK bukan auto increment
+    public $timestamps = false;       // kalau tiada created_at / updated_at
 
-    // declare primary key (cus by default 'id')
-    protected $primaryKey = 'userID';
-    protected $table = 'user';
-    protected $keyType = 'string';
-    public $incrementing = false; // by default true
-    public $timestamps = false;
-
-    // declare attributes 
-    // primary key exists in $fillable by default, no need to add it again
+    /**
+     * Mass assignable attributes
+     */
     protected $fillable = [
         'password', 'name', 'noHP', 'email', 'noIC', 'userType'
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Hidden attributes
      */
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
+    /**
+     * Cast attributes
+     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-     // Add this to ensure Laravel uses userID for authentication
+    /**
+     * Ensure Laravel uses userID for authentication
+     */
     public function getAuthIdentifierName()
     {
         return 'userID';
     }
-    
+
     public function getAuthIdentifier()
     {
         return $this->userID;
     }
-    
-    // for userID prefix
+
+    /**
+     * Auto-generate userID prefix based on userType
+     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            // Decide prefix based on userType
             $prefix = match ($model->userType) {
                 'customer' => 'UC',
                 'admin'    => 'UD',
@@ -69,7 +69,6 @@ class User extends Authenticatable
                 default    => 'U'
             };
 
-            // Find last ID with this prefix
             $lastUser = User::where('userID', 'LIKE', $prefix.'%')
                             ->orderBy('userID', 'desc')
                             ->first();
@@ -78,107 +77,105 @@ class User extends Authenticatable
                 ? intval(substr($lastUser->userID, 2)) + 1
                 : 1;
 
-            // Assign new ID
             $model->userID = $prefix . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
         });
     }
 
-
-    // relationship with Customer
+    /**
+     * Relationships
+     */
     public function customer()
     {
         return $this->hasOne(Customer::class, 'userID', 'userID');
     }
 
-    // Direct relationship with StudentCustomer
     public function studentCustomer()
     {
         return $this->hasOne(StudentCustomer::class, 'userID', 'userID');
     }
-    
-    // Direct relationship with StaffCustomer  
+
     public function staffCustomer()
     {
         return $this->hasOne(StaffCustomer::class, 'userID', 'userID');
     }
 
-    // Helper to get the right type
-    public function getSpecificCustomerAttribute()
+    public function staff()
     {
-        if (!$this->customer) return null;
-        
-        if ($this->customer->customerType === 'student') {
-            return $this->studentCustomer;
-        } elseif ($this->customer->customerType === 'staff') {
-            return $this->staffCustomer;
-        }
-        
-        return null;
+        return $this->hasOne(Staff::class, 'staffID', 'userID');
     }
 
-     // VerificationDocs through Customer
+    public function admin()
+    {
+        return $this->hasOne(Admin::class, 'adminID', 'userID');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'userID');
+    }
+
     public function verificationDocs()
     {
         return $this->hasOneThrough(
             VerificationDocs::class,
             Customer::class,
             'userID',      // Foreign key on Customer table
-            'customerID',  // Foreign key on VerificationDocs table (references customer.userID)
+            'customerID',  // Foreign key on VerificationDocs table
             'userID',      // Local key on User table
             'userID'       // Local key on Customer table
         );
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Helpers
      */
-
- 
-
-    // relationship with Staff
-    public function staff()
+    public function getSpecificCustomerAttribute()
     {
-        return $this->hasOne(Staff::class, 'staffID', 'userID');
+        if (!$this->customer) return null;
+
+        if ($this->customer->customerType === 'student') {
+            return $this->studentCustomer;
+        } elseif ($this->customer->customerType === 'staff') {
+            return $this->staffCustomer;
+        }
+
+        return null;
     }
 
-    // Add role checking methods to User model (add these methods)
     public function hasRole($role)
     {
         if (str_contains($role, '.')) {
             [$userType, $staffRole] = explode('.', $role, 2);
-            
+
             if ($this->userType !== $userType) {
                 return false;
             }
-            
+
             if ($this->userType === 'staff' && $this->staff) {
                 return $this->staff->staffRole === $staffRole;
             }
-            
+
             return false;
         }
-        
+
         return $this->userType === $role;
     }
 
-
     public function isSalesperson()
     {
-        return $this->userType === 'staff' && 
-               $this->staff && 
+        return $this->userType === 'staff' &&
+               $this->staff &&
                $this->staff->staffRole === 'salesperson';
     }
 
     public function isRunner()
     {
-        return $this->userType === 'staff' && 
-               $this->staff && 
+        return $this->userType === 'staff' &&
+               $this->staff &&
                $this->staff->staffRole === 'runner';
     }
 
-        public function isCustomer()
+    public function isCustomer()
     {
         return $this->userType === 'customer';
     }
@@ -191,13 +188,6 @@ class User extends Authenticatable
         return $this->userType;
     }
 
-    // Relationship to Admin
-    public function admin()
-    {
-        return $this->hasOne(Admin::class, 'adminID', 'userID');
-    }
-
-    // general admin
     public function isAdmin()
     {
         return $this->userType === 'admin';
@@ -217,9 +207,4 @@ class User extends Authenticatable
                 $this->admin->adminType === 'finance';
     }
 
-    // Booking
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class, 'userID');
-    }
 }
