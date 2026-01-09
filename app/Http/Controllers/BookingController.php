@@ -39,24 +39,37 @@ class BookingController extends Controller
             'pickupAddress'   => 'required|string|max:255',
             'returnAddress'   => 'required|string|max:255',
             'voucherCode'     => 'nullable|string|max:50',
+            'pickup_other_location' => 'nullable|string|max:255',
+            'return_other_location' => 'nullable|string|max:255',
         ]);
 
+        // Override pickupAddress if "others" or "staff_office"
+        $pickupAddress = $validated['pickupAddress'];
+        if ($pickupAddress === 'others' || $pickupAddress === 'staff_office') {
+            $pickupAddress = $request->input('pickup_other_location');
+        }
+
+        // Override returnAddress if "others" or "staff_office"
+        $returnAddress = $validated['returnAddress'];
+        if ($returnAddress === 'others' || $returnAddress === 'staff_office') {
+            $returnAddress = $request->input('return_other_location');
+        }
+
         $booking = Booking::create([
-            'userID'          => auth()->id(), // current logged-in user
+            'userID'          => auth()->id(),
             'vehicleID'       => $validated['vehicleID'],
             'pickup_dateTime' => $validated['pickup_dateTime'],
             'return_dateTime' => $validated['return_dateTime'],
-            'pickupAddress'   => $validated['pickupAddress'],
-            'returnAddress'   => $validated['returnAddress'],
+            'pickupAddress'   => $pickupAddress,
+            'returnAddress'   => $returnAddress,
             'voucherCode'     => $validated['voucherCode'],
             'bookingStatus'   => 'Pending',
         ]);
 
-        // corrected: redirect to a proper route instead of back()
         return redirect()->route('payment.show', ['bookingID' => $booking->bookingID])
-                         ->with('success', 'Booking Complete!');
-        //return redirect()->route('payment.show', $booking->id); 
+                        ->with('success', 'Booking Complete!');
     }
+
 
     //Auni tambah
     public function updateStatus(Request $request, $bookingID)
