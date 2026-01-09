@@ -91,15 +91,8 @@ Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStat
     ->name('booking.updateStatus');
 
 // Nak approve payment
-//Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
-Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus'])
-     ->name('booking.updateStatus');
-     
-Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])
-     ->name('booking.approve');
-     
-Route::put('/booking/{bookingID}/reject', [BookingController::class, 'reject'])
-     ->name('booking.reject');
+Route::post('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
+Route::post('/booking/{bookingID}/reject', [BookingController::class, 'reject'])->name('booking.reject');
 
 
 // Route untuk tunjuk summary payment/booking 
@@ -107,8 +100,6 @@ Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSu
         ->name('booking.summary');
 Route::post('/payment/{paymentID}/upload-receipt', [PaymentController::class, 'uploadReceipt'])
     ->name('payment.uploadReceipt');
-
-
 
 // Receipt routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -182,14 +173,14 @@ Route::middleware('auth')->group(function () {
             ->name('total_booking.filter');
 
         // Filter untuk Top College
-        Route::get('/top_college/filter', [ReportController::class, 'filterTopCollege'])
+        Route::get('/reports/top_college/filter', [ReportController::class, 'filterTopCollege'])
             ->name('top_college.filter');
 
-        // ✅ Export routes
-        Route::get('/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
+        // ✅ Export routes (corrected)
+        Route::get('/reports/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
             ->name('top_college.exportPdf');
 
-        Route::get('/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
+        Route::get('/reports/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
             ->name('top_college.exportExcel');
 
         Route::get('/total_booking/export-pdf', [ReportController::class, 'exportTotalBookingPdf'])
@@ -204,7 +195,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/revenue/export-excel', [ReportController::class, 'exportRevenueExcel'])
             ->name('revenue.exportExcel');
     });
-
 
     
 
@@ -254,8 +244,6 @@ Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.sub
 // Staff dashboard: verify payments
 //Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
 //Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
-Route::get('/verify', [VerifyPaymentController::class, 'index'])->name('payment.index');
-Route::post('/verify/{paymentID}', [VerifyPaymentController::class, 'verify'])->name('payment.verify');
 
 // ============================
 // Staff Management (Admin only)
@@ -298,6 +286,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     });
 });
 
-// Admin change customer status
-Route::post('/admin/customers/{userId}/toggle-status', [DashboardController::class, 'toggleCustomerStatus'])
-    ->name('admin.customers.toggle-status');
+// Admin blacklist customer 
+Route::post('/admin/customers/{userId}/blacklist', [DashboardController::class, 'toggleCustomerStatus'])
+    ->name('admin.customers.blacklist');
+// Blacklisted customers list
+Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustomers'])->name('admin.blacklisted.index');

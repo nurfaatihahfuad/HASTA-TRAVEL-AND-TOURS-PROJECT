@@ -7,6 +7,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Booking;
 use App\Models\Vehicle;
+use App\Models\Customer;
+use App\Models\BlacklistedCust;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -435,6 +438,19 @@ public function verifyBookings()
             abort(404, 'Customer not found');
         }
 
+        // Get blacklist data with admin info
+        $blacklistData = null;
+        if ($customer->status == 'blacklisted') {
+            $blacklistData = DB::table('blacklistedcust')
+                ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+                ->select('blacklistedcust.*', 'admin.name as admin_name')
+                ->where('blacklistedcust.customerID', $userId)
+                ->first();
+        }
+        
+        // Add blacklist data to customer object
+        $customer->blacklistData = $blacklistData;
+
         // Get customer bookings
         $bookings = DB::table('booking')
             ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
@@ -529,37 +545,153 @@ public function verifyBookings()
     }
 
     // Toggle customer status
-    public function toggleCustomerStatus($userId)
+    public function toggleCustomerStatus(Request $request, $userId)
     {
-        $customer = DB::table('customer')
-            ->where('userID', $userId)
-            ->first();
+        // Find customer using model
+        $customer = Customer::where('userID', $userId)->first();
 
         if (!$customer) {
-            abort(404);
+            abort(404, 'Customer not found');
         }
 
         // Check if customer is already blacklisted
         if ($customer->customerStatus == 'blacklisted') {
-            return back()->with('error', 'This customer is permanently blacklisted and cannot be activated.');
+            return back()->with('error', 'This customer is already blacklisted.');
         }
 
         // Only allow changing from active to blacklisted
         if ($customer->customerStatus == 'active') {
-            $newStatus = 'blacklisted';
-            
-            DB::table('customer')
-                ->where('userID', $userId)
-                ->update([
-                    'customerStatus' => $newStatus
-                ]);
+            // Validate the reason
+            $validated = $request->validate([
+                'reason' => 'required|string|max:100|min:10'
+            ]);
 
-            return back()->with('success', 'Customer has been permanently blacklisted.');
+            DB::beginTransaction();
+            
+            try {
+                // Update customer status
+                $customer->update(['customerStatus' => 'blacklisted']);
+                
+                // Generate unique blacklist ID
+                do {
+                    $blacklistID = 'BL' . strtoupper(Str::random(4));
+                } while (BlacklistedCust::where('blacklistID', $blacklistID)->exists());
+                
+                // Check if blacklist record already exists
+                $existingBlacklist = BlacklistedCust::where('customerID', $userId)->first();
+                
+                if ($existingBlacklist) {
+                    // Update existing record
+                    $existingBlacklist->update([
+                        'reason' => $validated['reason'],
+                        'adminID' => auth()->id()
+                        // No blacklistDate field
+                    ]);
+                } else {
+                    // Create new blacklist record WITHOUT blacklistDate
+                    BlacklistedCust::create([
+                        'blacklistID' => $blacklistID,
+                        'customerID' => $userId,
+                        'reason' => $validated['reason'],
+                        'adminID' => auth()->id()
+                        // No blacklistDate field
+                    ]);
+
+                    
+                }
+
+                DB::commit();
+                
+                // Log the action with current timestamp
+                \Log::info('Customer blacklisted', [
+                    'customerID' => $userId,
+                    'blacklistID' => $blacklistID,
+                    'adminID' => auth()->id(),
+                    'reason' => $validated['reason'],
+                    'timestamp' => now()->toDateTimeString()
+                ]);
+                
+                return back()->with('success', 
+                    'Customer has been blacklisted successfully. ' .
+                    'Blacklist ID: ' . $blacklistID);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                
+                \Log::error('Failed to blacklist customer', [
+                    'customerID' => $userId,
+                    'adminID' => auth()->id(),
+                    'error' => $e->getMessage()
+                ]);
+                
+                return back()->with('error', 
+                    'Failed to blacklist customer: ' . $e->getMessage());
+            }
         }
 
-        // If not active, show appropriate message
-        return back()->with('error', 'Only active customers can be blacklisted. Current status: ' . $customer->customerStatus);
+        return back()->with('error', 
+            'Only active customers can be blacklisted. Current status: ' . 
+            ucfirst($customer->customerStatus));
     }
 
+    public function blacklistedCustomers(Request $request)
+    {
+        // Get search and filter parameters
+        $search = $request->get('search');
+        
+        // Base query for blacklisted customers
+        $query = DB::table('customer')
+            ->join('user', 'customer.userID', '=', 'user.userID')
+            ->join('blacklistedcust', 'customer.userID', '=', 'blacklistedcust.customerID')
+            ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+            ->select(
+                'user.userID',
+                'user.name',
+                'user.email',
+                'user.noHP',
+                'user.noIC',
+                'customer.customerType',
+                'customer.customerStatus',
+                'blacklistedcust.blacklistID',
+                'blacklistedcust.reason',
+                'blacklistedcust.adminID',
+                'admin.name as adminName'
+            )
+            ->where('customer.customerStatus', 'blacklisted');
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('user.name', 'like', "%{$search}%")
+                ->orWhere('user.email', 'like', "%{$search}%")
+                ->orWhere('user.noHP', 'like', "%{$search}%")
+                ->orWhere('user.userID', 'like', "%{$search}%")
+                ->orWhere('blacklistedcust.blacklistID', 'like', "%{$search}%");
+            });
+        }
+
+
+        // Get paginated results
+        $blacklistedCustomers = $query->paginate(20)->withQueryString();
+
+        // Get statistics
+        $totalBlacklisted = DB::table('customer')
+            ->where('customerStatus', 'blacklisted')
+            ->count();
+        
+        $totalCustomers = DB::table('customer')->count();
+        
+        $blacklistPercentage = $totalCustomers > 0 
+            ? round(($totalBlacklisted / $totalCustomers) * 100, 2) 
+            : 0;
+
+        return view('admin.blacklisted.index', compact(
+            'blacklistedCustomers',
+            'totalBlacklisted',
+            'totalCustomers',
+            'blacklistPercentage',
+            'search',
+        ));
+    }
 }
 

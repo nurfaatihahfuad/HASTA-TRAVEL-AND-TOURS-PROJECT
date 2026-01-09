@@ -25,10 +25,16 @@ class AdminController extends Controller
                             ->whereHas('admin', function($q) {
                                 $q->where('adminType','finance');
                             })->count();
+
+        // Debug: Check what's happening
+        \Log::info('Admin index loading...');
         
         $query = User::where('userType', 'admin')
-                      ->with('admin')
-                      ->orderBy('name');
+                      ->with(['admin' => function($query) {
+                            \Log::info('Eager loading admin relationship');
+                            return $query;
+                        }])
+                        ->orderBy('name');
 
         // Apply role filter
         if ($request->has('role') && in_array($request->role, ['finance', 'IT'])) {
@@ -37,6 +43,16 @@ class AdminController extends Controller
             });
         }
         $admin = $query->get();
+
+        // Debug: Check what we loaded
+        \Log::info('Loaded ' . $admin->count() . ' admin users');
+        foreach ($admin as $user) {
+            \Log::info('User ' . $user->userID . ':', [
+                'name' => $user->name,
+                'has_admin_relation' => !is_null($user->admin),
+                'admin_type' => $user->admin ? $user->admin->adminType : 'NO RELATION'
+            ]);
+        }
         
         return view('admin.admins.index', [
             'admin' => $admin,
@@ -85,13 +101,13 @@ class AdminController extends Controller
             Admin::create([
                 'adminID' => $user->userID,
                 'adminType' => $validated['adminType'],
-                'is_active' => false,
+                'is_active' => true,
             ]);
 
             Log::info('New Admin created', [
                 'creator_id' => auth()->id(),
-                'admin_id' => $user->userID,
-                'admin_type' => $validated['adminType'],
+                'adminID' => $user->userID,
+                'adminType' => $validated['adminType'],
                 'email' => $validated['email']
             ]);
 
@@ -140,6 +156,21 @@ class AdminController extends Controller
                     ->where('userType', 'admin')
                     ->with('admin')
                     ->firstOrFail();
+
+        // CRITICAL: Check if admin record exists
+        if (!$admins->admin) {
+            \Log::error('NO ADMIN RECORD FOUND IN DATABASE FOR USER!', [
+                'userID' => $admins->userID,
+                'userName' => $admins->name
+            ]);
+
+        } else {
+            \Log::info('Admin record loaded:', [
+                'adminID' => $admins->admin->adminID,
+                'adminType' => $admins->admin->adminType,
+                'is_active' => $admins->admin->is_active
+            ]);
+        }
         
         $validated = $request->validate([
             'name' => 'required|string|max:100',
@@ -149,17 +180,47 @@ class AdminController extends Controller
             'adminType' => 'required|in:finance,IT',
         ]);
 
+
         try {
             DB::beginTransaction();
 
-            $admins->update($validated);
+            // Update user record
+            $userUpdateData = [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'noHP' => $validated['noHP'],
+                'noIC' => $validated['noIC'],
+            ];
+            $userUpdated = $admins->update($userUpdateData);
+
+            // 2. Handle Admin record
+            $adminUpdated = false;
+            $adminCreated = false;
+
+            // Check again if admin record exists (after user update)
+            $adminRecord = Admin::where('adminID', $admins->userID)->first();
+            
+            if ($adminRecord) {
+                // Save current state
+                $oldAdminType = $adminRecord->adminType;
+                // Method 1: Direct update
+                $adminRecord->adminType = $validated['adminType'];
+
+                // Verify the update
+                $adminRecord->refresh();
+
+            } else {
+                // Create new admin record
+                $newAdmin = Admin::create([
+                    'adminID' => $admins->userID,
+                    'adminType' => $validated['adminType'],
+                    'is_active' => true,
+                ]);
+                
+                $adminCreated = true;
+            }
 
             DB::commit();
-
-            Log::info('Admin updated', [
-                'updater_id' => auth()->id(),
-                'admin_id' => $admins->userID
-            ]);
 
             return redirect()->route('admins.index')
                 ->with('success', 'Admin updated successfully!');

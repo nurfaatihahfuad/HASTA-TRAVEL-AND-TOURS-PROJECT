@@ -6,13 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlacklistedCust extends Model
 {
-    protected $table = 'blacklistedcust';   // 👉 nama table sebenar
-    protected $primaryKey = 'blacklistID';  // 👉 PK column
-    public $timestamps = false;             // table anda tiada created_at/updated_at
+    protected $table = 'blacklistedcust';   
+    protected $primaryKey = 'blacklistID';  
+    public $timestamps = false;
+    public $incrementing = false;
+    protected $keyType = 'string';             
 
     protected $fillable = [
+        'blacklistID',
         'customerID',
         'reason',
         'adminID',
     ];
+
+    public function customer() {
+        return $this->belongsTo(Customer::class, 'customerID', 'userID');
+    }
+
+    public function admin() {
+        return $this->belongsTo(Admin::class, 'adminID', 'adminID');
+    }
 }

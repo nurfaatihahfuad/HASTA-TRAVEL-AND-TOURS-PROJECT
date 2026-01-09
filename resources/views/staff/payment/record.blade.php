@@ -70,7 +70,7 @@
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Payment Proof</th>
-                        <th>Payment Status</th>
+                        <!--<th>Payment Status</th> -->
                         <th>Amount</th>
                         <th>Created At</th>
                         <th>Actions</th>
@@ -103,7 +103,7 @@
                                     <span class="badge bg-warning">No receipt</span>
                                 @endif
                             </td>
-                            <td>
+                            <!--<td>
                                 <span class="badge 
                                     @if($b->paymentStatus == 'approved') bg-success
                                     @elseif($b->paymentStatus == 'pending') bg-warning
@@ -111,7 +111,7 @@
                                     @else bg-secondary @endif">
                                     {{ $b->paymentStatus ?? 'No payment' }}
                                 </span>
-                            </td>
+                            </td> -->
                             <td>
                                 @if(isset($b->amountPaid) && $b->amountPaid)
                                     <strong>RM {{ number_format($b->amountPaid, 2) }}</strong>
@@ -133,7 +133,7 @@
                                         <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID) }}" class="d-inline">
                                             @csrf
                                             @method('PUT')
-                                            <button type="submit" name="status" value="approved" 
+                                            <button type="submit" name="status" value="successful" 
                                                     class="btn btn-success btn-sm" 
                                                     onclick="return confirm('Approve this booking?')"
                                                     title="Approve">
@@ -186,11 +186,11 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <h6>Payment Information</h6>
-                                                        <p><strong>Status:</strong> 
+                                                        <!-- <p><strong>Status:</strong> 
                                                             <span class="badge bg-{{ $b->paymentStatus == 'approved' ? 'success' : ($b->paymentStatus == 'pending' ? 'warning' : 'danger') }}">
                                                                 {{ $b->paymentStatus ?? 'No payment' }}
                                                             </span>
-                                                        </p>
+                                                        </p> -->
                                                         <p><strong>Amount:</strong> RM {{ number_format($b->amountPaid ?? 0, 2) }}</p>
                                                         @if($b->receipt_file_path)
                                                             <p><strong>Receipt:</strong> 
