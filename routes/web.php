@@ -197,6 +197,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/total_booking/export-excel', [ReportController::class, 'exportTotalBookingExcel'])
             ->name('total_booking.exportExcel');
+
+        // ✅ Export Revenue 
+        Route::get('/revenue/export-pdf', [ReportController::class, 'exportRevenuePdf'])
+            ->name('revenue.exportPdf'); 
+        Route::get('/revenue/export-excel', [ReportController::class, 'exportRevenueExcel'])
+            ->name('revenue.exportExcel');
     });
 
 
