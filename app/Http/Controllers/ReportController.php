@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;       // DomPDF facade
-use Illuminate\Support\Facades\Response; 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Response;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class ReportController extends Controller
@@ -45,8 +45,33 @@ class ReportController extends Controller
                 return view('admin.report.partials.total_booking', compact('data','summary'));
 
             case 'revenue':
-                $data = Booking::where('bookingStatus','completed')->sum('totalPrice');
-                return view('admin.report.partials.revenue', compact('data'));
+                $data = DB::table('booking')
+                    ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+                    ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
+                    ->where('booking.bookingStatus', 'completed')
+                    ->select(
+                        'booking.bookingID',
+                        'vehicles.vehicleName',
+                        DB::raw('TIMESTAMPDIFF(HOUR, booking.pickup_dateTime, booking.return_dateTime) as duration'),
+                        'payment.paymentType',
+                        'payment.totalAmount'
+                    )
+                    ->get();
+
+                $summary = [
+                    'total_sales'        => $data->sum('totalAmount'),
+                    'total_income'       => $data->sum('totalAmount'),
+                    'avg_duration'       => $data->avg('duration'),
+                    'completed_payments' => $data->count(),
+                ];
+
+                $grouped = $data->groupBy('vehicleName');
+                $chart = [
+                    'labels' => $grouped->keys()->toArray(),
+                    'data'   => $grouped->map(fn($group) => $group->sum('totalAmount'))->values()->toArray()
+                ];
+
+                return view('admin.report.partials.revenue', compact('data','summary','chart'));
 
             case 'top_college':
                 $data = $this->getTopCollegeData(new Request());
@@ -70,7 +95,6 @@ class ReportController extends Controller
     
         return response()->json($data);
     }
-    
 
     public function filterTotalBooking(Request $request)
     {
@@ -81,7 +105,6 @@ class ReportController extends Controller
         if ($request->month) {
             $query->whereMonth('booking.pickup_dateTime', $request->month);
         }
-
         if ($request->year) {
             $query->whereYear('booking.pickup_dateTime', $request->year);
         }
@@ -114,7 +137,6 @@ class ReportController extends Controller
     {
         $data = $this->getTopCollegeData($request);
 
-        // Pass flag isPdf supaya Blade boleh hide UI elemen
         $pdf = Pdf::loadView('admin.report.partials.top_college', [
             'data' => $data,
             'isPdf' => true
@@ -147,7 +169,6 @@ class ReportController extends Controller
         return Response::download($tempPath)->deleteFileAfterSend(true);
     }
 
-    // Helper to reuse query
     private function getTopCollegeData(Request $request)
     {
         $query = DB::table('booking')
@@ -208,7 +229,6 @@ class ReportController extends Controller
             'cancelled' => $data->where('bookingStatus','cancelled')->count(),
         ];
 
-        // Pass flag isPdf supaya Blade boleh hide UI elemen
         $pdf = Pdf::loadView('admin.report.partials.total_booking', [
             'data' => $data,
             'summary' => $summary,
@@ -261,4 +281,76 @@ class ReportController extends Controller
         return Response::download($tempPath)->deleteFileAfterSend(true);
     }
 
+    // === Export Revenue Report ===
+    public function exportRevenuePdf(Request $request)
+    {
+        $data = DB::table('booking')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
+            ->where('booking.bookingStatus', 'completed')
+            ->select(
+                'booking.bookingID',
+                'vehicles.vehicleName',
+                DB::raw('TIMESTAMPDIFF(HOUR, booking.pickup_dateTime, booking.return_dateTime) as duration'),
+                'payment.paymentType',
+                'payment.totalAmount'
+            )
+            ->get();
+
+        $summary = [
+            'total_sales'        => $data->sum('totalAmount'),
+            'total_income'       => $data->sum('totalAmount'),
+            'avg_duration'       => $data->avg('duration'),
+            'completed_payments' => $data->count(),
+        ];
+
+        $grouped = $data->groupBy('vehicleName');
+        $chart = [
+            'labels' => $grouped->keys()->toArray(),
+            'data'   => $grouped->map(fn($group) => $group->sum('totalAmount'))->values()->toArray()
+        ];
+
+        $pdf = Pdf::loadView('admin.report.partials.revenue', [
+            'data' => $data,
+            'summary' => $summary,
+            'chart' => $chart,
+            'isPdf' => true
+        ]);
+
+        return $pdf->download('RevenueReport.pdf');
+    }
+
+    public function exportRevenueExcel(Request $request)
+    {
+        $data = DB::table('booking')
+            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
+            ->where('booking.bookingStatus', 'completed')
+            ->select(
+                'booking.bookingID',
+                'vehicles.vehicleName',
+                DB::raw('TIMESTAMPDIFF(HOUR, booking.pickup_dateTime, booking.return_dateTime) as duration'),
+                'payment.paymentType',
+                'payment.totalAmount'
+            )
+            ->get();
+
+        $rows = [];
+        foreach ($data as $item) {
+            $rows[] = [
+                'Booking ID'   => $item->bookingID,
+                'Vehicle'      => $item->vehicleName,
+                'Duration (h)' => $item->duration,
+                'Payment Type' => $item->paymentType,
+                'Total Amount' => $item->totalAmount,
+            ];
+        }
+
+        $tempPath = storage_path('app/temp_revenue.xlsx');
+        SimpleExcelWriter::create($tempPath)->addRows($rows);
+
+        return Response::download($tempPath)->deleteFileAfterSend(true);
+    }
 }
+
+    

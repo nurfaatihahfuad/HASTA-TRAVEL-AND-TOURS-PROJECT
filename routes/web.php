@@ -182,6 +182,18 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/reports/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
             ->name('top_college.exportExcel');
+
+        Route::get('/total_booking/export-pdf', [ReportController::class, 'exportTotalBookingPdf'])
+            ->name('total_booking.exportPdf');
+
+        Route::get('/total_booking/export-excel', [ReportController::class, 'exportTotalBookingExcel'])
+            ->name('total_booking.exportExcel');
+
+        // ✅ Export Revenue 
+        Route::get('/revenue/export-pdf', [ReportController::class, 'exportRevenuePdf'])
+            ->name('revenue.exportPdf'); 
+        Route::get('/revenue/export-excel', [ReportController::class, 'exportRevenueExcel'])
+            ->name('revenue.exportExcel');
     });
 
     
