@@ -155,6 +155,10 @@
                 <i class="fas fa-clipboard-check"></i> Payment Record
             </a>
 
+            <a class="sidebar-link" href="{{ route('commission.index') }}">
+                <i class="fas fa-clipboard-check"></i> Commission
+            </a>
+
             <a class="sidebar-link" href="{{ route('inspection.index') }}">
                 <i class="fas fa-chart-bar"></i> Car Inspection Checklist
             </a>
