@@ -274,6 +274,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     });
 });
 
-// Admin change customer status
-Route::post('/admin/customers/{userId}/toggle-status', [DashboardController::class, 'toggleCustomerStatus'])
-    ->name('admin.customers.toggle-status');
+// Admin blacklist customer 
+Route::post('/admin/customers/{userId}/blacklist', [DashboardController::class, 'toggleCustomerStatus'])
+    ->name('admin.customers.blacklist');
+// Blacklisted customers list
+Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustomers'])->name('admin.blacklisted.index');

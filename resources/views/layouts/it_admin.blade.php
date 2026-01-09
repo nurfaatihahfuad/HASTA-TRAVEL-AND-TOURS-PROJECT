@@ -175,8 +175,8 @@
                 <i class="	fa fa-drivers-license"></i> Customer Information
             </a>
 
-            <a class="sidebar-link @if($currentRoute == 'customers.index') active @endif" 
-               href="#">
+            <a class="sidebar-link @if($currentRoute == 'admin.blacklisted.index') active @endif"
+                href="{{ route('admin.blacklisted.index') }}">
                 <i class="fa fa-user-times"></i> Blacklisted Customer
             </a>
             

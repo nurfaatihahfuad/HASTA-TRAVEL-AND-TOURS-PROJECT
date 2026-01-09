@@ -11,10 +11,12 @@ class Customer extends Model
     use HasFactory, Notifiable;
 
     protected $table = 'customer';
+    protected $primaryKey = 'userID';
+    protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
-        'userID', 'referred_byCode', 'accountNumber', 'bankType', 'customerType'
+        'userID', 'referred_byCode', 'accountNumber', 'bankType', 'customerType', 'customerStatus'
     ];
 
     // relationship with User
@@ -50,5 +52,16 @@ class Customer extends Model
     public function verificationDocs()
     {
         return $this->hasOne(VerificationDocs::class, 'customerID', 'userID');
+    }
+
+    // Relationship to BlacklistedCust
+    public function blacklistedCust()
+    {
+        return $this->hasOne(BlacklistedCust::class, 'customerID', 'userID');
+    }
+    // Check if customer is currently blacklisted
+    public function isBlacklisted()
+    {
+        return $this->customerStatus === 'blacklisted';
     }
 }

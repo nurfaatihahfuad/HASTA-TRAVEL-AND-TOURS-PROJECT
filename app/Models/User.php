@@ -196,14 +196,15 @@ class User extends Authenticatable
     public function isITadmin()
     {
         return $this->userType === 'admin' &&
-               $this->admin &&
-               strtolower($this->admin->adminType) === 'it';
+                $this->admin &&
+                $this->admin->adminType === 'IT';
     }
 
     public function isFinanceAdmin()
     {
         return $this->userType === 'admin' &&
-               $this->admin &&
-               strtolower($this->admin->adminType) === 'finance';
+                $this->admin &&
+                $this->admin->adminType === 'finance';
     }
+
 }
