@@ -62,25 +62,17 @@
                     <td>
                         @if($payment->booking)
                             <!-- Form untuk APPROVE -->
-                            <form action="{{ route('booking.updateStatus', $payment->booking->bookingID) }}" 
-                                  method="POST" 
-                                  style="display:inline-block; margin-right:5px;">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="status" value="successful">
-                                <button type="submit" 
-                                        class="btn btn-success btn-sm"
-                                        onclick="return confirm('Approve this booking?')">
-                                    Approve
-                                </button>
-                            </form>
+                            <form action="{{ route('booking.approve', $payment->booking->bookingID) }}" method="POST">
+    @csrf
+    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+</form>
+
 
                             <!-- Form untuk REJECT -->
-                            <form action="{{ route('booking.updateStatus', $payment->booking->bookingID) }}" 
+                            <form action="{{ route('booking.reject', $payment->booking->bookingID) }}" 
                                   method="POST" 
                                   style="display:inline-block;">
                                 @csrf
-                                @method('PUT')
                                 <input type="hidden" name="status" value="rejected">
                                 <button type="submit" 
                                         class="btn btn-danger btn-sm"

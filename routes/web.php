@@ -91,15 +91,8 @@ Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStat
     ->name('booking.updateStatus');
 
 // Nak approve payment
-//Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
-Route::put('/booking/{bookingID}/status', [BookingController::class, 'updateStatus'])
-     ->name('booking.updateStatus');
-     
-Route::put('/booking/{bookingID}/approve', [BookingController::class, 'approve'])
-     ->name('booking.approve');
-     
-Route::put('/booking/{bookingID}/reject', [BookingController::class, 'reject'])
-     ->name('booking.reject');
+Route::post('/booking/{bookingID}/approve', [BookingController::class, 'approve'])->name('booking.approve');
+Route::post('/booking/{bookingID}/reject', [BookingController::class, 'reject'])->name('booking.reject');
 
 
 // Route untuk tunjuk summary payment/booking 
@@ -107,8 +100,6 @@ Route::get('/booking-summary/{bookingID}', [PaymentController::class, 'bookingSu
         ->name('booking.summary');
 Route::post('/payment/{paymentID}/upload-receipt', [PaymentController::class, 'uploadReceipt'])
     ->name('payment.uploadReceipt');
-
-
 
 // Receipt routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -121,6 +112,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/receipt/download/{bookingID}', [ReceiptController::class, 'download'])
         ->name('receipt.download')
         ->where('bookingID', '[A-Za-z0-9]+');
+
+    Route::get('/admin/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+        ->name('reports.total_booking.filter');
+    
 });
 
 // Payment Pending Verification Page for Staff
@@ -172,7 +167,19 @@ Route::middleware('auth')->group(function () {
         // Filter untuk Total Booking
         Route::get('/reports/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
+
+        // Filter untuk Top College
+        Route::get('/reports/top_college/filter', [ReportController::class, 'filterTopCollege'])
+            ->name('top_college.filter');
+
+        // ✅ Export routes (corrected)
+        Route::get('/reports/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
+            ->name('top_college.exportPdf');
+
+        Route::get('/reports/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
+            ->name('top_college.exportExcel');
     });
+
     
 
 
@@ -219,9 +226,8 @@ Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show')
 Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
 
 // Staff dashboard: verify payments
-Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
-
+//Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
+//Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
 // ============================
 // Staff Management (Admin only)

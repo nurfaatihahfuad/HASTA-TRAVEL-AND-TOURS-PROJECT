@@ -82,22 +82,23 @@ class BookingController extends Controller
     }
 
         public function approve($bookingID)
-    {
-        $booking = Booking::findOrFail($bookingID);
-        $booking->bookingStatus = 'successful'; // atau 'Approved' ikut DB
-        $booking->save();
+        {
 
-        return redirect()->back()->with('success', 'Booking has been approved.');
-    }
+            $booking = Booking::findOrFail($bookingID);
+            $booking->bookingStatus = 'successful';
+            $booking->save();
 
-    public function reject($bookingID)
-    {
-        $booking = Booking::findOrFail($bookingID);
-        $booking->bookingStatus = 'rejected'; // ikut ENUM dalam DB
-        $booking->save();
+            return redirect()->back()->with('success', 'Booking has been approved.');
+        }
 
-        return redirect()->back()->with('success', 'Booking has been rejected.');
-    }
+public function reject($bookingID): RedirectResponse
+{
+    $booking = Booking::findOrFail($bookingID);
+    $booking->bookingStatus = 'rejected';
+    $booking->save();
+
+    return redirect()->back()->with('success', 'Booking has been rejected.');
+}
 
     /**
      * Reset booking to pending (additional method if needed)
