@@ -78,7 +78,6 @@ class CustomerRegistrationController extends Controller
             $validationRules['staffNo'] = 'required|string|max:50|unique:staffcustomer,staffNo';
         }
 
-        
 
         // file uploads
         $validationRules['ic'] = 'required|file|mimes:jpg,jpeg,png,pdf|max:5120';
@@ -103,8 +102,8 @@ class CustomerRegistrationController extends Controller
             ]);
 
 
-            //$user->refresh(); // reloads trigger-generated userID
-            $user = User::where('email', $validated['email'])->first();
+            $user->refresh(); // reloads trigger-generated userID
+            //$user = User::where('email', $validated['email'])->first();
             \Log::info('Generated UserID: ' . $user->userID);
 
             // 2. Generate referral code if not provided
@@ -136,6 +135,22 @@ class CustomerRegistrationController extends Controller
                     'staffNo' => $validated['staffNo'],
                 ]);
             }
+
+            // 3b. Referral bonus: if referralCode was provided, reward the referrer
+            if (!empty($validated['referralCode'])) {
+                $referrer = Customer::whereHas('loyaltyCard', function ($q) use ($validated) {
+                    $q->where('referralCode', $validated['referralCode']);
+                })->first();
+
+                if ($referrer && $referrer->loyaltyCard) {
+                    $card = $referrer->loyaltyCard;
+                    $card->currentStamp += 2;   // award 2 stamps (adjust as needed)
+                    $card->totalStamp += 2;
+                    $card->save();
+                }
+            }
+
+            
 
             // store files and create VerificationDocs record
             $verificationData = [

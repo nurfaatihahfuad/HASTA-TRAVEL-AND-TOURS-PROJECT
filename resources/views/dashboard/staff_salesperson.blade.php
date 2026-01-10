@@ -55,7 +55,7 @@
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Payment Proof</th>
-                        <!--<th>Payment Status</th> -->
+                        <th>Payment Status</th>
                         <th>Amount</th>
                         <th>Created At</th>
                         <th>Actions</th>
@@ -88,7 +88,7 @@
                                     <span class="badge bg-warning">No receipt</span>
                                 @endif
                             </td>
-                            <!--<td>
+                            <td>
                                 <span class="badge 
                                     @if($b->paymentStatus == 'approved') bg-success
                                     @elseif($b->paymentStatus == 'pending') bg-warning
@@ -96,7 +96,7 @@
                                     @else bg-secondary @endif">
                                     {{ $b->paymentStatus ?? 'No payment' }}
                                 </span>
-                            </td> -->
+                            </td> 
                             <td>
                                 @if(isset($b->amountPaid) && $b->amountPaid)
                                     <strong>RM {{ number_format($b->amountPaid, 2) }}</strong>

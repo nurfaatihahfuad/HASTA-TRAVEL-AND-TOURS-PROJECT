@@ -56,6 +56,10 @@ Route::get('/register/customer/success', [CustomerRegistrationController::class,
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
+Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    Route::get('/customer/profile', [DashboardController::class, 'customerProfile'])->name('customer.profile');
+    Route::post('/customer/profile', [DashboardController::class, 'customerUpdateProfile'])->name('customer.profile.update');
+});
         
 // Admin 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])

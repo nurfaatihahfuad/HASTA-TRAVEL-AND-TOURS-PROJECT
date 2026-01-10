@@ -291,7 +291,7 @@
             </a>
             
             <a class="sidebar-link @if($currentRoute == 'customer.profile') active @endif" 
-               href="#">
+               href="{{ route('customer.profile') }}">
                 <i class="fas fa-user"></i> Profile
             </a>
             

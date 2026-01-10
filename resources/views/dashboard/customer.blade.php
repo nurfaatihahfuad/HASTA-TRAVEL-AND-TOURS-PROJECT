@@ -212,7 +212,7 @@
                     <!-- Vehicle Image -->
                     @if($mostRentedDetails && $mostRentedDetails->image_url)
                         <div class="mb-3">
-                            <img src="{{ asset('storage/' . $mostRentedDetails->image_url) }}" 
+                            <img src="{{ asset('img/' . $mostRentedDetails->image_url) }}" 
                                 alt="{{ $mostRentedDetails->vehicleName }}" 
                                 class="img-fluid rounded" 
                                 style="max-height: 150px; width: auto;">
