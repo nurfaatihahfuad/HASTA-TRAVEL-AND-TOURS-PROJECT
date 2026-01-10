@@ -114,6 +114,12 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'userID');
     }
 
+    //Auni tambah
+    public function commissions()
+    {
+        return $this->hasMany(Commission::class, 'userID', 'userID');
+    }
+
     public function verificationDocs()
     {
         return $this->hasOneThrough(

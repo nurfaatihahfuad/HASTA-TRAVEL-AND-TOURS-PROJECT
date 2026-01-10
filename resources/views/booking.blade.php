@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Car</title>
     <link rel="stylesheet" href="{{ asset('css/booking.css') }}">
+    <!-- SweetAlert2 CSS (Optional) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
     <div class="page-header">
@@ -19,7 +21,7 @@
         <div class="booking-content">
             <!-- Left Column: Booking Form -->
             <div class="booking-form">
-                <form action="{{ route('booking.store') }}" method="POST">
+                <form id="bookingForm" action="{{ route('booking.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="vehicleID" value="{{ $vehicle->vehicleID }}">
 
@@ -73,7 +75,7 @@
                     <!-- Pickup Others input -->
                     <div class="form-group" id="pickup_others" style="display:none;">
                         <label for="pickup_other_location">Please specify pick-up location:</label>
-                        <input type="text" name="pickup_other_location" class="form-control">
+                        <input type="text" name="pickup_other_location" id="pickup_other_location" class="form-control">
                     </div>
 
                     <!-- Return Location Dropdown -->
@@ -108,18 +110,18 @@
                     <!-- Return Others input -->
                     <div class="form-group" id="return_others" style="display:none;">
                         <label for="return_other_location">Please specify return location:</label>
-                        <input type="text" name="return_other_location" class="form-control">
+                        <input type="text" name="return_other_location" id="return_other_location" class="form-control">
                     </div>
 
                     <!-- Voucher -->
                     <div class="form-group">
                         <label for="voucherCode">Voucher Code:</label>
-                        <input type="text" name="voucherCode">
+                        <input type="text" name="voucherCode" id="voucherCode">
                     </div>
 
                     <!-- Submit button -->
                     <div class="button-group">
-                        <button type="submit" class="submit-btn">Submit Booking</button>
+                        <button type="button" id="submitBookingBtn" class="submit-btn">Submit Booking</button>
                     </div>
                 </form>
             </div>
@@ -128,7 +130,7 @@
             @if($vehicle)
                 <div class="car-info">
                     <h2>{{ $vehicle->vehicleName }}</h2>
-                    <p class="price">RM{{ $vehicle->price_per_day }}/hour</p>
+                    <p class="price">RM{{ $vehicle->price_per_day }}/day</p>
                     <img src="{{ asset('img/' . $vehicle->image_url) }}" alt="{{ $vehicle->vehicleName }}" class="car-image">
                     
                     <div class="vehicle-details">
@@ -145,24 +147,131 @@
         </div>
     </div>
 
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         // Toggle pickup others input
         document.getElementById('pickup_location').addEventListener('change', function() {
+            const pickupOthersDiv = document.getElementById('pickup_others');
+            const pickupOtherInput = document.getElementById('pickup_other_location');
+            
             if (this.value === 'others') {
-                document.getElementById('pickup_others').style.display = 'block';
+                pickupOthersDiv.style.display = 'block';
+                pickupOtherInput.required = true;
             } else {
-                document.getElementById('pickup_others').style.display = 'none';
+                pickupOthersDiv.style.display = 'none';
+                pickupOtherInput.required = false;
+                pickupOtherInput.value = '';
             }
         });
 
         // Toggle return others input
         document.getElementById('return_location').addEventListener('change', function() {
+            const returnOthersDiv = document.getElementById('return_others');
+            const returnOtherInput = document.getElementById('return_other_location');
+            
             if (this.value === 'others') {
-                document.getElementById('return_others').style.display = 'block';
+                returnOthersDiv.style.display = 'block';
+                returnOtherInput.required = true;
             } else {
-                document.getElementById('return_others').style.display = 'none';
+                returnOthersDiv.style.display = 'none';
+                returnOtherInput.required = false;
+                returnOtherInput.value = '';
             }
         });
+
+        // Booking submission with popup
+        document.getElementById('submitBookingBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const pickupLocation = document.getElementById('pickup_location').value;
+            const returnLocation = document.getElementById('return_location').value;
+            const pickupOther = document.getElementById('pickup_other_location').value;
+            const returnOther = document.getElementById('return_other_location').value;
+            
+            // Validate required fields
+            if (!pickupLocation || !returnLocation) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select both pick-up and return locations!',
+                });
+                return;
+            }
+            
+            if (pickupLocation === 'others' && !pickupOther.trim()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please specify your pick-up location!',
+                });
+                return;
+            }
+            
+            if (returnLocation === 'others' && !returnOther.trim()) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please specify your return location!',
+                });
+                return;
+            }
+            
+            // Get location display names
+            function getLocationDisplayName(value, otherValue) {
+                if (value === 'others') {
+                    return otherValue;
+                }
+                
+                const select = document.getElementById('pickup_location');
+                const option = select.querySelector(`option[value="${value}"]`);
+                return option ? option.textContent : value;
+            }
+            
+            const pickupDisplay = getLocationDisplayName(pickupLocation, pickupOther);
+            const returnDisplay = getLocationDisplayName(returnLocation, returnOther);
+            
+            // Show confirmation popup
+            Swal.fire({
+                title: 'Confirm Booking?',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Vehicle:</strong> {{ $vehicle->vehicleName }}</p>
+                        <p><strong>Pick-up:</strong> {{ \Carbon\Carbon::parse($pickup_dateTime)->format('d M Y, h:i A') }}</p>
+                        <p><strong>Return:</strong> {{ \Carbon\Carbon::parse($return_dateTime)->format('d M Y, h:i A') }}</p>
+                        <p><strong>Pick-up Location:</strong> ${pickupDisplay}</p>
+                        <p><strong>Return Location:</strong> ${returnDisplay}</p>
+                        <p><strong>Price per day:</strong> RM{{ $vehicle->price_per_day }}</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Book Now!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                width: '600px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit form
+                    document.getElementById('bookingForm').submit();
+                }
+            });
+        });
+
+        // Optional: Success message popup if redirected with success session
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Booking Successful!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
     </script>
 </body>
 </html>

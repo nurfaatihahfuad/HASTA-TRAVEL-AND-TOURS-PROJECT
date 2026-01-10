@@ -47,7 +47,7 @@
 
             <!-- All bookings -->
             <div class="section-card">
-                <h6 class="mb-3">All bookings</h6>
+                <h6 class="mb-3">Latest bookings</h6>
                 <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-light">

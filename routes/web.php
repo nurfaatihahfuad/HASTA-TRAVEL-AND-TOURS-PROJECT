@@ -17,6 +17,7 @@ use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DamageCaseController;
 use App\Http\Controllers\ReceiptController;
+use App\Http\Controllers\CommissionController;
 
 
 // ============================
@@ -201,7 +202,9 @@ Route::middleware('auth')->group(function () {
 
 });
 
+    //================
     // Payment routes
+    //================
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
@@ -291,3 +294,17 @@ Route::post('/admin/customers/{userId}/blacklist', [DashboardController::class, 
     ->name('admin.customers.blacklist');
 // Blacklisted customers list
 Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustomers'])->name('admin.blacklisted.index');
+
+//================
+//Commission
+//================
+// Commission Routes
+Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
+Route::get('/commission/create', [CommissionController::class, 'create'])->name('commission.create');
+Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
+Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
+Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
+//Route::delete('/commission/{id}', [CommissionController::class, 'destroy'])->name('commission.destroy');
+
+
+
