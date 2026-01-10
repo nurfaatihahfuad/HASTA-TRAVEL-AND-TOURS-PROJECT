@@ -171,6 +171,46 @@ class PaymentController extends Controller
 
         return redirect()->back()->with('success', 'Payment has been reset to pending status.');
     }
+
+    //ni terkait dengan admin dashboard-dina--------------------------------------------------------------------------
+    public function index(Request $request)
+    {
+        $status = $request->get('status', 'all');
+        
+        $query = Payment::with(['booking.vehicle', 'booking.user'])
+            ->orderBy('created_at', 'desc');
+        
+        // Filter by status if not 'all'
+        if ($status !== 'all') {
+            $query->where('paymentStatus', $status);
+        }
+        
+        // Add search if needed
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('paymentID', 'LIKE', "%{$search}%")
+                ->orWhere('bookingID', 'LIKE', "%{$search}%")
+                ->orWhereHas('booking.user', function($userQuery) use ($search) {
+                    $userQuery->where('name', 'LIKE', "%{$search}%")
+                            ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+        
+        // Use pagination for better performance
+        $payments = $query->paginate(20)->withQueryString();
+        
+        // Get statistics for the dashboard
+        $stats = [
+            'total' => Payment::count(),
+            'pending' => Payment::where('paymentStatus', 'pending')->count(),
+            'approved' => Payment::where('paymentStatus', 'approved')->count(),
+            'rejected' => Payment::where('paymentStatus', 'rejected')->count(),
+        ];
+        
+        return view('admin.payments.index', compact('payments', 'status', 'stats'));
+    }
    
 
 }
