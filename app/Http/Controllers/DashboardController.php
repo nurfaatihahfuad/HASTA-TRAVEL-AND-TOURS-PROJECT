@@ -142,16 +142,16 @@ class DashboardController extends Controller
     
     //yg ni Auni dh ubah jadi coding asal semula
     //dina komen bawah ni
-    /*
+    
     public function staffSalesperson()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
-        //$bookings = DB::table('booking')->get();
-        //$bookings = Booking::with(['payments', 'vehicle'])
-            //->orderBy('created_at', 'desc')
-            //->get();
-        // Try different column names SINI
+        $bookings = DB::table('booking')->get();
+        $bookings = Booking::with(['payments', 'vehicle'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        //Try different column names SINI
         $latestBookings = DB::table('booking')
             ->leftJoin('payment', function($join) {
                 $join->on('booking.bookingID', '=', 'payment.bookingID');
@@ -184,7 +184,7 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    } */
+    } 
 
     // Display bookings for verification (Staff)
     /**
@@ -203,8 +203,7 @@ class DashboardController extends Controller
             ->select(
                 'booking.*',
                 'user.name',
-                'vehicles.vehicltakpalah taknaklah yang ni, 
-                eName',
+                'vehicles.vehicleName',
                 'vehicles.plateNo',
                 'payment.receipt_file_path',
                 'payment.paymentStatus',

@@ -69,23 +69,35 @@
             </div>
         </div>
 
-        <!-- Chart -->
-        <canvas id="revenueChart" height="100"></canvas>
+        <!-- Error Message -->
+        @if(isset($error))
+        <div class="alert alert-danger mb-4">
+            <strong>Error:</strong> {{ $error }}
+        </div>
+        @endif
 
-        <script>
-            const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-            new Chart(ctxRevenue, {
-                type: 'bar',
-                data: {
-                    labels: {!! json_encode($chart['labels']) !!},
-                    datasets: [{
-                        label: 'Revenue by Vehicle',
-                        data: {!! json_encode($chart['data']) !!},
-                        backgroundColor: '#dc3545'
-                    }]
-                }
-            });
-        </script>
+        <!-- Chart Section -->
+        @if(!empty($chart['labels']) && count($chart['labels']) > 0)
+            <canvas id="revenueChart" height="100" class="mb-4"></canvas>
+            <script>
+                const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+                new Chart(ctxRevenue, {
+                    type: 'bar',
+                    data: {
+                        labels: @json($chart['labels']),
+                        datasets: [{
+                            label: 'Revenue by Vehicle',
+                            data: @json($chart['data']),
+                            backgroundColor: '#dc3545'
+                        }]
+                    }
+                });
+            </script>
+        @else
+            <div class="alert alert-info mb-4">
+                No chart data available
+            </div>
+        @endif
     @else
         <!-- PDF Summary Boxes -->
         <div class="summary-box">
@@ -97,31 +109,46 @@
     @endif
 
     <!-- Revenue Table -->
-    <div class="table-responsive">
+    <div class="table-responsive mt-4">
         <table class="table table-hover" @if(!empty($isPdf)) style="border: 1px solid #000;" @endif>
             <thead class="table-light">
                 <tr>
-                    <th>Vehicle</th>
+                    <th>Payment ID</th>
                     <th>Booking ID</th>
+                    <th>Vehicle</th>
                     <th>Duration (hrs)</th>
                     <th>Payment Type</th>
                     <th>Total Amount</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($data as $row)
                     <tr>
-                        <td>{{ $row->vehicleName }}</td>
+                        <td><code>{{ $row->paymentID ?? 'N/A' }}</code></td>
                         <td>{{ $row->bookingID }}</td>
-                        <td>{{ $row->duration }}</td>
+                        <td>{{ $row->vehicleName ?? 'N/A' }}</td>
+                        <td>{{ $row->duration ?? 'N/A' }}</td>
                         <td>{{ $row->paymentType }}</td>
-                        <td>RM {{ number_format($row->totalAmount, 2) }}</td>
+                        <td class="text-end">RM {{ number_format($row->totalAmount, 2) }}</td>
+                        <td>
+                            <span class="badge bg-{{ 
+                                ($row->paymentStatus == 'approved') ? 'success' : 
+                                (($row->paymentStatus == 'pending') ? 'warning' : 'danger') 
+                            }}">
+                                {{ ucfirst($row->paymentStatus) }}
+                            </span>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center py-4">
+                        <td colspan="7" class="text-center py-4">
                             <div class="text-muted">
+                                <i class="fas fa-receipt fa-2x mb-2"></i>
                                 <p class="mb-0">No revenue data available</p>
+                                @if(isset($error))
+                                <small class="text-danger">{{ $error }}</small>
+                                @endif
                             </div>
                         </td>
                     </tr>
