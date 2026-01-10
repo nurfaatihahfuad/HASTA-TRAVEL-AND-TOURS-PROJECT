@@ -141,14 +141,15 @@ class DashboardController extends Controller
     // ============================
     
     //yg ni Auni dh ubah jadi coding asal semula
+    /*
     public function staffSalesperson()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
         //$bookings = DB::table('booking')->get();
-        /*$bookings = Booking::with(['payments', 'vehicle'])
-            ->orderBy('created_at', 'desc')
-            ->get();*/
+        //$bookings = Booking::with(['payments', 'vehicle'])
+            //->orderBy('created_at', 'desc')
+            //->get();
         // Try different column names SINI
         $latestBookings = DB::table('booking')
             ->leftJoin('payment', function($join) {
@@ -182,49 +183,51 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    }
+    } */
 
     // Display bookings for verification (Staff)
     /**
  * Display all bookings for verification (dedicated page)
  */
-public function verifyBookings()
-{
-    // Get all bookings with filters
-    $bookings = DB::table('booking')
-        ->leftJoin('payment', function($join) {
-            $join->on('booking.bookingID', '=', 'payment.bookingID');
-        })
-        ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
-        ->leftJoin('user', 'booking.userID', '=', 'user.userID')
-        ->select(
-            'booking.*',
-            'user.name',
-            'vehicles.vehicleName',
-            'vehicles.plateNo',
-            'payment.receipt_file_path',
-            'payment.paymentStatus',
-            'payment.amountPaid',
-            'booking.created_at as booking_date'
-        )
-        ->orderBy('booking.created_at', 'desc')
-        ->paginate(20); // Use pagination for better performance
 
-    // Statistics for the verification page
-    $totalBookings = DB::table('booking')->count();
-    $pendingVerification = DB::table('booking')
-        ->leftJoin('payment', 'booking.bookingID', '=', 'payment.bookingID')
-        ->where('payment.paymentStatus', 'pending')
-        ->orWhereNull('payment.paymentStatus')
-        ->count();
-    
+    public function verifyBookings()
+    {
+        // Get all bookings with filters
+        $bookings = DB::table('booking')
+            ->leftJoin('payment', function($join) {
+                $join->on('booking.bookingID', '=', 'payment.bookingID');
+            })
+            ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->leftJoin('user', 'booking.userID', '=', 'user.userID')
+            ->select(
+                'booking.*',
+                'user.name',
+                'vehicles.vehicltakpalah taknaklah yang ni, 
+                eName',
+                'vehicles.plateNo',
+                'payment.receipt_file_path',
+                'payment.paymentStatus',
+                'payment.amountPaid',
+                'booking.created_at as booking_date'
+            )
+            ->orderBy('booking.created_at', 'desc')
+            ->paginate(20); // Use pagination for better performance
 
-    return view('staff.payment.record', compact(
-        'bookings',
-        'totalBookings',
-        'pendingVerification'
-    ));
-}
+        // Statistics for the verification page
+        $totalBookings = DB::table('booking')->count();
+        $pendingVerification = DB::table('booking')
+            ->leftJoin('payment', 'booking.bookingID', '=', 'payment.bookingID')
+            ->where('payment.paymentStatus', 'pending')
+            ->orWhereNull('payment.paymentStatus')
+            ->count();
+        
+
+        return view('staff.payment.record', compact(
+            'bookings',
+            'totalBookings',
+            'pendingVerification'
+        ));
+    }
 
     // ============================
     // Staff Runner Dashboard
