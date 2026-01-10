@@ -186,24 +186,24 @@ class BookingController extends Controller
             return redirect()->back()->with('success', 'Booking has been approved.');
         }
 
-public function reject($bookingID): RedirectResponse
+/*public function reject($bookingID): RedirectResponse
 {
     $booking = Booking::findOrFail($bookingID);
     $booking->bookingStatus = 'rejected';
     $booking->save();
 
     return redirect()->back()->with('success', 'Booking has been rejected.');
-}
+}*/
 
     /**
      * Reset booking to pending (additional method if needed)
      */
-    public function resetToPending($bookingID): RedirectResponse
+    /*public function resetToPending($bookingID): RedirectResponse
     {
         $booking = Booking::findOrFail($bookingID);
         $booking->bookingStatus = 'pending';
         $booking->save();
 
         return redirect()->back()->with('success', 'Booking has been reset to pending status.');
-    }
+    }*/
 }

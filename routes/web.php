@@ -223,10 +223,6 @@ Route::middleware('auth')->group(function () {
     //    Route::resource('inspection', InspectionController::class)
     //        ->only(['index','edit','update']);
     //});
-    Route::post('/booking/{id}/pickup-inspection', [BookingController::class, 'storePickupInspection'])
-        ->name('inspection.storePickupInspection');
-    Route::post('/booking/{id}/return-inspection', [BookingController::class, 'storeReturnInspection'])
-        ->name('inspection.storeReturnInspection');
 
     // ============================
     // Inspection Routes
@@ -235,9 +231,7 @@ Route::middleware('auth')->group(function () {
     // Customer routes
     Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
         // Resource routes (index, create, store, edit, update)
-        Route::resource('inspection', InspectionController::class)
-            ->only(['index','create','store','edit','update']);
-
+        Route::get('/customer/inspections', [InspectionController::class, 'index'])->name('customer.inspections.index');        
         // Pickup inspection
         Route::get('/booking/{id}/pickup-inspection', [InspectionController::class, 'pickupInspection'])
             ->name('inspection.pickupInspection');
@@ -249,6 +243,7 @@ Route::middleware('auth')->group(function () {
             ->name('inspection.returnInspection');
         Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
             ->name('inspection.storeReturnInspection');
+    
     });
 
     // Staff routes
@@ -346,4 +341,33 @@ Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('c
 //Route::delete('/commission/{id}', [CommissionController::class, 'destroy'])->name('commission.destroy');
 
 
+// Staff Inspection Management Routes
+Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->name('staff.')->group(function () {
+    
+    // Inspections - View and Manage
+    Route::prefix('inspections')->name('inspections.')->group(function () {
+        // Index - View ALL inspections
+        Route::get('/', [InspectionController::class, 'staffIndex'])->name('index');
+        
+        // Show single inspection
+        Route::get('/{id}', [InspectionController::class, 'show'])->name('show');
+        
+        // Edit inspection (form)
+        Route::get('/{id}/edit', [InspectionController::class, 'staffEdit'])->name('edit');
+        
+        // Update inspection
+        Route::put('/{id}', [InspectionController::class, 'staffUpdate'])->name('update');
+        
+        // Delete inspection
+        Route::delete('/{id}', [InspectionController::class, 'destroy'])->name('destroy');
+        
+        // Verify inspection
+        Route::post('/{id}/verify', [InspectionController::class, 'verify'])->name('verify');
+        
+        // Special views
+        Route::get('/today', [InspectionController::class, 'todayInspections'])->name('today');
+        Route::get('/pending', [InspectionController::class, 'pendingInspections'])->name('pending');
+        Route::get('/with-damage', [InspectionController::class, 'inspectionsWithDamage'])->name('damage');
+    });
+});
 

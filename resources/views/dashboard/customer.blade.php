@@ -103,7 +103,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary">View</button>
+                                        <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View</a>
                                     </td>
                                 </tr>
                             @endforeach

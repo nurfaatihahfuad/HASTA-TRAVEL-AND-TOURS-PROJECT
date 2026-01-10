@@ -9,6 +9,8 @@ use App\Models\Booking;
 use App\Models\Vehicle;
 use App\Models\Customer;
 use App\Models\BlacklistedCust;
+use App\Models\Inspection; 
+use App\Models\DamageCase;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -141,14 +143,14 @@ class DashboardController extends Controller
     // ============================
     
     //yg ni Auni dh ubah jadi coding asal semula
-    public function staffSalesperson()
+    /*public function staffSalesperson()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
         //$bookings = DB::table('booking')->get();
         /*$bookings = Booking::with(['payments', 'vehicle'])
             ->orderBy('created_at', 'desc')
-            ->get();*/
+            ->get();
         // Try different column names SINI
         $latestBookings = DB::table('booking')
             ->leftJoin('payment', function($join) {
@@ -182,7 +184,7 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    }
+    }*/
 
     // Display bookings for verification (Staff)
     /**
@@ -732,5 +734,45 @@ public function verifyBookings()
             'search',
         ));
     }
+     public function staffSalesperson()
+    {
+        // HITUNG STATISTIK UTAMA
+        $returnInspections = Inspection::where('inspectionType', 'return')->count();
+        $pickupInspections = Inspection::where('inspectionType', 'pickup')->count();
+        $totalInspections = Inspection::count();
+        
+        // HITUNG STATISTIK TAMBAHAN (optional)
+        $todayInspections = Inspection::whereDate('created_at', Carbon::today())->count();
+        $pendingInspectionsCount = Inspection::whereNull('remark')->count();
+        
+        // STATISTIK DAMAGE
+        $damageFreeInspections = Inspection::where('damageDetected', 0)->count();
+        $damageDetectedInspections = Inspection::where('damageDetected', 1)->count();
+        
+        // INSPEKSI TERBARU
+        $recentInspections = Inspection::with(['vehicle', 'booking'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('staff.salesperson.dashboard', compact(
+            // UTAMA
+            'returnInspections',
+            'pickupInspections', 
+            'totalInspections',
+            
+            // TAMBAHAN
+            'todayInspections',
+            'pendingInspectionsCount',
+            
+            // DAMAGE
+            'damageFreeInspections',
+            'damageDetectedInspections',
+            
+            // RECENT
+            'recentInspections'
+        ));
+    }
+   
 }
 

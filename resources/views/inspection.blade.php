@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.customer')
 
 @section('content')
 <style>
@@ -140,6 +140,13 @@
                 </tr>
             @endforeach
         </tbody>
+        <td>
+            <form action="{{ route('inspection.destroy', $inspection->inspectionID) }}" method="POST" onsubmit="return confirm('Confirm delete?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+        </td>
     </table>
 </div>
 @endsection

@@ -80,6 +80,6 @@ class Booking extends Model
     }
     public function inspections()
     {
-        return $this->hasMany(Inspection::class, 'vehicleID', 'vehicleID');
+        return $this->hasMany(Inspection::class, 'bookingID', 'bookingID');
     }
-}
+       }
