@@ -158,20 +158,74 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
-    // Car inspection to damage case
-    // Car inspection CRUD
-    Route::resource('inspection', InspectionController::class)->middleware('auth');
+    // ============================
+    // Pickup Return
+    // ============================
 
-    // Damage Case page
-    //Route::get('/damage-case', function () {
-    //return view('damagecase'); // letak nama view yang betul
-    //})->name('damage_case.index');
-    //Route::get('/damage-case', [DamageCaseController::class, 'index'])->name('damage_case');
-    //Route::get('/damage-case', [App\Http\Controllers\DamageCaseController::class, 'index'])
-    //->name('damage_case.index');
-    Route::resource('damagecase', DamageCaseController::class)->middleware('auth');
-    //Route::post('/damagecase/store', [DamageCaseController::class, 'store'])->name('damage.store');
-    //Route::post('/damagecase/{id}/resolve', [DamageCaseController::class, 'resolve'])->name('damage.resolve');
+    // Customer boleh index, create, store, edit, update
+    //Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','create','store','edit','update']);
+    //});
+
+    // Staff hanya index, edit, update
+    //Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','edit','update']);
+    //});
+    Route::post('/booking/{id}/pickup-inspection', [BookingController::class, 'storePickupInspection'])
+        ->name('inspection.storePickupInspection');
+    Route::post('/booking/{id}/return-inspection', [BookingController::class, 'storeReturnInspection'])
+        ->name('inspection.storeReturnInspection');
+
+    // ============================
+    // Inspection Routes
+    // ============================
+
+    // Customer routes
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+        // Resource routes (index, create, store, edit, update)
+        Route::resource('inspection', InspectionController::class)
+            ->only(['index','create','store','edit','update']);
+
+        // Pickup inspection
+        Route::get('/booking/{id}/pickup-inspection', [InspectionController::class, 'pickupInspection'])
+            ->name('inspection.pickupInspection');
+        Route::post('/booking/{id}/pickup-inspection', [InspectionController::class, 'storePickupInspection'])
+            ->name('inspection.storePickupInspection');
+
+        // Return inspection
+        Route::get('/booking/{id}/return-inspection', [InspectionController::class, 'returnInspection'])
+            ->name('inspection.returnInspection');
+        Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
+            ->name('inspection.storeReturnInspection');
+    });
+
+    // Staff routes
+    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+        Route::resource('inspection', InspectionController::class)
+            ->only(['index','edit','update']);
+    });
+
+
+    // ============================
+    // Damage Case Routes
+    // ============================
+
+    // Staff hanya index, create, store, edit, update
+    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+        Route::resource('damagecase', DamageCaseController::class)
+            ->only(['index','edit','update','show']); 
+            // tambah 'create','store','destroy' kalau staff perlu
+        Route::post('damagecase/{caseID}/resolve', [DamageCaseController::class, 'resolve'])
+        ->name('damagecase.resolve');
+    });
+    // ============================
+    // Pickup Return Button
+    // ============================
+    Route::post('/booking/{id}/pickup', [BookingController::class, 'markPickup'])->name('booking.pickup');
+    Route::post('/booking/{id}/return', [BookingController::class, 'markReturn'])->name('booking.return');
+
 
 // ============================
 // Payment routes

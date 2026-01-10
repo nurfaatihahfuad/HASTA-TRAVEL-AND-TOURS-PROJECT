@@ -70,6 +70,100 @@ class BookingController extends Controller
 
         return back()->with('success', "Booking {$bookingID} updated to {$request->status}");
     }
+    public function reject($bookingID): RedirectResponse
+    {
+        $booking = Booking::findOrFail($bookingID);
+        $booking->bookingStatus = 'rejected';
+        $booking->save();
+
+        return redirect()->back()->with('success', 'Booking has been rejected.');
+    }
+    //    public function reject($bookingID): RedirectResponse
+    //{
+    //    $booking = Booking::findOrFail($bookingID);
+    //    $booking->bookingStatus = 'rejected';
+    //    $booking->save();
+
+    //    return redirect()->back()->with('success', 'Booking has been rejected.');
+    //}
+
+    /**
+     * Reset booking to pending (additional method if needed)
+     */
+    public function resetToPending($bookingID): RedirectResponse
+    {
+        $booking = Booking::findOrFail($bookingID);
+        $booking->bookingStatus = 'pending';
+        $booking->save();
+
+        return redirect()->back()->with('success', 'Booking has been reset to pending status.');
+    }
+
+    public function markPickup($id)
+    {
+        $booking = Booking::findOrFail($id);
+        //$booking->bookingStatus = 'picked_up';
+        //$booking->save();
+
+        return back()->with('success', 'Booking marked as picked up.');
+    }
+
+    public function markReturn($id)
+    {
+        $booking = Booking::findOrFail($id);
+        //$booking->bookingStatus = 'returned';
+        //$booking->save();
+
+        return back()->with('success', 'Booking marked as returned.');
+    }
+    public function pickupInspection($id)
+    {
+        $booking = Booking::findOrFail($id);
+        return view('inspection.pickup', compact('booking'));
+    }
+
+    public function storePickupInspection(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        $request->validate([
+            'carCondition'   => 'required|string',
+            'mileage'        => 'required|integer|min:0',
+            'fuel_level'     => 'required|integer|min:0|max:100',
+            'fuel_evidence'  => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'damageDetected' => 'required|boolean',
+            'notes'          => 'required|string',
+            'front_view'     => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'back_view'      => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'right_view'     => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'left_view'      => 'required|file|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $inspection = new Inspection();
+        $inspection->vehicleID       = $booking->vehicleID;
+        $inspection->carCondition    = $request->carCondition;
+        $inspection->mileageReturned = $request->mileage;
+        $inspection->fuelLevel       = $request->fuel_level;
+        $inspection->damageDetected  = $request->damageDetected;
+        $inspection->remark          = $request->notes;
+        $inspection->inspectionType  = 'pickup';
+        $inspection->staffID         = auth()->id();
+
+        // required fuel evidence
+        $inspection->fuel_evidence = $request->file('fuel_evidence')
+            ->store('fuel_evidence', 'public');
+
+        // optional photos
+        foreach (['front_view','back_view','right_view','left_view'] as $field) {
+            if ($request->hasFile($field)) {
+                $inspection->$field = $request->file($field)->store('inspection_images', 'public');
+            }
+        }
+
+        $inspection->save();
+
+        return redirect()->route('customers.BookingView.pickupInspection', $booking->bookingID)
+                        ->with('success', 'Pickup inspection recorded successfully.');
+    }
 
 }
-

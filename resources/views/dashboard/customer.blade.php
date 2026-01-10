@@ -72,8 +72,15 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
+<<<<<<< Updated upstream
                                             <div class="bg-light rounded p-2 me-2">
                                                 <i class="fas fa-car text-danger"></i>
+=======
+                                            <div class="d-flex align-items-center">
+                                            <div>
+                                                <strong>{{ $booking->vehicle->vehicleName ?? 'N/A' }}</strong><br>
+                                                <small><td>{{ optional($booking->vehicle)->plateNo ?? 'N/A' }}</td></small>
+>>>>>>> Stashed changes
                                             </div>
                                             <div>
                                                 <strong>{{ $booking->carModel ?? 'Unknown' }}</strong><br>

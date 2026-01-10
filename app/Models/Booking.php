@@ -49,4 +49,37 @@ class Booking extends Model
     { 
         return $this->hasMany(Payment::class, 'bookingID', 'bookingID'); 
     }
+
+    public function getTotalHoursAttribute()
+    {
+        if ($this->pickup_dateTime && $this->return_dateTime) {
+            return Carbon::parse($this->pickup_dateTime)
+                ->diffInHours(Carbon::parse($this->return_dateTime));
+        }
+        return 0;
+    }
+
+    public function getTotalPriceAttribute()
+    {
+        if ($this->vehicle && $this->pickup_dateTime && $this->return_dateTime) {
+            $pickup = Carbon::parse($this->pickup_dateTime);
+            $return = Carbon::parse($this->return_dateTime);
+
+            $hours = $pickup->diffInHours($return);
+            $days  = $pickup->diffInDays($return);
+
+            // kalau lebih 24 jam, kira ikut hari
+            if ($days >= 1) {
+                return $days * ($this->vehicle->price_per_day ?? 0);
+            }
+
+            // kalau kurang 24 jam, kira ikut jam
+            return $hours * ($this->vehicle->price_per_hour ?? 0);
+        }
+        return 0;
+    }
+    public function inspections()
+    {
+        return $this->hasMany(Inspection::class, 'vehicleID', 'vehicleID');
+    }
 }

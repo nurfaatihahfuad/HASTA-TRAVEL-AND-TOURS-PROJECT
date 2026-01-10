@@ -31,19 +31,6 @@ class InspectionController extends Controller
         return view('staff.inspection.create', compact('bookings'));
     }
 
-    // Papar form edit inspection
-    public function edit($id)
-    {
-        $inspection = Inspection::findOrFail($id);
-
-        $bookings = Booking::with('vehicle')
-                    ->where('bookingStatus', 'active')
-                    ->whereHas('vehicle')
-                    ->orderBy('pickup_dateTime', 'asc')
-                    ->get();
-
-        return view('staff.inspection.update', compact('inspection', 'bookings'));
-    }
 
     // Simpan inspection baru
     public function store(Request $request)
@@ -84,19 +71,36 @@ class InspectionController extends Controller
                          ->with('success', 'Inspection created successfully!');
     }
 
-    // Update inspection
+        
+    // Staff & Customer: Papar form edit
+    public function edit($id)
+    {
+        $inspection = Inspection::findOrFail($id);
+
+        if (Auth::user()->role === 'customer') {
+            return view('customer.inspection.update', compact('inspection'));
+        }
+
+        return view('staff.inspection.update', compact('inspection'));
+    }
+
+    // Staff & Customer: Simpan update
     public function update(Request $request, $id)
     {
         $inspection = Inspection::findOrFail($id);
 
         $validated = $request->validate([
-            'vehicleID'       => 'required|exists:vehicles,vehicleID',
-            'carCondition'    => 'required|string',
-            'mileageReturned' => 'required|integer',
-            'fuelLevel'       => 'required|integer',
-            'damageDetected'  => 'required|boolean',
-            'remark'          => 'nullable|string',
-            'evidence'        => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'vehicleID'        => 'required|integer|exists:vehicles,vehicleID',
+            'carCondition'   => 'required|string',
+            'mileage'        => 'required|integer|min:0',
+            'fuel_level'     => 'required|integer|min:0|max:100',
+            'fuel_evidence'  => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'damageDetected' => 'required|boolean',
+            'notes'          => 'required|string',
+            'front_view'     => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'back_view'      => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'right_view'     => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'left_view'      => 'required|file|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($request->hasFile('evidence')) {
@@ -126,5 +130,97 @@ class InspectionController extends Controller
 
         return redirect()->route('inspection.index')
                          ->with('success', 'Inspection deleted successfully!');
+    }
+
+    // ============================
+    // Pickup Inspection
+    // ============================
+    public function pickupInspection($id)
+    {
+        $booking = Booking::findOrFail($id);
+        return view('inspection.pickup', compact('booking'));
+    }
+
+    public function storePickupInspection(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        Inspection::create([
+        'carCondition'    => $request->carCondition,
+        'mileageReturned' => $request->mileage,
+        'fuelLevel'       => $request->fuel_level,
+        'fuel_evidence'   => $request->file('fuel_evidence')
+                                    ? $request->file('fuel_evidence')->store('fuel_evidence', 'public')
+                                    : null, // wajib isi, jadi pastikan form ada input file
+
+        'damageDetected'  => $request->damageDetected,
+        'remark'          => $request->notes,
+
+        // image uploads (optional tapi ikut schema awak)
+        'front_view'      => $request->file('front_view')
+                                    ? $request->file('front_view')->store('inspection_images', 'public')
+                                    : null,
+        'back_view'       => $request->file('back_view')
+                                    ? $request->file('back_view')->store('inspection_images', 'public')
+                                    : null,
+        'right_view'      => $request->file('right_view')
+                                    ? $request->file('right_view')->store('inspection_images', 'public')
+                                    : null,
+        'left_view'       => $request->file('left_view')
+                                    ? $request->file('left_view')->store('inspection_images', 'public')
+                                    : null,
+
+        'vehicleID'       => $booking->vehicleID,
+        'staffID'         => auth()->id(), // kalau staff login
+        'inspectionType'  => 'pickup',     // atau 'return'
+    ]);
+        return redirect()->route('inspection.pickupInspection', $booking->bookingID)
+                 ->with('success', 'Pickup inspection recorded successfully.');
+    }
+
+    // ============================
+    // Return Inspection
+    // ============================
+    public function returnInspection($id)
+    {
+        $booking = Booking::findOrFail($id);
+        return view('inspection.return', compact('booking'));
+    }
+
+    public function storeReturnInspection(Request $request, $id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        Inspection::create([
+        'carCondition'    => $request->carCondition,
+        'mileageReturned' => $request->mileage,
+        'fuelLevel'       => $request->fuel_level,
+        'fuel_evidence'   => $request->file('fuel_evidence')
+                                    ? $request->file('fuel_evidence')->store('fuel_evidence', 'public')
+                                    : null, // wajib isi, jadi pastikan form ada input file
+
+        'damageDetected'  => $request->damageDetected,
+        'remark'          => $request->notes,
+
+        // image uploads (optional tapi ikut schema awak)
+        'front_view'      => $request->file('front_view')
+                                    ? $request->file('front_view')->store('inspection_images', 'public')
+                                    : null,
+        'back_view'       => $request->file('back_view')
+                                    ? $request->file('back_view')->store('inspection_images', 'public')
+                                    : null,
+        'right_view'      => $request->file('right_view')
+                                    ? $request->file('right_view')->store('inspection_images', 'public')
+                                    : null,
+        'left_view'       => $request->file('left_view')
+                                    ? $request->file('left_view')->store('inspection_images', 'public')
+                                    : null,
+
+        'vehicleID'       => $booking->vehicleID,
+        'staffID'         => auth()->id(), // kalau staff login
+        'inspectionType'  => 'return',     // atau 'return'
+    ]);
+        return redirect()->route('inspection.returnInspection', $booking->bookingID)
+                 ->with('success', 'Return inspection recorded successfully.');
     }
 }
