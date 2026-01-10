@@ -208,6 +208,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
+    //==============
+    //Payment Verify
+    //==============
+    Route::middleware(['auth', 'role:salesperson'])->group(function () {
+    Route::put('/salesperson/payments/{paymentID}/update-status', [PaymentController::class, 'updateStatus'])
+        ->name('payment.updateStatus');
+    });
+    Route::post('/salesperson/payments/{paymentID}/approve', [PaymentController::class, 'approve'])
+    ->name('payment.approve');
+    Route::post('/salesperson/payments/{paymentID}/reject', [PaymentController::class, 'reject'])
+        ->name('payment.reject');
+
     // ============================
     // Inspection Routes
     // ============================

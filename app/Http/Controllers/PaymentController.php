@@ -126,6 +126,51 @@ class PaymentController extends Controller
         */ 
     }
 
+    public function updateStatus(Request $request, $bookingID): RedirectResponse
+    {
+        $request->validate([
+            'status' => 'required|string|in:pending,successful,rejected',
+        ]);
+
+        $payment = Payment::findOrFail($paymentID);
+        $status = strtolower(trim($request->input('status')));
+        
+        $payment->paymentStatus = $status;
+        $payment->save();
+
+        return back()->with('success', "Payment {$paymentID} updated to " . ucfirst($status));
+    }
+
+    public function approve($paymentID)
+    {
+
+        $payment = Payment::findOrFail($paymentID);
+        $payment->paymentStatus = 'approved';
+        $payment->save();
+
+        return redirect()->back()->with('success', 'Payment has been approved.');
+    }
+
+    public function reject($paymentID)
+    {
+        $payment = Payment::findOrFail($paymentID);
+        $payment->paymentStatus = 'rejected';
+        $payment->save();
+
+        return redirect()->back()->with('success', 'Payment has been rejected.');
+    }
+
+            /**
+             * Reset booking to pending (additional method if needed)
+             */
+    public function resetToPending($paymentID): RedirectResponse
+    {
+        $payment = Payment::findOrFail($bookingID);
+        $payment->paymentStatus = 'pending';
+        $payment->save();
+
+        return redirect()->back()->with('success', 'Payment has been reset to pending status.');
+    }
    
 
 }
