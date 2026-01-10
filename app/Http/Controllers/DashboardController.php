@@ -141,6 +141,7 @@ class DashboardController extends Controller
     // ============================
     
     //yg ni Auni dh ubah jadi coding asal semula
+    //dina komen bawah ni
     /*
     public function staffSalesperson()
     {
