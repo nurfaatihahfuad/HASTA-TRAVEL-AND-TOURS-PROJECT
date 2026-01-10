@@ -349,7 +349,8 @@ Route::get('/commission/create', [CommissionController::class, 'create'])->name(
 Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
 Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
 Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
-//Route::delete('/commission/{id}', [CommissionController::class, 'destroy'])->name('commission.destroy');
+Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
+    ->name('commission.deleteReceipt');
 
 
 

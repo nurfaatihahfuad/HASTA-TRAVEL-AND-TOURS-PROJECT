@@ -151,7 +151,7 @@ class DashboardController extends Controller
         $bookings = Booking::with(['payments', 'vehicle'])
             ->orderBy('created_at', 'desc')
             ->get();
-        //Try different column names SINI
+        // Try different column names SINI
         $latestBookings = DB::table('booking')
             ->leftJoin('payment', function($join) {
                 $join->on('booking.bookingID', '=', 'payment.bookingID');
@@ -184,7 +184,7 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    } 
+    }
 
     // Display bookings for verification (Staff)
     /**
