@@ -18,6 +18,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DamageCaseController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\CommissionController;
+use App\Http\Controllers\CustomerProfileController;
 
 
 // ============================
@@ -56,10 +57,46 @@ Route::get('/register/customer/success', [CustomerRegistrationController::class,
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
-Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
-    Route::get('/customer/profile', [DashboardController::class, 'customerProfile'])->name('customer.profile');
-    Route::post('/customer/profile', [DashboardController::class, 'customerUpdateProfile'])->name('customer.profile.update');
+
+// Customer Profile & Vouchers
+Route::middleware(['auth'])->group(function () {
+    // Profile
+    Route::get('/customer/profile', [CustomerProfileController::class, 'show'])->name('customer.profile');
+    Route::put('/customer/profile', [CustomerProfileController::class, 'update'])->name('customer.profile.update');
+    
+    // Voucher redemption - MUST HAVE voucherCode PARAMETER
+    Route::post('/customer/voucher/{voucherCode}/redeem', [CustomerProfileController::class, 'redeem'])
+        ->name('customer.voucher.redeem');
 });
+
+// In routes/web.php
+Route::get('/test-raw-update/{voucherCode}', function($voucherCode) {
+    $customer = Auth::user()->customer;
+    
+    \Log::info("🔧 === TEST RAW UPDATE ===");
+    \Log::info("🔧 Customer: {$customer->userID}");
+    \Log::info("🔧 Voucher: {$voucherCode}");
+    
+    // Method that worked in SQL test
+    $result = DB::update("
+        UPDATE customer_voucher 
+        SET redeemed_at = NOW() 
+        WHERE customerID = ? AND voucherCode = ?
+    ", [$customer->userID, $voucherCode]);
+    
+    \Log::info("🔧 Raw SQL update: {$result} rows affected");
+    
+    // Verify
+    $after = DB::table('customer_voucher')
+        ->where('customerID', $customer->userID)
+        ->where('voucherCode', $voucherCode)
+        ->first();
+    
+    \Log::info("🔧 After - redeemed_at: " . ($after->redeemed_at ?? 'NULL'));
+    
+    return redirect()->route('customer.profile')
+        ->with('info', "Test: {$result} rows updated, redeemed_at = " . ($after->redeemed_at ?? 'NULL'));
+})->middleware('auth');
         
 // Admin 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
@@ -200,10 +237,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/revenue/export-excel', [ReportController::class, 'exportRevenueExcel'])
             ->name('revenue.exportExcel');
     });
-
-    
-
-
 });
 
     //================
@@ -259,10 +292,6 @@ Route::middleware('auth')->group(function () {
 // ============================
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
-
-// Staff dashboard: verify payments
-//Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-//Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
 // ============================
 // Staff Management (Admin only)

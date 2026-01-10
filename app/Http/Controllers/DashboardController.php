@@ -142,7 +142,7 @@ class DashboardController extends Controller
     
     //yg ni Auni dh ubah jadi coding asal semula
     //dina komen bawah ni
-    /*
+    
     public function staffSalesperson()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
@@ -184,7 +184,7 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    } */
+    } 
 
     // Display bookings for verification (Staff)
     /**
@@ -345,43 +345,6 @@ class DashboardController extends Controller
                     
         return view('customer.dashboard', compact('bookings'));
     }
-
-    // Customer Profile View
-    public function customerProfile()
-    {
-        $user = Auth::user();
-        $customer = $user->customer; // assuming you have a relation User -> Customer
-
-        return view('customers.profile', compact('user', 'customer'));
-    }
-    // Customer Profile Update
-    public function customerUpdateProfile(Request $request)
-    {
-        $user = Auth::user();
-        $customer = $user->customer;
-
-        // validate input
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'noHP' => 'required|string|max:20',
-            'accountNumber' => 'required|string|max:20',
-            'bankType' => 'required|string|max:20',
-        ]);
-
-        // update user basic info
-        $user->name = $request->name;
-        $user->noHP = $request->noHP;
-        $user->save();
-
-        // update customer-specific info
-        $customer->accountNumber = $request->accountNumber;
-        $customer->bankType = $request->bankType;
-        $customer->save();
-
-        return redirect()->route('customer.profile')->with('success', 'Profile updated successfully!');
-    }
-
-
 
     // ============================
     // Admin Customer Management

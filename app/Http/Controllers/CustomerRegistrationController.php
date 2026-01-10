@@ -9,6 +9,7 @@ use App\Models\StaffCustomer;
 use App\Models\Faculty;
 use App\Models\College;
 use App\Models\VerificationDocs;
+use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -137,7 +138,7 @@ class CustomerRegistrationController extends Controller
             }
 
             // 3b. Referral bonus: if referralCode was provided, reward the referrer
-            if (!empty($validated['referralCode'])) {
+            /*if (!empty($validated['referralCode'])) {
                 $referrer = Customer::whereHas('loyaltyCard', function ($q) use ($validated) {
                     $q->where('referralCode', $validated['referralCode']);
                 })->first();
@@ -148,7 +149,9 @@ class CustomerRegistrationController extends Controller
                     $card->totalStamp += 2;
                     $card->save();
                 }
-            }
+            }*/
+            ReferralService::applyReferral($customer, $validated['referralCode'] ?? null);
+
 
             
 
