@@ -17,13 +17,15 @@ class Commission extends Model
     protected $fillable = [
         'commissionID',
         'commissionType',
+        'receipt_file_path',
         'status',
         'appliedDate',
         'amount',
-        'userID', // Ganti dari staffID ke userID
+        'accountNumber', 
+        'bankName',    
+        'userID',
     ];
 
-    // Update relasi
     public function user()
     {
         return $this->belongsTo(User::class, 'userID', 'userID');

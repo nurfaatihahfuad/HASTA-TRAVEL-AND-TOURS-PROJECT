@@ -200,6 +200,48 @@
                             <p>Times Rented: {{ $mostRentedVehicle->rental_count ?? '1' }}</p>
                         @endif
                     </div>
+
+                    <!-- Get vehicle details with image -->
+                    @php
+                        $mostRentedDetails = auth()->user()->bookings()
+                            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+                            ->where('vehicles.vehicleName', $mostCar)
+                            ->select('vehicles.*')
+                            ->first();
+                    @endphp
+
+                    <div class="text-center">
+                    <!-- Vehicle Image -->
+                    @if($mostRentedDetails && $mostRentedDetails->image_url)
+                        <div class="mb-3">
+                            <img src="{{ asset('img/' . $mostRentedDetails->image_url) }}" 
+                                alt="{{ $mostRentedDetails->vehicleName }}" 
+                                class="img-fluid rounded" 
+                                style="max-height: 150px; width: auto;">
+                        </div>
+                    @else
+                        <!-- Default car icon if no image -->
+                        <div class="mb-3">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
+                                style="width: 150px; height: 150px; margin: 0 auto;">
+                                <i class="fas fa-car fa-3x text-danger"></i>
+                            </div>
+                        </div>
+                    @endif
+                    
+                    <h5 class="mb-1">{{ $mostCar }}</h5>
+                    @if($mostRentedDetails)
+                        <div class="row text-start small mt-3">
+                            <div class="col-6">
+                                <span class="text-muted">Vehicle:</span>
+                                <div class="fw-semibold">{{ $mostRentedDetails->vehicleName ?? 'N/A' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <span class="text-muted">Plate:</span>
+                                <div class="fw-semibold">{{ $mostRentedDetails->plateNo ?? 'N/A' }}</div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @endif
 

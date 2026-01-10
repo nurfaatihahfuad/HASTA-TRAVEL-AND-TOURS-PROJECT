@@ -147,8 +147,8 @@ class DashboardController extends Controller
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
-        //$bookings = DB::table('booking')->get();
-        /*$bookings = Booking::with(['payments', 'vehicle'])
+        $bookings = DB::table('booking')->get();
+        $bookings = Booking::with(['payments', 'vehicle'])
             ->orderBy('created_at', 'desc')
             ->get();
         // Try different column names SINI
@@ -190,43 +190,44 @@ class DashboardController extends Controller
     /**
  * Display all bookings for verification (dedicated page)
  */
-public function verifyBookings()
-{
-    // Get all bookings with filters
-    $bookings = DB::table('booking')
-        ->leftJoin('payment', function($join) {
-            $join->on('booking.bookingID', '=', 'payment.bookingID');
-        })
-        ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
-        ->leftJoin('user', 'booking.userID', '=', 'user.userID')
-        ->select(
-            'booking.*',
-            'user.name',
-            'vehicles.vehicleName',
-            'vehicles.plateNo',
-            'payment.receipt_file_path',
-            'payment.paymentStatus',
-            'payment.amountPaid',
-            'booking.created_at as booking_date'
-        )
-        ->orderBy('booking.created_at', 'desc')
-        ->paginate(20); // Use pagination for better performance
 
-    // Statistics for the verification page
-    $totalBookings = DB::table('booking')->count();
-    $pendingVerification = DB::table('booking')
-        ->leftJoin('payment', 'booking.bookingID', '=', 'payment.bookingID')
-        ->where('payment.paymentStatus', 'pending')
-        ->orWhereNull('payment.paymentStatus')
-        ->count();
-    
+    public function verifyBookings()
+    {
+        // Get all bookings with filters
+        $bookings = DB::table('booking')
+            ->leftJoin('payment', function($join) {
+                $join->on('booking.bookingID', '=', 'payment.bookingID');
+            })
+            ->leftJoin('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+            ->leftJoin('user', 'booking.userID', '=', 'user.userID')
+            ->select(
+                'booking.*',
+                'user.name',
+                'vehicles.vehicleName',
+                'vehicles.plateNo',
+                'payment.receipt_file_path',
+                'payment.paymentStatus',
+                'payment.amountPaid',
+                'booking.created_at as booking_date'
+            )
+            ->orderBy('booking.created_at', 'desc')
+            ->paginate(20); // Use pagination for better performance
 
-    return view('staff.payment.record', compact(
-        'bookings',
-        'totalBookings',
-        'pendingVerification'
-    ));
-}
+        // Statistics for the verification page
+        $totalBookings = DB::table('booking')->count();
+        $pendingVerification = DB::table('booking')
+            ->leftJoin('payment', 'booking.bookingID', '=', 'payment.bookingID')
+            ->where('payment.paymentStatus', 'pending')
+            ->orWhereNull('payment.paymentStatus')
+            ->count();
+        
+
+        return view('staff.payment.record', compact(
+            'bookings',
+            'totalBookings',
+            'pendingVerification'
+        ));
+    }
 
     // ============================
     // Staff Runner Dashboard
@@ -297,32 +298,6 @@ public function verifyBookings()
     // ============================
     public function customer()
     {
-        /*$userId = auth()->user()->userID; // pastikan field betul ikut DB
-        $booking = DB::table('booking')->where('userID',$userId)->get();
-
-        $totalBookings = $booking->count();
-
-        // kira jumlah hari sewa guna Carbon
-        $totalDays = $booking->sum(function($b) {
-            return Carbon::parse($b->pickup_dateTime)
-                ->diffInDays(Carbon::parse($b->return_dateTime));
-        });        
-
-        // cari kereta paling banyak disewa
-        $mostCar = $booking
-            ->groupBy('carModel')
-            ->sortByDesc(fn($group) => count($group))
-            ->keys()
-            ->first();
-        $booking = DB::table('booking')
-            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
-            ->where('userID', $userId)
-            ->select('booking.*', 'vehicles.vehicleName as carModel')
-            ->get();    
-
-        return view('dashboard.customer', compact(
-            'booking','totalBookings','totalDays','mostCar'
-        ));*/
         $user = Auth::user();
         $customer = $user->customer;
         
@@ -336,7 +311,10 @@ public function verifyBookings()
         
         // Calculate metrics
         $totalBookings = $user->bookings()->count();
-        $activeBookings = $user->bookings()->where('bookingStatus', 'successful')->count();
+        $activeBookings = $user->bookings()
+                        ->where('bookingStatus', 'successful')
+                        ->where('return_dateTime', '>', now())
+                        ->count();
         
         // Calculate total days (example logic)
         $totalDays = $user->bookings()
@@ -388,7 +366,7 @@ public function verifyBookings()
             'bookings' => $bookings,
             'upcomingBookings' => $upcomingBookings,
             'totalBookings' => $totalBookings,
-            //'activeBookings' => $activeBookings,
+            'activeBookings' => $activeBookings,
             'completedBookings' => $completedBookings,
             'totalDays' => $totalDays,
             'mostCar' => $mostCar,
@@ -406,6 +384,46 @@ public function verifyBookings()
         return view('customer.dashboard', compact('bookings'));
     }
 
+    // Customer Profile View
+    public function customerProfile()
+    {
+        $user = Auth::user();
+        $customer = $user->customer; // assuming you have a relation User -> Customer
+
+        return view('customers.profile', compact('user', 'customer'));
+    }
+    // Customer Profile Update
+    public function customerUpdateProfile(Request $request)
+    {
+        $user = Auth::user();
+        $customer = $user->customer;
+
+        // validate input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'noHP' => 'required|string|max:20',
+            'accountNumber' => 'required|string|max:20',
+            'bankType' => 'required|string|max:20',
+        ]);
+
+        // update user basic info
+        $user->name = $request->name;
+        $user->noHP = $request->noHP;
+        $user->save();
+
+        // update customer-specific info
+        $customer->accountNumber = $request->accountNumber;
+        $customer->bankType = $request->bankType;
+        $customer->save();
+
+        return redirect()->route('customer.profile')->with('success', 'Profile updated successfully!');
+    }
+
+
+
+    // ============================
+    // Admin Customer Management
+    // ============================
     public function manageCustomers(Request $request)
     {
         // Query for customers with join to customer table

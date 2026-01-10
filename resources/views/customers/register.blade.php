@@ -410,11 +410,11 @@
 
                             <!-- Referral Code (Optional) -->
                             <div class="md:col-span-2">
-                                <label for="referred_byCode" class="block text-gray-700 font-medium mb-2">Referral Code (Optional)</label>
+                                <label for="referralCode" class="block text-gray-700 font-medium mb-2">Referral Code (Optional)</label>
                                 <input type="text" 
-                                       id="referred_byCode" 
-                                       name="referred_byCode" 
-                                       value="{{ old('referred_byCode') }}"
+                                       id="referralCode" 
+                                       name="referralCode" 
+                                       value="{{ old('referralCode') }}"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg reg-focus-ring transition duration-300"
                                        placeholder="Enter referral code if any">
                                 <p class="mt-1 text-sm text-gray-500">If you have a referral code from an existing customer</p>

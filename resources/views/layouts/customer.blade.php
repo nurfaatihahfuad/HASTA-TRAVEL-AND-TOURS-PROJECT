@@ -185,9 +185,19 @@
                 <span class="menu-text ms-2">Inspections</span>
             </a>
             
-            <a class="sidebar-link" href="{{ route('browse.vehicle') }}" style="background-color: var(--customer-primary); color: white;">
-                <i class="fas fa-calendar-plus"></i>
-                <span class="menu-text ms-2">Book Now</span>
+            <a class="sidebar-link @if($currentRoute == 'customer.profile') active @endif" 
+               href="{{ route('customer.profile') }}">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            
+            <a class="sidebar-link @if($currentRoute == 'customer.settings') active @endif" 
+               href="#">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+            
+            <a class="sidebar-link @if($currentRoute == 'browse.vehicle') active @endif" 
+               href="{{ route('browse.vehicle') }}" style="background-color: var(--customer-primary); color: white;">
+                <i class="fas fa-calendar-plus"></i> Book Now
             </a>
             
             <div class="mt-4 pt-3 border-top">

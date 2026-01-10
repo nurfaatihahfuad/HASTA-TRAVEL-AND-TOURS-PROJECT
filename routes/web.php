@@ -56,6 +56,10 @@ Route::get('/register/customer/success', [CustomerRegistrationController::class,
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
+Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    Route::get('/customer/profile', [DashboardController::class, 'customerProfile'])->name('customer.profile');
+    Route::post('/customer/profile', [DashboardController::class, 'customerUpdateProfile'])->name('customer.profile.update');
+});
         
 // Admin 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
@@ -166,22 +170,28 @@ Route::middleware('auth')->group(function () {
         // Page utama report (ada dropdown)
         Route::get('/', [ReportController::class, 'index'])->name('index');
 
+        // ✅ FIX: Route untuk show report by category (untuk halaman penuh)
+        Route::get('/{category}', [ReportController::class, 'show'])->name('show');
+        
         // AJAX untuk tukar kategori tanpa reload page
         Route::get('/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
 
-        // Filter untuk Total Booking
-        Route::get('/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+        // ✅ FIX: Filter routes (tukar ke POST untuk form submission)
+        Route::post('/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
 
-        // Filter untuk Top College
-        Route::get('/reports/top_college/filter', [ReportController::class, 'filterTopCollege'])
+        // ✅ ADD: Filter untuk Revenue (belum ada)
+        Route::post('/revenue/filter', [ReportController::class, 'filterRevenue'])
+            ->name('revenue.filter');
+
+        Route::post('/top_college/filter', [ReportController::class, 'filterTopCollege'])
             ->name('top_college.filter');
 
-        // ✅ Export routes (corrected)
-        Route::get('/reports/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
+        // ✅ FIX: Export routes structure (remove duplicate /reports/)
+        Route::get('/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
             ->name('top_college.exportPdf');
 
-        Route::get('/reports/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
+        Route::get('/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
             ->name('top_college.exportExcel');
 
         Route::get('/total_booking/export-pdf', [ReportController::class, 'exportTotalBookingPdf'])
@@ -197,16 +207,51 @@ Route::middleware('auth')->group(function () {
             ->name('revenue.exportExcel');
     });
 
-    
-
-
 });
+
+    // ============================
+    // Payment Management Routes (Admin/Salesperson)
+    // ============================
+    Route::middleware(['auth', 'role:admin']) // Admin access
+    ->prefix('admin/payments')
+    ->name('admin.payments.')
+    ->group(function () {
+        // List all payments (with optional status filter)
+        Route::get('/', [PaymentController::class, 'index'])->name('index');
+        
+        // Filter by status
+        Route::get('/status/{status}', [PaymentController::class, 'index'])->name('status');
+        
+        // View payment details
+        Route::get('/{paymentID}', [PaymentController::class, 'view'])->name('view');
+        
+        // Admin approve payment
+        Route::post('/{paymentID}/approve', [PaymentController::class, 'approve'])->name('approve');
+        
+        // Admin reject payment  
+        Route::post('/{paymentID}/reject', [PaymentController::class, 'reject'])->name('reject');
+        
+        // View receipt
+        Route::get('/{paymentID}/receipt', [PaymentController::class, 'viewReceipt'])->name('receipt');
+    });
 
     //================
     // Payment routes
     //================
     Route::get('/payment/{bookingID}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
+
+    //==============
+    //Payment Verify
+    //==============
+    Route::middleware(['auth', 'role:salesperson'])->group(function () {
+    Route::put('/salesperson/payments/{paymentID}/update-status', [PaymentController::class, 'updateStatus'])
+        ->name('payment.updateStatus');
+    });
+    Route::post('/salesperson/payments/{paymentID}/approve', [PaymentController::class, 'approve'])
+    ->name('payment.approve');
+    Route::post('/salesperson/payments/{paymentID}/reject', [PaymentController::class, 'reject'])
+        ->name('payment.reject');
 
     // ============================
     // Pickup Return
@@ -338,7 +383,8 @@ Route::get('/commission/create', [CommissionController::class, 'create'])->name(
 Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
 Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
 Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
-//Route::delete('/commission/{id}', [CommissionController::class, 'destroy'])->name('commission.destroy');
+Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
+    ->name('commission.deleteReceipt');
 
 
 // Staff Inspection Management Routes

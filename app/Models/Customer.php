@@ -13,6 +13,7 @@ class Customer extends Model
     protected $table = 'customer';
     protected $primaryKey = 'userID';
     protected $keyType = 'string';
+    public $incrementing = false;
     public $timestamps = false;
 
     protected $fillable = [
@@ -64,4 +65,25 @@ class Customer extends Model
     {
         return $this->customerStatus === 'blacklisted';
     }
+
+    // Relationship to LoyaltyCard
+    public function loyaltyCard()
+    {
+        return $this->hasOne(LoyaltyCard::class, 'customerID', 'userID');
+    }
+
+    // Automatically create a LoyaltyCard when a Customer is created
+    protected static function booted()
+    {
+        static::created(function ($customer) {
+            $customer->loyaltyCard()->create([
+                'currentStamp' => 0,
+                'totalStamp' => 0,
+                'redeemedStamp' => 0,
+                'referralCode' => substr(strtoupper(uniqid('REF')), 0, 10),
+                
+            ]);
+        });
+    }
+
 }
