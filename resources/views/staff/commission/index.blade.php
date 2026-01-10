@@ -27,6 +27,7 @@
                     <tr>
                         <th>Commission ID</th>
                         <th>Type</th>
+                        <th>Payment Proof</th>
                         <th>Bank Account</th>
                         <th>Bank Name</th>
                         <th>Applied Date</th>
@@ -40,6 +41,16 @@
                         <tr>
                             <td>{{ $commission->commissionID }}</td>
                             <td>{{ $commission->commissionType }}</td>
+                        <td>
+                            @if($commission->receipt_file_path)
+                                <a href="{{ Storage::url($commission->receipt_file_path) }}" 
+                                target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-file"></i> View
+                                </a>
+                            @else
+                                <span class="text-muted">No receipt</span>
+                            @endif
+                        </td>
                             <td>
                                 @if($commission->accountNumber)
                                     {{ $commission->accountNumber }}

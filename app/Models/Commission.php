@@ -17,12 +17,12 @@ class Commission extends Model
     protected $fillable = [
         'commissionID',
         'commissionType',
+        'receipt_file_path',
         'status',
         'appliedDate',
         'amount',
-        'accountNumber',  // TAMBAH
-        'bankName',       // TAMBAH
-        //'bankType',       // TAMBAH
+        'accountNumber', 
+        'bankName',    
         'userID',
     ];
 

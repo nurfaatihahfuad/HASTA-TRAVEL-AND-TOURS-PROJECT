@@ -54,6 +54,19 @@
         @endif
 
         <!--<button class="btn-print" onclick="window.print()">Print Receipt</button> -->
-    </div>
+
+        <br><h2>Booking Actions</h2>
+        <p><em>Kindly fill in these forms when you pickup and return the car, thank you.</em></p>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+            
+            <a href="{{ route('inspection.pickupInspection', $booking->bookingID) }}" class="btn btn-success" style="text-decoration: none; padding: 10px 20px; border-radius: 5px; color: white; background-color: #28a745;">
+                Pickup
+            </a>
+
+            <a href="{{ route('inspection.returnInspection', $booking->bookingID) }}" class="btn btn-warning" style="text-decoration: none; padding: 10px 20px; border-radius: 5px; color: white; background-color: #ffc107;">
+                Return
+            </a>
+        </div>
+
 </body>
 </html>

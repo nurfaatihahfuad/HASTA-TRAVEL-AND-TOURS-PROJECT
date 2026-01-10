@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <form id="commissionForm" action="{{ route('commission.store') }}" method="POST">
+    <form id="commissionForm" action="{{ route('commission.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
         <div class="mb-3">
@@ -24,6 +24,16 @@
             <input type="text" name="commissionType" class="form-control" required 
                    value="{{ old('commissionType') }}">
             @error('commissionType')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Receipt/Proof (Optional)</label>
+            <input type="file" name="receipt_file" class="form-control" 
+                   accept=".pdf,.jpg,.jpeg,.png" id="receiptFile">
+            <small class="text-muted">Upload proof of commission (PDF, JPG, PNG) - Max 10MB</small>
+            @error('receipt_file')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
@@ -142,8 +152,8 @@
             @enderror
         </div>
 
-        <button type="button" id="submitBtn" class="btn btn-primary">Simpan</button>
-        <button type="button" id="cancelBtn" class="btn btn-secondary">Batal</button>
+        <button type="button" id="submitBtn" class="btn btn-primary">Submit</button>
+        <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
     </form>
 </div>
 
@@ -153,6 +163,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const bankSelect = document.getElementById('bankSelect');
     const otherBankField = document.getElementById('otherBankField');
+    const receiptFileInput = document.getElementById('receiptFile');
     
     // Handle "Other" bank selection
     if (bankSelect && otherBankField) {
@@ -181,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const amount = document.querySelector('input[name="amount"]').value;
         const accountNumber = document.querySelector('input[name="accountNumber"]').value;
         const bankName = bankSelect ? bankSelect.value : '';
+        const receiptFile = receiptFileInput ? receiptFileInput.files[0] : null;
         
         // Check jika ada field kosong
         if (!commissionType.trim()) {
@@ -213,11 +225,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Validasi file receipt jika ada yang diupload
+        if (receiptFile) {
+            const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            
+            // Validasi jenis file
+            if (!validTypes.includes(receiptFile.type)) {
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Ralat', 
+                    text: 'Fail receipt mestilah dalam format PDF, JPG, atau PNG!' 
+                });
+                return;
+            }
+            
+            // Validasi saiz file
+            if (receiptFile.size > maxSize) {
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Error', 
+                    text: 'File Size Cannot Exceed 10MB!' 
+                });
+                return;
+            }
+        }
+        
         // Get final bank name for display
         let displayBankName = bankName;
         if (bankName === 'Other') {
             const otherBankName = document.querySelector('input[name="otherBankName"]');
             displayBankName = otherBankName ? otherBankName.value : 'Other Bank';
+        }
+        
+        // Get receipt info for display
+        let receiptInfo = '<p><strong>Receipt File:</strong> <em>Tiada fail diupload</em></p>';
+        if (receiptFile) {
+            const fileSizeMB = (receiptFile.size / (1024 * 1024)).toFixed(2);
+            receiptInfo = `<p><strong>Receipt File:</strong> ${receiptFile.name} (${fileSizeMB} MB)</p>`;
         }
         
         // Show confirmation popup dengan semua details
@@ -230,6 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Amount:</strong> RM ${amount}</p>
                     <p><strong>Bank Account:</strong> ${accountNumber}</p>
                     <p><strong>Bank Name:</strong> ${displayBankName}</p>
+                    ${receiptInfo}
                 </div>
             `,
             icon: 'question',
@@ -257,7 +303,8 @@ document.addEventListener('DOMContentLoaded', function() {
                           document.querySelector('input[name="amount"]').value ||
                           document.querySelector('input[name="accountNumber"]').value ||
                           (bankSelect && bankSelect.value) ||
-                          document.querySelector('input[name="otherBankName"]').value;
+                          document.querySelector('input[name="otherBankName"]').value ||
+                          (receiptFileInput && receiptFileInput.files.length > 0);
         
         if (hasChanges) {
             Swal.fire({

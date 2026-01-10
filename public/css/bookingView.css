@@ -62,3 +62,18 @@ strong {
 .btn-print:hover {
     background: #0056b3;
 }
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+}

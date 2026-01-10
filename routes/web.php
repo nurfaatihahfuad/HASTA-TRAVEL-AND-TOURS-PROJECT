@@ -207,22 +207,28 @@ Route::middleware('auth')->group(function () {
         // Page utama report (ada dropdown)
         Route::get('/', [ReportController::class, 'index'])->name('index');
 
+        // ✅ FIX: Route untuk show report by category (untuk halaman penuh)
+        Route::get('/{category}', [ReportController::class, 'show'])->name('show');
+        
         // AJAX untuk tukar kategori tanpa reload page
         Route::get('/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
 
-        // Filter untuk Total Booking
-        Route::get('/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
+        // ✅ FIX: Filter routes (tukar ke POST untuk form submission)
+        Route::post('/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
 
-        // Filter untuk Top College
-        Route::get('/reports/top_college/filter', [ReportController::class, 'filterTopCollege'])
+        // ✅ ADD: Filter untuk Revenue (belum ada)
+        Route::post('/revenue/filter', [ReportController::class, 'filterRevenue'])
+            ->name('revenue.filter');
+
+        Route::post('/top_college/filter', [ReportController::class, 'filterTopCollege'])
             ->name('top_college.filter');
 
-        // ✅ Export routes (corrected)
-        Route::get('/reports/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
+        // ✅ FIX: Export routes structure (remove duplicate /reports/)
+        Route::get('/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
             ->name('top_college.exportPdf');
 
-        Route::get('/reports/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
+        Route::get('/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
             ->name('top_college.exportExcel');
 
         Route::get('/total_booking/export-pdf', [ReportController::class, 'exportTotalBookingPdf'])
@@ -238,6 +244,32 @@ Route::middleware('auth')->group(function () {
             ->name('revenue.exportExcel');
     });
 });
+
+    // ============================
+    // Payment Management Routes (Admin/Salesperson)
+    // ============================
+    Route::middleware(['auth', 'role:admin']) // Admin access
+    ->prefix('admin/payments')
+    ->name('admin.payments.')
+    ->group(function () {
+        // List all payments (with optional status filter)
+        Route::get('/', [PaymentController::class, 'index'])->name('index');
+        
+        // Filter by status
+        Route::get('/status/{status}', [PaymentController::class, 'index'])->name('status');
+        
+        // View payment details
+        Route::get('/{paymentID}', [PaymentController::class, 'view'])->name('view');
+        
+        // Admin approve payment
+        Route::post('/{paymentID}/approve', [PaymentController::class, 'approve'])->name('approve');
+        
+        // Admin reject payment  
+        Route::post('/{paymentID}/reject', [PaymentController::class, 'reject'])->name('reject');
+        
+        // View receipt
+        Route::get('/{paymentID}/receipt', [PaymentController::class, 'viewReceipt'])->name('receipt');
+    });
 
     //================
     // Payment routes
@@ -258,16 +290,44 @@ Route::middleware('auth')->group(function () {
         ->name('payment.reject');
 
     // ============================
-    // Inspection Routes
+    // Pickup Return
     // ============================
 
     // Customer boleh index, create, store, edit, update
-    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
-        Route::resource('inspection', InspectionController::class)
-            ->only(['index','create','store','edit','update']);
-    });
+    //Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','create','store','edit','update']);
+    //});
 
     // Staff hanya index, edit, update
+    //Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','edit','update']);
+    //});
+
+    // ============================
+    // Inspection Routes
+    // ============================
+
+    // Customer routes
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+        // Resource routes (index, create, store, edit, update)
+        Route::get('/customer/inspections', [InspectionController::class, 'index'])->name('customer.inspections.index');        
+        // Pickup inspection
+        Route::get('/booking/{id}/pickup-inspection', [InspectionController::class, 'pickupInspection'])
+            ->name('inspection.pickupInspection');
+        Route::post('/booking/{id}/pickup-inspection', [InspectionController::class, 'storePickupInspection'])
+            ->name('inspection.storePickupInspection');
+
+        // Return inspection
+        Route::get('/booking/{id}/return-inspection', [InspectionController::class, 'returnInspection'])
+            ->name('inspection.returnInspection');
+        Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
+            ->name('inspection.storeReturnInspection');
+    
+    });
+
+    // Staff routes
     Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
         Route::resource('inspection', InspectionController::class)
             ->only(['index','edit','update']);
@@ -286,6 +346,12 @@ Route::middleware('auth')->group(function () {
         Route::post('damagecase/{caseID}/resolve', [DamageCaseController::class, 'resolve'])
         ->name('damagecase.resolve');
     });
+    // ============================
+    // Pickup Return Button
+    // ============================
+    Route::post('/booking/{id}/pickup', [BookingController::class, 'markPickup'])->name('booking.pickup');
+    Route::post('/booking/{id}/return', [BookingController::class, 'markReturn'])->name('booking.return');
+
 
 // ============================
 // Payment routes
@@ -349,7 +415,37 @@ Route::get('/commission/create', [CommissionController::class, 'create'])->name(
 Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
 Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
 Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
-//Route::delete('/commission/{id}', [CommissionController::class, 'destroy'])->name('commission.destroy');
+Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
+    ->name('commission.deleteReceipt');
 
 
+// Staff Inspection Management Routes
+Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->name('staff.')->group(function () {
+    
+    // Inspections - View and Manage
+    Route::prefix('inspections')->name('inspections.')->group(function () {
+        // Index - View ALL inspections
+        Route::get('/', [InspectionController::class, 'staffIndex'])->name('index');
+        
+        // Show single inspection
+        Route::get('/{id}', [InspectionController::class, 'show'])->name('show');
+        
+        // Edit inspection (form)
+        Route::get('/{id}/edit', [InspectionController::class, 'staffEdit'])->name('edit');
+        
+        // Update inspection
+        Route::put('/{id}', [InspectionController::class, 'staffUpdate'])->name('update');
+        
+        // Delete inspection
+        Route::delete('/{id}', [InspectionController::class, 'destroy'])->name('destroy');
+        
+        // Verify inspection
+        Route::post('/{id}/verify', [InspectionController::class, 'verify'])->name('verify');
+        
+        // Special views
+        Route::get('/today', [InspectionController::class, 'todayInspections'])->name('today');
+        Route::get('/pending', [InspectionController::class, 'pendingInspections'])->name('pending');
+        Route::get('/with-damage', [InspectionController::class, 'inspectionsWithDamage'])->name('damage');
+    });
+});
 

@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <form id="commissionForm" action="{{ route('commission.update', $commission->commissionID) }}" method="POST">
+    <form id="commissionForm" action="{{ route('commission.update', $commission->commissionID) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         
@@ -25,6 +25,29 @@
             <input type="text" name="commissionType" class="form-control" required 
                    value="{{ old('commissionType', $commission->commissionType) }}">
             @error('commissionType')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Receipt/Proof</label>
+            
+          @if($commission->receipt_file_path)
+    <div class="mb-3">
+        <p class="mb-2">Current file:</p>
+        <a href="{{ Storage::url($commission->receipt_file_path) }}" 
+           target="_blank" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center">
+            <i class="fas fa-file-invoice me-2"></i>
+            <span>View Receipt</span>
+            <i class="fas fa-external-link-alt ms-2" style="font-size: 0.8rem;"></i>
+        </a>
+    </div>
+@endif
+            
+            <input type="file" name="receipt_file" class="form-control" 
+                   accept=".pdf,.jpg,.jpeg,.png" id="receiptFile">
+            <small class="text-muted">Upload new receipt (PDF, JPG, PNG) - Max 10MB. Leave empty to keep current file.</small>
+            @error('receipt_file')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
@@ -167,8 +190,8 @@
             @enderror
         </div>
 
-        <button type="button" id="submitBtn" class="btn btn-primary">Simpan</button>
-        <button type="button" id="cancelBtn" class="btn btn-secondary">Batal</button>
+        <button type="button" id="submitBtn" class="btn btn-primary">Update</button>
+        <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
     </form>
 </div>
 
@@ -178,21 +201,69 @@
 document.addEventListener('DOMContentLoaded', function() {
     const bankSelect = document.getElementById('bankSelect');
     const otherBankField = document.getElementById('otherBankField');
+    const receiptFileInput = document.getElementById('receiptFile');
+    const deleteReceiptBtn = document.getElementById('deleteReceiptBtn');
     
     // Handle "Other" bank selection
     if (bankSelect && otherBankField) {
-        // Check initial value
         if (bankSelect.value === 'Other') {
             otherBankField.style.display = 'block';
         }
         
-        // Listen for changes
         bankSelect.addEventListener('change', function() {
             if (this.value === 'Other') {
                 otherBankField.style.display = 'block';
             } else {
                 otherBankField.style.display = 'none';
             }
+        });
+    }
+    
+    // Handle delete receipt button
+    if (deleteReceiptBtn) {
+        deleteReceiptBtn.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Delete Receipt?',
+                text: "Are you sure you want to delete the receipt file?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send delete request
+                    fetch("{{ route('commission.deleteReceipt', $commission->commissionID) }}", {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Receipt has been deleted.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to delete receipt. Please try again.'
+                        });
+                    });
+                }
+            });
         });
     }
     
@@ -206,6 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const amount = document.querySelector('input[name="amount"]').value;
         const accountNumber = document.querySelector('input[name="accountNumber"]').value;
         const bankName = bankSelect ? bankSelect.value : '';
+        const receiptFile = receiptFileInput ? receiptFileInput.files[0] : null;
         
         // Check jika ada field kosong
         if (!commissionType.trim()) {
@@ -238,11 +310,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Validasi file receipt jika ada yang diupload
+        if (receiptFile) {
+            const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            
+            // Validasi jenis file
+            if (!validTypes.includes(receiptFile.type)) {
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Ralat', 
+                    text: 'Fail receipt mestilah dalam format PDF, JPG, atau PNG!' 
+                });
+                return;
+            }
+            
+            // Validasi saiz file
+            if (receiptFile.size > maxSize) {
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Error', 
+                    text: 'File Size Cannot Exceed 10MB!' 
+                });
+                return;
+            }
+        }
+        
         // Get final bank name for display
         let displayBankName = bankName;
         if (bankName === 'Other') {
             const otherBankName = document.querySelector('input[name="otherBankName"]');
             displayBankName = otherBankName ? otherBankName.value : 'Other Bank';
+        }
+        
+        // Get receipt info for display
+        let receiptInfo = '<p><strong>Receipt File:</strong> <em>Keep current file</em></p>';
+        if (receiptFile) {
+            const fileSizeMB = (receiptFile.size / (1024 * 1024)).toFixed(2);
+            receiptInfo = `<p><strong>Receipt File:</strong> ${receiptFile.name} (${fileSizeMB} MB)</p>`;
+        } else if (!document.querySelector('a[target="_blank"]')) {
+            receiptInfo = '<p><strong>Receipt File:</strong> <em>No file</em></p>';
         }
         
         // Show confirmation popup dengan semua details
@@ -255,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Amount:</strong> RM ${amount}</p>
                     <p><strong>Bank Account:</strong> ${accountNumber}</p>
                     <p><strong>Bank Name:</strong> ${displayBankName}</p>
+                    ${receiptInfo}
                     <div class="mt-2 text-warning">
                         <small><i class="fas fa-exclamation-triangle"></i> Status akan dikembalikan ke "Pending" selepas kemaskini.</small>
                     </div>
@@ -302,13 +410,17 @@ document.addEventListener('DOMContentLoaded', function() {
             currentData.bankName = otherBankName ? otherBankName.value : '';
         }
         
+        // Check receipt file
+        const hasNewReceiptFile = receiptFileInput && receiptFileInput.files.length > 0;
+        
         // Check if any field has changed
         const hasChanges = 
             currentData.commissionType !== originalData.commissionType ||
             currentData.appliedDate !== originalData.appliedDate ||
             currentData.amount != originalData.amount ||
             currentData.accountNumber !== originalData.accountNumber ||
-            currentData.bankName !== originalData.bankName;
+            currentData.bankName !== originalData.bankName ||
+            hasNewReceiptFile;
         
         if (hasChanges) {
             Swal.fire({
