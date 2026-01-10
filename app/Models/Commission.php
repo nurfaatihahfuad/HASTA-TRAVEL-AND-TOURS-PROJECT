@@ -20,10 +20,12 @@ class Commission extends Model
         'status',
         'appliedDate',
         'amount',
-        'userID', // Ganti dari staffID ke userID
+        'accountNumber',  // TAMBAH
+        'bankName',       // TAMBAH
+        //'bankType',       // TAMBAH
+        'userID',
     ];
 
-    // Update relasi
     public function user()
     {
         return $this->belongsTo(User::class, 'userID', 'userID');

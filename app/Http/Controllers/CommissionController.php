@@ -10,9 +10,13 @@ class CommissionController extends Controller
 {
     public function index()
     {
-        // Filter by logged-in user
-        $userID = auth()->user()->userID; // GANTI: staffID -> userID
-        $commissions = Commission::where('userID', $userID)->get(); // GANTI: staffID -> userID
+        $userID = auth()->user()->userID;
+        $commissions = Commission::where('userID', $userID)->get();
+        
+        // Set semua status kepada pending untuk view sahaja
+        foreach ($commissions as $commission) {
+            $commission->status = 'pending'; // Override status
+        }
         
         return view('staff.commission.index', compact('commissions'));
     }
@@ -28,7 +32,16 @@ class CommissionController extends Controller
             'commissionType' => 'required|string|max:50',
             'appliedDate' => 'required|date',
             'amount' => 'required|integer|min:1',
+            'accountNumber' => 'required|string|max:20',
+            'bankName' => 'required|string|max:100',
+            'otherBankName' => 'required_if:bankName,Other|nullable|max:100',
         ]);
+
+        // Handle bank name (jika pilih "Other", guna otherBankName)
+        $bankName = $request->bankName;
+        if ($request->bankName === 'Other' && $request->filled('otherBankName')) {
+            $bankName = $request->otherBankName;
+        }
 
         // Generate ID dengan format: CO + 4 random alphanumeric
         $commissionID = 'CO' . strtoupper(Str::random(4));
@@ -43,20 +56,22 @@ class CommissionController extends Controller
         Commission::create([
             'commissionID' => $commissionID,
             'commissionType' => $request->commissionType,
-            'status' => 'approved',
+            'status' => 'pending',
             'appliedDate' => $request->appliedDate,
             'amount' => $request->amount,
+            'accountNumber' => $request->accountNumber,
+            'bankName' => $bankName, // Guna bank name yang sudah diproses
             'userID' => $userID,
         ]);
 
-        return redirect()->route('commission.index')->with('success', 'Commission added successfully!');
+        return redirect()->route('commission.index')
+            ->with('success', 'Commission submitted successfully! Waiting for admin approval.');
     }
-    
     
     public function edit($id)
     {
         $commission = Commission::where('commissionID', $id)
-            ->where('userID', auth()->user()->userID) // GANTI: staffID -> userID
+            ->where('userID', auth()->user()->userID)
             ->firstOrFail();
             
         return view('staff.commission.edit', compact('commission'));
@@ -65,34 +80,34 @@ class CommissionController extends Controller
     public function update(Request $request, $id)
     {
         $commission = Commission::where('commissionID', $id)
-            ->where('userID', auth()->user()->userID) // GANTI: staffID -> userID
+            ->where('userID', auth()->user()->userID)
             ->firstOrFail();
 
         $request->validate([
             'commissionType' => 'required|string|max:50',
             'appliedDate' => 'required|date',
             'amount' => 'required|integer|min:1',
+            'accountNumber' => 'required|string|max:20',
+            'bankName' => 'required|string|max:100',
+            'otherBankName' => 'required_if:bankName,Other|nullable|max:100',
         ]);
+
+        // Handle bank name (jika pilih "Other", guna otherBankName)
+        $bankName = $request->bankName;
+        if ($request->bankName === 'Other' && $request->filled('otherBankName')) {
+            $bankName = $request->otherBankName;
+        }
 
         $commission->update([
             'commissionType' => $request->commissionType,
             'appliedDate' => $request->appliedDate,
             'amount' => $request->amount,
+            'accountNumber' => $request->accountNumber,
+            'bankName' => $bankName, // Guna bank name yang sudah diproses
+            'status' => 'pending', // Reset status ke pending apabila update
         ]);
 
-        return redirect()->route('commission.index')->with('success', 'Commission updated successfully!');
+        return redirect()->route('commission.index')
+            ->with('success', 'Commission updated successfully! Status reset to pending.');
     }
-    
-    /*
-    public function destroy($id)
-    {
-        $commission = Commission::where('commissionID', $id)
-            ->where('userID', auth()->user()->userID) // GANTI: staffID -> userID
-            ->firstOrFail();
-
-        $commission->delete();
-
-        return redirect()->route('commission.index')->with('success', 'Commission deleted successfully!');
-    }
-        */
 }

@@ -27,9 +27,11 @@
                     <tr>
                         <th>Commission ID</th>
                         <th>Type</th>
-                        <th>Status</th>
+                        <th>Bank Account</th>
+                        <th>Bank Name</th>
                         <th>Applied Date</th>
                         <th>Amount (RM)</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -39,6 +41,22 @@
                             <td>{{ $commission->commissionID }}</td>
                             <td>{{ $commission->commissionType }}</td>
                             <td>
+                                @if($commission->accountNumber)
+                                    {{ $commission->accountNumber }}
+                                @else
+                                    <span class="text-muted">Not provided</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($commission->bankName)
+                                    {{ $commission->bankName }}
+                                @else
+                                    <span class="text-muted">Not provided</span>
+                                @endif
+                            </td>
+                            <td>{{ \Carbon\Carbon::parse($commission->appliedDate)->format('d M Y') }}</td>
+                            <td>{{ number_format($commission->amount, 2) }}</td>
+                            <td>
                                 @if ($commission->status === 'approved')
                                     <span class="badge bg-success">Approved</span>
                                 @elseif ($commission->status === 'rejected')
@@ -47,26 +65,14 @@
                                     <span class="badge bg-warning">Pending</span>
                                 @endif
                             </td>
-                            <td>{{ \Carbon\Carbon::parse($commission->appliedDate)->format('d M Y') }}</td>
-                            <td>{{ number_format($commission->amount, 2) }}</td>
                             <td>
-                                {{-- KEEP EDIT BUTTON --}}
                                 <a href="{{ route('commission.edit', $commission->commissionID) }}" 
                                    class="btn btn-sm btn-primary">Edit</a>
-                                
-                                {{-- HAPUS DELETE BUTTON --}}
-                                {{-- <form action="{{ route('commission.destroy', $commission->commissionID) }}" 
-                                      method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger" 
-                                            onclick="return confirm('Are you sure?')">Delete</button>
-                                </form> --}}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted">No commission records found.</td>
+                            <td colspan="8" class="text-center text-muted">No commission records found.</td>
                         </tr>
                     @endforelse
                 </tbody>
