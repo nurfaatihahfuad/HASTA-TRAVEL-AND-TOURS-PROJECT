@@ -287,7 +287,8 @@ class ReportController extends Controller
         $data = DB::table('booking')
             ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
             ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
-            ->where('booking.bookingStatus', 'completed')
+            ->where('booking.bookingStatus', 'successful') // <-- guna status sebenar 
+            ->where('payment.paymentStatus', 'pending') // atau 'approved' bila dah verify
             ->select(
                 'booking.bookingID',
                 'vehicles.vehicleName',
@@ -296,6 +297,7 @@ class ReportController extends Controller
                 'payment.totalAmount'
             )
             ->get();
+
 
         $summary = [
             'total_sales'        => $data->sum('totalAmount'),
