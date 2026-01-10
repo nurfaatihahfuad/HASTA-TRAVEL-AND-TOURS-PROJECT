@@ -147,7 +147,7 @@
                href="{{ route('staff_runner.dashboard') }}">
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
-
+                        
             <a class="sidebar-link" href="{{ route('inspection.index') }}">
                 <i class="fas fa-chart-bar"></i> Car Inspection Checklist
             </a>

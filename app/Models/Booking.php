@@ -78,7 +78,8 @@ class Booking extends Model
         }
         return 0;
     }
-
-
-
+    public function inspections()
+    {
+        return $this->hasMany(Inspection::class, 'vehicleID', 'vehicleID');
+    }
 }

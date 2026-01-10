@@ -229,7 +229,7 @@ public function verifyBookings()
     // ============================
     // Staff Runner Dashboard
     // ============================
-    public function staffRunner()
+    /*public function staffRunner()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
@@ -249,7 +249,46 @@ public function verifyBookings()
             'statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
+    }*/
+    public function staffRunner()
+    {
+        // ============================
+        // 1. KPI INSPECTION
+        // ============================
+        $totalInspections = Inspection::count();
+
+        $inspectionToday = Inspection::whereDate('created_at', now())->count();
+
+        $damagedCount = Inspection::where('damageDetected', 1)->count();
+        $okCount      = Inspection::where('damageDetected', 0)->count();
+
+        // ============================
+        // 2. WEEKLY INSPECTION (BAR)
+        // ============================
+        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        
+        $weeklyData = [];
+        foreach ($weeklyLabels as $day) {
+            $weeklyData[] = Inspection::whereRaw('DAYNAME(created_at) = ?', [$day])->count();
+        }
+
+        // ============================
+        // 3. ALL INSPECTIONS (TABLE)
+        // ============================
+        $inspections = Inspection::with('vehicle')->orderBy('created_at', 'desc')->get();
+
+        return view('dashboard.staff_runner', compact(
+            'totalInspections',
+            'inspectionToday',
+            'damagedCount',
+            'okCount',
+            'weeklyLabels',
+            'weeklyData',
+            'inspections'
+        ));
     }
+
+    
 
     // ============================
     // Customer Dashboard

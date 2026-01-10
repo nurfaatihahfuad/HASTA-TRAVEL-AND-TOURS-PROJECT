@@ -13,17 +13,13 @@ class Inspection extends Model
     protected $primaryKey = 'inspectionID';       // PK
     public $incrementing = true;
     protected $keyType = 'int';
-    public $timestamps = false;                   // kalau table tiada created_at/updated_at
+    public $timestamps = true;                   // kalau table tiada created_at/updated_at
 
     protected $fillable = [
-        'carCondition',
-        'mileageReturned',
-        'fuelLevel',
-        'damageDetected',
-        'remark',
-        'evidence',
-        'vehicleID',
-        'staffID',
+        'vehicleID', 'staffID', 'carCondition',
+        'mileageReturned', 'fuelLevel', 'damageDetected',
+        'remark', 'evidence',
+        'created_at', 'updated_at'          // include timestamps
     ];
 
     // Relationship: inspection belongs to vehicle

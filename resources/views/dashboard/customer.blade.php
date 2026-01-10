@@ -60,7 +60,7 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Vehicle</th>
+                                <th>Car</th>
                                 <th>Pickup Date</th>
                                 <th>Return Date</th>
                                 <th>Status</th>
@@ -74,9 +74,11 @@
                                         <div class="d-flex align-items-center">
                                             <div class="d-flex align-items-center">
                                             <div>
-                                                <strong>{{ $booking->vehicle->vehicleName }}</strong><br>
-                                                <small>{{ $booking->vehicle->plateNo }}</small>
+                                                <strong>{{ $booking->vehicle->vehicleName ?? 'N/A' }}</strong><br>
+                                                <small><td>{{ optional($booking->vehicle)->plateNo ?? 'N/A' }}</td></small>
                                             </div>
+                                            <div>
+                                                <strong>{{ $booking->carModel ?? 'Unknown' }}</strong><br>
                                             </div>
                                         </div>
                                     </td>
@@ -88,21 +90,20 @@
                                     </td>
                                     <td>
                                         @php
-                                        $status = strtolower($booking->bookingStatus ?? 'pending');
-                                        $statusColors = [
-                                            'successful' => 'success',
-                                            'pending' => 'warning',
-                                            'rejected' => 'danger'
-                                        ];
-                                        $color = $statusColors[$status] ?? 'secondary';
+                                            $status = strtolower($booking->status ?? 'pending');
+                                            $statusColors = [
+                                                'successful' => 'success',
+                                                'pending' => 'warning',
+                                                'rejected' => 'danger'
+                                            ];
+                                            $color = $statusColors[$status] ?? 'secondary';
                                         @endphp
                                         <span class="badge bg-{{ $color }}">
                                             {{ ucfirst($status) }}
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">View</a>
-                                        <!--<a href="{{ route('booking.summary', $booking->bookingID) }}" class="btn btn-sm btn-primary">Cancelled</a> -->
+                                        <button class="btn btn-sm btn-primary">View</button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -163,7 +164,7 @@
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h6 class="mb-1">{{ $booking->vehicle->vehicleName ?? 'Car' }}</h6>
+                                    <h6 class="mb-1">{{ $booking->carModel ?? 'Car' }}</h6>
                                     <small class="text-muted">
                                         {{ \Carbon\Carbon::parse($booking->pickup_dateTime)->format('M d') }}
                                     </small>
@@ -185,64 +186,48 @@
 
         <!-- Display most rented car -->
             @if($mostCar)
-                <div class="section-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0">Most Rented Car</h6>
-                        @php
-                            $rentalCount = auth()->user()->bookings()
-                                ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
-                                ->where('vehicles.vehicleName', $mostCar)
-                                ->count();
-                        @endphp
-                        @if($rentalCount > 1)
-                            <span class="badge bg-danger">{{ $rentalCount }} times</span>
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Most Rented Car</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Your most frequently rented vehicle: <strong>{{ $mostCar }}</strong></p>
+                        
+                        <!-- If you have $mostRentedVehicle object -->
+                        @if(isset($mostRentedVehicle))
+                            <p>Brand: {{ $mostRentedVehicle->brand ?? 'N/A' }}</p>
+                            <p>Plate: {{ $mostRentedVehicle->plateNumber ?? 'N/A' }}</p>
+                            <p>Times Rented: {{ $mostRentedVehicle->rental_count ?? '1' }}</p>
                         @endif
                     </div>
-
-                    <!-- Get vehicle details with image -->
-                    @php
-                        $mostRentedDetails = auth()->user()->bookings()
-                            ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
-                            ->where('vehicles.vehicleName', $mostCar)
-                            ->select('vehicles.*')
-                            ->first();
-                    @endphp
-
-                    <div class="text-center">
-                    <!-- Vehicle Image -->
-                    @if($mostRentedDetails && $mostRentedDetails->image_url)
-                        <div class="mb-3">
-                            <img src="{{ asset('storage/' . $mostRentedDetails->image_url) }}" 
-                                alt="{{ $mostRentedDetails->vehicleName }}" 
-                                class="img-fluid rounded" 
-                                style="max-height: 150px; width: auto;">
-                        </div>
-                    @else
-                        <!-- Default car icon if no image -->
-                        <div class="mb-3">
-                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
-                                style="width: 150px; height: 150px; margin: 0 auto;">
-                                <i class="fas fa-car fa-3x text-danger"></i>
-                            </div>
-                        </div>
-                    @endif
-                    
-                    <h5 class="mb-1">{{ $mostCar }}</h5>
-                    @if($mostRentedDetails)
-                        <div class="row text-start small mt-3">
-                            <div class="col-6">
-                                <span class="text-muted">Vehicle:</span>
-                                <div class="fw-semibold">{{ $mostRentedDetails->vehicleName ?? 'N/A' }}</div>
-                            </div>
-                            <div class="col-6">
-                                <span class="text-muted">Plate:</span>
-                                <div class="fw-semibold">{{ $mostRentedDetails->plateNo ?? 'N/A' }}</div>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             @endif
 
+            <!-- Display bookings -->
+            @foreach($bookings as $booking)
+                <tr>
+                    <td>{{ $booking->bookingID }}</td>
+                    <td>{{ $booking->vehicle->brand ?? 'N/A' }} {{ $booking->vehicle->model ?? 'N/A' }}</td>
+                    <td>{{ $booking->vehicle->plateNumber ?? 'N/A' }}</td>
+                    <!-- ... other columns -->
+                </tr>
+            @endforeach
+        
+        <!-- Support Card
+        <div class="section-card bg-light">
+            <h6 class="mb-3">Need Help?</h6>
+            <p class="text-muted small mb-3">
+                Our support team is here to help you with any questions.
+            </p>
+            <div class="d-grid gap-2">
+                <a href="tel:+60123456789" class="btn btn-outline-primary">
+                    <i class="fas fa-phone me-1"></i> Call Support
+                </a>
+                <a href="mailto:support@hasta.com" class="btn btn-outline-primary">
+                    <i class="fas fa-envelope me-1"></i> Email Support
+                </a>
+            </div>
+        </div>-->
     </div>
 </div>
 @endsection

@@ -209,16 +209,49 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment/{bookingID}/submit', [PaymentController::class, 'submit'])->name('payment.submit');
 
     // ============================
-    // Inspection Routes
+    // Pickup Return
     // ============================
 
     // Customer boleh index, create, store, edit, update
-    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
-        Route::resource('inspection', InspectionController::class)
-            ->only(['index','create','store','edit','update']);
-    });
+    //Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','create','store','edit','update']);
+    //});
 
     // Staff hanya index, edit, update
+    //Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','edit','update']);
+    //});
+    Route::post('/booking/{id}/pickup-inspection', [BookingController::class, 'storePickupInspection'])
+        ->name('inspection.storePickupInspection');
+    Route::post('/booking/{id}/return-inspection', [BookingController::class, 'storeReturnInspection'])
+        ->name('inspection.storeReturnInspection');
+
+    // ============================
+    // Inspection Routes
+    // ============================
+
+    // Customer routes
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+        // Resource routes (index, create, store, edit, update)
+        Route::resource('inspection', InspectionController::class)
+            ->only(['index','create','store','edit','update']);
+
+        // Pickup inspection
+        Route::get('/booking/{id}/pickup-inspection', [InspectionController::class, 'pickupInspection'])
+            ->name('inspection.pickupInspection');
+        Route::post('/booking/{id}/pickup-inspection', [InspectionController::class, 'storePickupInspection'])
+            ->name('inspection.storePickupInspection');
+
+        // Return inspection
+        Route::get('/booking/{id}/return-inspection', [InspectionController::class, 'returnInspection'])
+            ->name('inspection.returnInspection');
+        Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
+            ->name('inspection.storeReturnInspection');
+    });
+
+    // Staff routes
     Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
         Route::resource('inspection', InspectionController::class)
             ->only(['index','edit','update']);
@@ -237,6 +270,12 @@ Route::middleware('auth')->group(function () {
         Route::post('damagecase/{caseID}/resolve', [DamageCaseController::class, 'resolve'])
         ->name('damagecase.resolve');
     });
+    // ============================
+    // Pickup Return Button
+    // ============================
+    Route::post('/booking/{id}/pickup', [BookingController::class, 'markPickup'])->name('booking.pickup');
+    Route::post('/booking/{id}/return', [BookingController::class, 'markReturn'])->name('booking.return');
+
 
 // ============================
 // Payment routes
