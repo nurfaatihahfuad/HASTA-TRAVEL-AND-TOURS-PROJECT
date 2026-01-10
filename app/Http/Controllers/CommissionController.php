@@ -35,7 +35,17 @@ class CommissionController extends Controller
             'accountNumber' => 'required|string|max:20',
             'bankName' => 'required|string|max:100',
             'otherBankName' => 'required_if:bankName,Other|nullable|max:100',
+            'receipt_file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
+
+        // Handle file upload
+        $receiptFilePath = null;
+        if ($request->hasFile('receipt_file')) {
+            $file = $request->file('receipt_file');
+            $fileName = 'receipt_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('receipts', $fileName, 'public');
+            $receiptFilePath = $path;
+        }
 
         // Handle bank name (jika pilih "Other", guna otherBankName)
         $bankName = $request->bankName;
@@ -56,6 +66,7 @@ class CommissionController extends Controller
         Commission::create([
             'commissionID' => $commissionID,
             'commissionType' => $request->commissionType,
+            'receipt_file_path' => $receiptFilePath,
             'status' => 'pending',
             'appliedDate' => $request->appliedDate,
             'amount' => $request->amount,
