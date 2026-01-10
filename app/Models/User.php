@@ -213,4 +213,25 @@ class User extends Authenticatable
                 $this->admin->adminType === 'finance';
     }
 
+    //==========
+    //Blaclisted
+    //==========
+    public function getIsBlacklistedAttribute()
+    {
+        return $this->status === 'blacklisted' || 
+               $this->customer && $this->customer->blacklistedCust;
+    }
+
+    public function blacklistedRecord()
+    {
+        return $this->hasOneThrough(
+            BlacklistedCust::class,
+            Customer::class,
+            'userID', // Foreign key on customers table
+            'customerID', // Foreign key on blacklistedcust table
+            'userID', // Local key on users table
+            'customerID' // Local key on customers table
+        );
+    }
+
 }
