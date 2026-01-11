@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.it_admin')
 
 @section('title', 'Commission Verification')
 

@@ -122,7 +122,7 @@ class CommissionController extends Controller
             'bankName' => $bankName,
         ]);
 
-        return redirect()->route('staff.commission.index')
+        return redirect()->route('commission.index')
             ->with('success', 'Commission submitted successfully! Waiting for admin approval.');
     }
 
@@ -217,7 +217,7 @@ class CommissionController extends Controller
             'status' => 'pending', // Reset status apabila update
         ]);
 
-        return redirect()->route('staff.commission.index')
+        return redirect()->route('commission.index')
             ->with('success', 'Commission updated successfully! Status reset to pending.');
     }
 
