@@ -14,7 +14,7 @@ class CommissionController extends Controller
     /**
      * Display a listing of commissions FOR STAFF
      */
-    public function staffIndex()
+    public function index()
     {
         // Staff only - jika admin cuba access, redirect ke admin page
         if (auth()->user()->role === 'admin') {
@@ -122,7 +122,7 @@ class CommissionController extends Controller
             'bankName' => $bankName,
         ]);
 
-        return redirect()->route('staff.commission.index')
+        return redirect()->route('commission.index')
             ->with('success', 'Commission submitted successfully! Waiting for admin approval.');
     }
 
@@ -217,7 +217,7 @@ class CommissionController extends Controller
             'status' => 'pending', // Reset status apabila update
         ]);
 
-        return redirect()->route('staff.commission.index')
+        return redirect()->route('commission.index')
             ->with('success', 'Commission updated successfully! Status reset to pending.');
     }
 

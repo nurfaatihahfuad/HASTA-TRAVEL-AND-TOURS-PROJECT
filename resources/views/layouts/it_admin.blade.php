@@ -174,14 +174,13 @@
                 <span class="menu-text">Admin Management</span>
             </a>
 
-            @if(auth()->user()->role === 'admin')
                 <a class="sidebar-link @if(request()->routeIs('admin.commissionVerify.*')) active @endif" 
                     href="{{ route('admin.commissionVerify.index') }}">
                     <i class="fas fa-money-bill"></i>
                     
                     <span class="menu-text">Commission Verification</span>
                 </a>
-            @endif
+            
 
             <a class="sidebar-link @if($currentRoute == 'vehicles.index') active @endif" href="{{ route('vehicles.index') }}">
                 <i class="fas fa-car"></i>

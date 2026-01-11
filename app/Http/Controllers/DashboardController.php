@@ -143,7 +143,7 @@ class DashboardController extends Controller
     // ============================
     
     //yg ni Auni dh ubah jadi coding asal semula
-    /*public function staffSalesperson()
+    public function staffSalesperson()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
@@ -184,7 +184,7 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    }*/
+    }
 
     // Display bookings for verification (Staff)
     /**
@@ -232,7 +232,7 @@ class DashboardController extends Controller
     // ============================
     // Staff Runner Dashboard
     // ============================
-    /*public function staffRunner()
+    public function staffRunner()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
@@ -252,8 +252,8 @@ class DashboardController extends Controller
             'statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    }*/
-    public function staffRunner()
+    }
+    /*public function staffRunner()
     {
         // ============================
         // 1. KPI INSPECTION
@@ -289,7 +289,7 @@ class DashboardController extends Controller
             'weeklyData',
             'inspections'
         ));
-    }
+    }*/
 
     
 
@@ -715,7 +715,7 @@ class DashboardController extends Controller
             'search',
         ));
     }
-     public function staffSalesperson()
+     public function Salesperson()
     {
         // HITUNG STATISTIK UTAMA
         $returnInspections = Inspection::where('inspectionType', 'return')->count();
@@ -736,7 +736,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('staff.salesperson.dashboard', compact(
+        return view('dashboard.staff_salesperson', compact(
             // UTAMA
             'returnInspections',
             'pickupInspections', 
