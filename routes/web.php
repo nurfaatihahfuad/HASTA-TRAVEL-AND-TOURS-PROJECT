@@ -299,15 +299,18 @@ Route::middleware('auth')->group(function () {
     //        ->only(['index','create','store','edit','update']);
     //});
 
-    // Staff hanya index, edit, update
-    //Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
-    //    Route::resource('inspection', InspectionController::class)
-    //        ->only(['index','edit','update']);
-    //});
-
     // ============================
     // Inspection Routes
     // ============================
+    // Route untuk salesperson dashboard
+    Route::get('/salesperson/dashboard', function () {
+        return view('salesperson.dashboard');
+    })->name('salesperson.dashboard')->middleware(['auth']);
+
+    // Atau jika guna controller:
+    Route::get('/salesperson/dashboard', [SalespersonController::class, 'dashboard'])
+        ->name('salesperson.dashboard')
+        ->middleware(['auth']);
 
     // Customer routes
     Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
