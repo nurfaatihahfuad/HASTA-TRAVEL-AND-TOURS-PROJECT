@@ -26,7 +26,7 @@ class PaymentController extends Controller
     // Kira total hours
     $pickup = Carbon::parse($booking->pickup_dateTime);
     $return = Carbon::parse($booking->return_dateTime);
-    $totalHours = $pickup->diffInHours($return);
+    $totalHours = round($pickup->diffInHours($return));
     
     // Kira total amount
     $totalAmount = round($totalHours * $booking->vehicle->price_per_hour);
@@ -84,7 +84,7 @@ class PaymentController extends Controller
         $booking = Booking::with('vehicle')->findOrFail($request->bookingID);
         $pickup = Carbon::parse($booking->pickup_dateTime);
         $return = Carbon::parse($booking->return_dateTime);
-        $totalHours = $pickup->diffInHours($return);
+        $totalHours = round($pickup->diffInHours($return));
         $totalAmount = round($totalHours * $booking->vehicle->price_per_hour);
 
         // Simpan rekod ke DB
@@ -114,7 +114,7 @@ class PaymentController extends Controller
 
         $pickup = \Carbon\Carbon::parse($booking->pickup_dateTime);
         $return = \Carbon\Carbon::parse($booking->return_dateTime);
-        $totalHours = $pickup->diffInHours($return);
+        $totalHours = round($pickup->diffInHours($return));
         $totalPayment = round($totalHours * $booking->vehicle->price_per_hour);
 
         return view('customers.BookingView.bookingView', compact('booking','payment','totalHours','totalPayment'));
@@ -132,7 +132,7 @@ class PaymentController extends Controller
         $booking = Booking::with('vehicle')->findOrFail($bookingID);
         $pickup = Carbon::parse($booking->pickup_dateTime);
         $return = Carbon::parse($booking->return_dateTime);
-        $totalHours = $pickup->diffInHours($return);
+        $totalHours = round($pickup->diffInHours($return));
         $totalAmount = round($totalHours * $booking->vehicle->price_per_hour);
 
         $amount = $request->paymentType === 'Full Payment' ? $totalAmount : 50;

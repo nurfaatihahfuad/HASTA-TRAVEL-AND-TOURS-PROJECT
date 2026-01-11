@@ -14,7 +14,7 @@ class CommissionController extends Controller
     /**
      * Display a listing of commissions FOR STAFF
      */
-    public function staffIndex()
+    public function index()
     {
         // Staff only - jika admin cuba access, redirect ke admin page
         if (auth()->user()->role === 'admin') {

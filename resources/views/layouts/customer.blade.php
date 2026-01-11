@@ -21,6 +21,7 @@
     <style>
         :root {
             --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
             --primary-color: #dc3545;
             --secondary-color: #c82333;
             --customer-primary: #dc3545;
@@ -33,9 +34,10 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
         
-        /* Sidebar - Similar to Admin */
+        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -46,11 +48,28 @@
             z-index: 1000;
             box-shadow: 2px 0 10px rgba(0,0,0,0.05);
             overflow-y: auto;
+            transition: width 0.3s ease;
+            overflow-x: hidden;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
         }
         
         .sidebar-header {
             padding: 15px;
             border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            white-space: nowrap;
+        }
+        
+        .sidebar-header h6 {
+            margin: 0;
+            color: var(--customer-primary);
+            font-weight: 600;
+            display: inline-block;
         }
         
         .sidebar-logo {
@@ -64,13 +83,15 @@
         }
         
         .sidebar-link {
-            display: block;
+            display: flex;
+            align-items: center;
             padding: 10px 15px;
             color: #495057;
             text-decoration: none;
             border-radius: 5px;
             margin-bottom: 5px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         
         .sidebar-link:hover, .sidebar-link.active {
@@ -82,49 +103,38 @@
             width: 20px;
             text-align: center;
             margin-right: 10px;
+            flex-shrink: 0;
         }
         
-        /* Main content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            flex: 1;
+        .sidebar.collapsed .sidebar-link {
+            padding: 10px 0;
+            justify-content: center;
         }
         
-        /* Cards - Similar to Admin */
-        .section-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+        .sidebar.collapsed .sidebar-link i {
+            margin-right: 0;
         }
         
-        .metric-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border-left: 4px solid var(--customer-primary);
+        .menu-text {
+            transition: opacity 0.3s ease;
         }
         
-        .metric-title {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 5px;
+        /* Hide text when collapsed */
+        .sidebar.collapsed .menu-text,
+        .sidebar.collapsed .profile-info,
+        .sidebar.collapsed .sidebar-header h6,
+        .sidebar.collapsed hr {
+            display: none;
         }
         
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #212529;
-        }
-        
-        /* Profile Section in Sidebar */
+        /* Profile Section */
         .profile-sidebar {
             padding: 20px;
             text-align: center;
             border-bottom: 1px solid #e9ecef;
+            transition: padding 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
         }
         
         .profile-avatar {
@@ -138,6 +148,17 @@
             justify-content: center;
             font-size: 24px;
             margin: 0 auto 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed .profile-sidebar {
+            padding: 15px 10px;
+        }
+        
+        .sidebar.collapsed .profile-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
         }
         
         .profile-name {
@@ -168,6 +189,56 @@
             color: #92400e;
         }
         
+        /* Toggle Button */
+        #toggleBtn {
+            cursor: pointer;
+            color: #6c757d;
+            border: none;
+            background: none;
+            font-size: 1.2rem;
+        }
+        
+        /* Main content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+        
+        /* Cards */
+        .section-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid var(--customer-primary);
+        }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #212529;
+        }
+        
         /* Footer Styles */
         .footer-main {
             background-color: #f8f9fa;
@@ -175,6 +246,11 @@
             margin-top: auto;
             margin-left: var(--sidebar-width);
             border-top: 1px solid #dee2e6;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .footer-main.expanded {
+            margin-left: var(--sidebar-collapsed-width);
         }
         
         .footer-main a {
@@ -244,9 +320,10 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h6><i class="fas fa-car me-2"></i>HASTA</h6>
+            <button id="toggleBtn"><i class="fas fa-bars"></i></button>
         </div>
         
         <!-- Profile Info in Sidebar -->
@@ -254,22 +331,24 @@
             <div class="profile-avatar">
                 {{ substr(auth()->user()->name, 0, 1) }}
             </div>
-            <div class="profile-name">{{ auth()->user()->name }}</div>
-            <div class="profile-email">{{ auth()->user()->email }}</div>
-            @php
-                $status = auth()->user()->customer->customerStatus ?? 'inactive';
+            <div class="profile-info">
+                <div class="profile-name">{{ auth()->user()->name }}</div>
+                <div class="profile-email">{{ auth()->user()->email }}</div>
+                @php
+                    $status = auth()->user()->customer->customerStatus ?? 'inactive';
 
-                $statusClass = match($status) {
-                    'active' => 'bg-success',
-                    'inactive' => 'bg-warning text-dark',
-                    'blacklisted' => 'bg-dark',
-                    default => 'bg-secondary'
-                };
-            @endphp
+                    $statusClass = match($status) {
+                        'active' => 'bg-success',
+                        'inactive' => 'bg-warning text-dark',
+                        'blacklisted' => 'bg-dark',
+                        default => 'bg-secondary'
+                    };
+                @endphp
 
-            <span class="badge {{ $statusClass }} small profile-status">
-                {{ ucfirst($status) }}
-            </span>
+                <span class="badge {{ $statusClass }} small profile-status">
+                    {{ ucfirst($status) }}
+                </span>
+            </div>
         </div>
         
         <div class="sidebar-nav">
@@ -279,12 +358,14 @@
             
             <a class="sidebar-link @if($currentRoute == 'customer.dashboard') active @endif" 
                href="{{ route('customer.dashboard') }}">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
+                <i class="fas fa-tachometer-alt"></i>
+                <span class="menu-text">Dashboard</span>
             </a>
             
             <a class="sidebar-link @if($currentRoute == 'customer.bookings') active @endif" 
                href="#">
-                <i class="fas fa-history"></i> Booking History
+                <i class="fas fa-history"></i>
+                <span class="menu-text">Booking History</span>
             </a>
 
             <a class="sidebar-link" href="#">
@@ -292,29 +373,34 @@
             </a>
 
             <a class="sidebar-link" href="{{ route('damagecase.index') }}">
-                <i class="fas fa-chart-bar"></i> Damage Case Checklist 
+                <i class="fas fa-chart-bar"></i>
+                <span class="menu-text">Damage Case Checklist</span>
             </a>
             
             <a class="sidebar-link @if($currentRoute == 'customer.profile') active @endif" 
                href="{{ route('customer.profile') }}">
-                <i class="fas fa-user"></i> Profile
+                <i class="fas fa-user"></i>
+                <span class="menu-text">Profile</span>
             </a>
             
             <!--<a class="sidebar-link @if($currentRoute == 'customer.settings') active @endif" 
                href="#">
-                <i class="fas fa-cog"></i> Settings
+                <i class="fas fa-cog"></i>
+                <span class="menu-text">Settings</span>
             </a>-->
             
             <a class="sidebar-link @if($currentRoute == 'browse.vehicle') active @endif" 
                href="{{ route('browse.vehicle') }}" style="background-color: var(--customer-primary); color: white;">
-                <i class="fas fa-calendar-plus"></i> Book Now
+                <i class="fas fa-calendar-plus"></i>
+                <span class="menu-text">Book Now</span>
             </a>
             
             <div class="mt-4 pt-3 border-top">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="btn btn-outline-danger w-100">
-                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    <button type="submit" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="menu-text ms-2">Logout</span>
                     </button>
                 </form>
             </div>
@@ -322,12 +408,12 @@
     </div>
     
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         @yield('content')
     </div>
     
     <!-- Footer -->
-    <footer class="footer-main">
+    <footer class="footer-main" id="footerMain">
         <div class="container">
             <div class="row gy-4">
                 <div class="col-md-3">
@@ -387,6 +473,19 @@
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const footerMain = document.getElementById('footerMain');
+        const toggleBtn = document.getElementById('toggleBtn');
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            footerMain.classList.toggle('expanded');
+        });
+    </script>
     
     <!-- Chart.js (if needed) -->
     @stack('scripts')
