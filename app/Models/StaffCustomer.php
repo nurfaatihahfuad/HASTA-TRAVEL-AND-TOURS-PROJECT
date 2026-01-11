@@ -11,6 +11,8 @@ class StaffCustomer extends Model
     use HasFactory, Notifiable;
 
     protected $table = 'staffcustomer';
+    protected $primaryKey = 'userID';
+    protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
