@@ -126,7 +126,8 @@ class PaymentController extends Controller
         */ 
     }
 
-    public function updateStatus(Request $request, $bookingID): RedirectResponse
+
+    public function updateStatus(Request $request, $paymentID): RedirectResponse
     {
         $request->validate([
             'status' => 'required|string|in:pending,successful,rejected',

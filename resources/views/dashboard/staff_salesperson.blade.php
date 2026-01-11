@@ -184,7 +184,7 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <!-- Quick Approve/Reject Booking -->
-                                    @if($b->paymentStatus == 'pending' && $b->bookingStatus == 'pending')
+                                    @if($b->bookingStatus == 'pending') <!-- HAPUS paymentStatus condition -->
                                         <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID) }}" class="d-inline">
                                             @csrf
                                             @method('PUT')
@@ -253,43 +253,74 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        @if($b->paymentStatus == 'pending')
-                                            <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID ) }}" class="d-inline">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" name="status" value="approved" 
-                                                        class="btn btn-success"
-                                                        onclick="return confirm('Approve this booking?')">
-                                                    <i class="fas fa-check me-1"></i> Approve Booking
-                                                </button>
-                                                <button type="submit" name="status" value="rejected" 
-                                                        class="btn btn-danger"
-                                                        onclick="return confirm('Reject this booking?')">
-                                                    <i class="fas fa-times me-1"></i> Reject Booking
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        
+                        <!-- Booking Actions -->
+                        @if($b->bookingStatus == 'pending')
+                            <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID ) }}" class="d-inline">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" name="status" value="successful" 
+                                        class="btn btn-success"
+                                        onclick="return confirm('Approve this booking?')">
+                                    <i class="fas fa-check me-1"></i> Approve Booking
+                                </button>
+                                <button type="submit" name="status" value="rejected" 
+                                        class="btn btn-danger"
+                                        onclick="return confirm('Reject this booking?')">
+                                    <i class="fas fa-times me-1"></i> Reject Booking
+                                </button>
+                            </form>
+                        @endif
+                        
+                        <!-- Payment Actions (optional tambahan) -->
+                        @if($b->paymentStatus == 'pending')
+                            @php
+                                $payment = \App\Models\Payment::where('bookingID', $b->bookingID)->first();
+                            @endphp
+                            
+                            @if($payment)
+                                <div class="vr mx-2"></div>
+                                <span class="text-muted me-2">Payment:</span>
+                                <form method="POST" action="{{ route('payment.approve', $payment->paymentID) }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" 
+                                            class="btn btn-outline-success"
+                                            onclick="return confirm('Approve this payment?')">
+                                        <i class="fas fa-check me-1"></i> Approve
+                                    </button>
+                                </form>
+                                
+                                <form method="POST" action="{{ route('payment.reject', $payment->paymentID) }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" 
+                                            class="btn btn-outline-danger"
+                                            onclick="return confirm('Reject this payment?')">
+                                        <i class="fas fa-times me-1"></i> Reject
+                                    </button>
+                                </form>
+                            @endif
+                        @endif
+                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <tr>
+                                                <td colspan="8" class="text-center py-4">
+                                                    <div class="text-muted">
+                                                        <i class="fas fa-clipboard-list fa-2x mb-3"></i>
+                                                        <h5>No bookings found</h5>
+                                                        <p>No recent bookings to display</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center py-4">
-                                <div class="text-muted">
-                                    <i class="fas fa-clipboard-list fa-2x mb-3"></i>
-                                    <h5>No bookings found</h5>
-                                    <p>No recent bookings to display</p>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    </div>
 
 {{-- Charts --}}
 <script>
