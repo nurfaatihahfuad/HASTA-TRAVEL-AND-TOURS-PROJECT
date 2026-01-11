@@ -116,9 +116,6 @@ class PaymentController extends Controller
             'totalAmount' => $totalAmount,
         ]);
 
-        $booking->bookingStatus = 'payment_submitted';
-        //$booking->save();
-
         return redirect()->route('customer.dashboard')->with('success', 'Payment submitted successfully!');
         /*
         return redirect()->route('payment.show', ['paymentType' => $paymentType])
@@ -126,7 +123,8 @@ class PaymentController extends Controller
         */ 
     }
 
-    public function updateStatus(Request $request, $bookingID): RedirectResponse
+
+    public function updateStatus(Request $request, $paymentID): RedirectResponse
     {
         $request->validate([
             'status' => 'required|string|in:pending,successful,rejected',

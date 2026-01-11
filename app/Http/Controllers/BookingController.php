@@ -80,6 +80,7 @@ class BookingController extends Controller
 
         return back()->with('success', "Booking {$bookingID} updated to " . ucfirst($status));
     }
+
     public function reject($bookingID): RedirectResponse
     {
         $booking = Booking::findOrFail($bookingID);
@@ -176,15 +177,15 @@ class BookingController extends Controller
                         ->with('success', 'Pickup inspection recorded successfully.');
     }
 
-        public function approve($bookingID)
-        {
+    public function approve($bookingID)
+    {
 
-            $booking = Booking::findOrFail($bookingID);
-            $booking->bookingStatus = 'successful';
-            $booking->save();
+        $booking = Booking::findOrFail($bookingID);
+        $booking->bookingStatus = 'successful';
+        $booking->save();
 
-            return redirect()->back()->with('success', 'Booking has been approved.');
-        }
+        return redirect()->back()->with('success', 'Booking has been approved.');
+    }
 
 /*public function reject($bookingID): RedirectResponse
 {

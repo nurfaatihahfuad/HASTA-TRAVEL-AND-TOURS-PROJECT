@@ -174,10 +174,10 @@
                 <span class="menu-text">Admin Management</span>
             </a>
 
+            
                 <a class="sidebar-link @if(request()->routeIs('admin.commissionVerify.*')) active @endif" 
                     href="{{ route('admin.commissionVerify.index') }}">
                     <i class="fas fa-money-bill"></i>
-                    
                     <span class="menu-text">Commission Verification</span>
                 </a>
             
