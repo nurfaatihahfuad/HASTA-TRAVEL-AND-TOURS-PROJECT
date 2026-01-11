@@ -69,7 +69,7 @@
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Payment Proof</th>
-                        <th>Payment Status</th>
+                        <!--<th>Payment Status</th> -->
                         <th>Payment Actions</th>
                         <th>Amount</th>
                         <th>Created At</th>
@@ -109,7 +109,7 @@
                                 @endif
                             </td>
                             
-                            <!-- Payment Status Column -->
+                            <!-- Payment Status Column 
                             <td>
                                 <span class="badge 
                                     @if($b->paymentStatus == 'approved') bg-success
@@ -118,7 +118,7 @@
                                     @else bg-secondary @endif">
                                     {{ $b->paymentStatus ?? 'No payment' }}
                                 </span>
-                            </td>
+                            </td> -->
                             
                             <!-- Payment Actions Column -->
                             <td>
@@ -328,12 +328,13 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        
+        <!-- Pagination 
         @if($bookings->hasPages())
             <div class="d-flex justify-content-center mt-4">
                 {{ $bookings->links() }}
             </div>
-        @endif
+        @endif -->
     </div>
 </div>
 @endsection
