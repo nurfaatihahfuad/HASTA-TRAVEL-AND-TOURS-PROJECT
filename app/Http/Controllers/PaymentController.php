@@ -116,9 +116,6 @@ class PaymentController extends Controller
             'totalAmount' => $totalAmount,
         ]);
 
-        $booking->bookingStatus = 'payment_submitted';
-        //$booking->save();
-
         return redirect()->route('customer.dashboard')->with('success', 'Payment submitted successfully!');
         /*
         return redirect()->route('payment.show', ['paymentType' => $paymentType])
