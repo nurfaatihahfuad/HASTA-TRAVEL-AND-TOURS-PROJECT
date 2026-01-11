@@ -165,7 +165,7 @@
                 <span class="menu-text">Commission</span>
             </a>
 
-            <a class="sidebar-link" href="{{ route('staff.inspections.index') }}">
+            <a class="sidebar-link" href="{{ route('salesperson.dashboard') }}">
                 <i class="fas fa-file-invoice"></i>
                 <span class="menu-text">Inspections</span>
             </a>
