@@ -30,7 +30,7 @@ class CommissionController extends Controller
         return view('staff.commission.index', compact('commissions'));
     }
 
-    public function index()
+    public function staffIndex()
     {
         // Staff only - jika admin cuba access, redirect ke admin page
         if (auth()->user()->role === 'admin') {
