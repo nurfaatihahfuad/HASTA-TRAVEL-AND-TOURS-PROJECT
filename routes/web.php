@@ -308,9 +308,9 @@ Route::middleware('auth')->group(function () {
     })->name('salesperson.dashboard')->middleware(['auth']);
 
     // Atau jika guna controller:
-    Route::get('/salesperson/dashboard', [SalespersonController::class, 'dashboard'])
-        ->name('salesperson.dashboard')
-        ->middleware(['auth']);
+    //Route::get('/salesperson/dashboard', [SalespersonController::class, 'dashboard'])
+    //    ->name('salesperson.dashboard')
+    //    ->middleware(['auth']);
 
     // Customer routes
     Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
@@ -331,10 +331,12 @@ Route::middleware('auth')->group(function () {
     });
 
     // Staff routes
-    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
-        Route::resource('inspection', InspectionController::class)
-            ->only(['index','edit','update']);
+    // ✅ BETUL - Tambah `()` selepas `group`
+Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->name('staff.')->group(function () {
+    Route::prefix('inspections')->name('inspections.')->group(function () {
+        Route::get('/', [InspectionController::class, 'staffIndex'])->name('index');
     });
+});
 
 
     // ============================

@@ -15,16 +15,38 @@ class InspectionController extends Controller
      * Menampilkan senarai rekod inspection untuk Customer.
      */
     public function index()
-    {
-        $inspections = Inspection::with(['booking', 'vehicle'])
-            ->whereHas('booking', function($query) {
-                $query->where('userID', auth()->user()->userID);
-            })
-            ->latest()
-            ->get();
+{
+    $inspections = Inspection::with(['booking', 'vehicle'])
+        ->whereHas('booking', function($query) {
+            $query->where('userID', auth()->user()->userID);
+        })
+        ->latest()
+        ->get();
 
-        return view('customers.inspections', compact('inspections'));
-    }
+    return view('customers.inspections', compact('inspections'));
+}
+    // Method untuk filter (optional)
+public function staffToday()
+{
+    $inspections = Inspection::with(['booking.customer.user', 'vehicle'])
+        ->whereDate('created_at', today())
+        ->latest()
+        ->paginate(20);
+
+    return view('staff.inspections.index', compact('inspections'))
+        ->with('filter', 'Today');
+}
+
+public function staffPending()
+{
+    $inspections = Inspection::with(['booking.customer.user', 'vehicle'])
+        ->where('status', 'pending')
+        ->latest()
+        ->paginate(20);
+
+    return view('staff.inspections.index', compact('inspections'))
+        ->with('filter', 'Pending');
+}
 
     /**
      * Tampilkan borang Pickup (GET).
@@ -392,4 +414,33 @@ class InspectionController extends Controller
             'poorPercentage'
         ));
     }
+    /**
+ * Staff: Show single inspection details
+ */
+public function show($id)
+{
+    $inspection = Inspection::with([
+        'vehicle', 
+        'booking.user',
+        'staffUser'
+    ])->findOrFail($id);
+    /*
+    // Get related data if needed
+    $previousInspections = Inspection::where('vehicleID', $inspection->vehicleID)
+        ->where('id', '!=', $id)
+        ->orderBy('created_at', 'desc')
+        ->limit(5)
+        ->get();
+    */
+    return view('staff.inspections.show', compact('inspection'));
+}
+
+/**
+ * Staff: Show single inspection details (alias untuk staff)
+ */
+public function staffShow($id)
+{
+    // You can use the same method or create a different view
+    return $this->show($id);
+}
 }

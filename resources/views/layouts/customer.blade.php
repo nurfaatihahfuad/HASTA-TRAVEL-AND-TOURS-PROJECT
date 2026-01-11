@@ -287,7 +287,7 @@
                 <i class="fas fa-history"></i> Booking History
             </a>
 
-            <a class="sidebar-link" href="{{ route('inspection.index') }}">
+            <a class="sidebar-link" href="#">
                 <i class="fas fa-chart-bar"></i> Car Inspection Checklist
             </a>
 
