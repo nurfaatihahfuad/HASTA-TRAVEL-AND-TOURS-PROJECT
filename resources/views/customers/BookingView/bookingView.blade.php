@@ -38,9 +38,9 @@
             </div> 
             @endif
 
-            @if($payment->file_path)
+            @if($payment->receipt_file_path)
                 <p><strong>Proof File:</strong> 
-                    <a href="{{ asset('storage/' . $payment->file_path) }}" target="_blank">View Proof</a>
+                    <a href="{{ asset('storage/' . $payment->receipt_file_path) }}" target="_blank">View Proof</a>
                 </p>
             @endif
         @else

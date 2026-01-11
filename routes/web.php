@@ -363,7 +363,8 @@ Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->na
 // ============================
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
-
+Route::post('/payment/{paymentID}/upload-receipt', [PaymentController::class, 'uploadReceipt'])
+    ->name('payment.uploadReceipt');
 // ============================
 // Staff Management (Admin only)
 // ============================
@@ -424,6 +425,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
     Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
         ->name('commission.deleteReceipt');
+    Route::get('/admin/commission-verify/{id}', [CommissionController::class, 'adminShow'])
+    ->name('admin.commissionVerify.show')
+    ->middleware('auth');
 });
 
 ///========================================
