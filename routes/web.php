@@ -406,17 +406,37 @@ Route::post('/admin/customers/{userId}/blacklist', [DashboardController::class, 
 // Blacklisted customers list
 Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustomers'])->name('admin.blacklisted.index');
 
-//================
-//Commission
-//================
-// Commission Routes
-Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
-Route::get('/commission/create', [CommissionController::class, 'create'])->name('commission.create');
-Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
-Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
-Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
-Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
-    ->name('commission.deleteReceipt');
+//==============================
+// Commission Routes (for STAFF)
+//==============================
+Route::middleware(['auth'])->group(function () {
+    // Staff commission routes (accessible by staff/salesperson)
+    Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
+    Route::get('/commission/create', [CommissionController::class, 'create'])->name('commission.create');
+    Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
+    Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
+    Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
+    Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
+        ->name('commission.deleteReceipt');
+});
+
+///========================================
+// Commission Verification (for ADMIN only)
+//=========================================
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    // Admin commission routes
+    Route::get('/commission-verify', [CommissionController::class, 'adminIndex'])
+        ->name('commissionVerify.index');
+    
+    Route::get('/commission-verify/{id}', [CommissionController::class, 'adminShow'])
+        ->name('commissionVerify.show');
+    
+    Route::post('/commission-verify/{id}/approve', [CommissionController::class, 'approve'])
+        ->name('commissionVerify.approve');
+    
+    Route::post('/commission-verify/{id}/reject', [CommissionController::class, 'reject'])
+        ->name('commissionVerify.reject');
+});
 
 
 // Staff Inspection Management Routes

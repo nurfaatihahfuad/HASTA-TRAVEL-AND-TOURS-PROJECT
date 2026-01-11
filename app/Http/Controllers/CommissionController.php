@@ -2,33 +2,83 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Commission;
-use Illuminate\Support\Str;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CommissionController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of commissions FOR STAFF
+     */
+    public function staffIndex()
     {
-        $userID = auth()->user()->userID;
-        $commissions = Commission::where('userID', $userID)->get();
-        
-        // Set semua status kepada pending untuk view sahaja
-        foreach ($commissions as $commission) {
-            $commission->status = 'pending'; // Override status
+        // Staff only - jika admin cuba access, redirect ke admin page
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.commission.index');
         }
+        
+        // STAFF VIEW: commissions sendiri sahaja
+        $userID = auth()->user()->userID;
+        $commissions = Commission::where('userID', $userID)
+            ->orderBy('appliedDate', 'desc')
+            ->get();
         
         return view('staff.commission.index', compact('commissions'));
     }
 
+    /**
+     * Display a listing of commissions FOR ADMIN
+     */
+    public function adminIndex(Request $request)
+    {
+        // Admin only - jika staff cuba access, redirect ke staff page
+        /*
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route('staff.commission.index');
+        }
+        */
+        
+        // ADMIN VIEW: semua commissions dengan user
+        $status = $request->query('status');
+        
+        $query = Commission::with('user');
+        
+        if ($status && in_array($status, ['pending', 'approved', 'rejected'])) {
+            $query->where('status', $status);
+        }
+        
+        $commissions = $query->orderBy('appliedDate', 'desc')->get();
+        
+        return view('admin.commissionVerify.index', compact('commissions'));
+    }
+
+    /**
+     * Show the form for creating a new commission (STAFF ONLY)
+     */
     public function create()
     {
+        // Staff only - jika admin cuba access, redirect ke admin page
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.commission.index');
+        }
+        
         return view('staff.commission.create');
     }
 
+    /**
+     * Store a newly created commission (STAFF ONLY)
+     */
     public function store(Request $request)
     {
+        // Staff only
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.commission.index');
+        }
+
         $request->validate([
             'commissionType' => 'required|string|max:50',
             'appliedDate' => 'required|date',
@@ -36,10 +86,10 @@ class CommissionController extends Controller
             'accountNumber' => 'required|string|max:20',
             'bankName' => 'required|string|max:100',
             'otherBankName' => 'required_if:bankName,Other|nullable|max:100',
-            'receipt_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240', // Validation untuk receipt
+            'receipt_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
-        // Handle bank name (jika pilih "Other", guna otherBankName)
+        // Handle bank name
         $bankName = $request->bankName;
         if ($request->bankName === 'Other' && $request->filled('otherBankName')) {
             $bankName = $request->otherBankName;
@@ -54,34 +104,57 @@ class CommissionController extends Controller
             $receiptFilePath = $path;
         }
 
-        // Generate ID dengan format: CO + 4 random alphanumeric
+        // Generate commission ID
         $commissionID = 'CO' . strtoupper(Str::random(4));
-        
-        // Pastikan ID unique
         while (Commission::where('commissionID', $commissionID)->exists()) {
             $commissionID = 'CO' . strtoupper(Str::random(4));
         }
 
-        $userID = auth()->user()->userID;
-
         Commission::create([
             'commissionID' => $commissionID,
+            'userID' => auth()->user()->userID,
             'commissionType' => $request->commissionType,
-            'receipt_file_path' => $receiptFilePath, // Simpan path receipt
+            'receipt_file_path' => $receiptFilePath,
             'status' => 'pending',
             'appliedDate' => $request->appliedDate,
             'amount' => $request->amount,
             'accountNumber' => $request->accountNumber,
             'bankName' => $bankName,
-            'userID' => $userID,
         ]);
 
-        return redirect()->route('commission.index')
+        return redirect()->route('staff.commission.index')
             ->with('success', 'Commission submitted successfully! Waiting for admin approval.');
     }
-    
+
+    /**
+     * Display commission details FOR ADMIN
+     */
+    public function adminShow($id)
+    {
+        /*
+        // Admin only
+        if (auth()->user()->role !== 'admin') {
+            return redirect()->route('staff.commission.index');
+        }
+        */
+
+        $commission = Commission::with('user')
+            ->where('commissionID', $id)
+            ->firstOrFail();
+        
+        return view('admin.commission.show', compact('commission'));
+    }
+
+    /**
+     * Show the form for editing commission (STAFF ONLY)
+     */
     public function edit($id)
     {
+        // Staff only
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.commission.index');
+        }
+
         $commission = Commission::where('commissionID', $id)
             ->where('userID', auth()->user()->userID)
             ->firstOrFail();
@@ -89,8 +162,16 @@ class CommissionController extends Controller
         return view('staff.commission.edit', compact('commission'));
     }
 
+    /**
+     * Update the specified commission (STAFF ONLY)
+     */
     public function update(Request $request, $id)
     {
+        // Staff only
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.commission.index');
+        }
+
         $commission = Commission::where('commissionID', $id)
             ->where('userID', auth()->user()->userID)
             ->firstOrFail();
@@ -105,16 +186,16 @@ class CommissionController extends Controller
             'receipt_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
-        // Handle bank name (jika pilih "Other", guna otherBankName)
+        // Handle bank name
         $bankName = $request->bankName;
         if ($request->bankName === 'Other' && $request->filled('otherBankName')) {
             $bankName = $request->otherBankName;
         }
 
-        // Handle file upload jika ada file baru
+        // Handle file upload
         $receiptFilePath = $commission->receipt_file_path;
         if ($request->hasFile('receipt_file')) {
-            // Delete old file jika ada
+            // Delete old file
             if ($receiptFilePath && Storage::disk('public')->exists($receiptFilePath)) {
                 Storage::disk('public')->delete($receiptFilePath);
             }
@@ -133,16 +214,67 @@ class CommissionController extends Controller
             'amount' => $request->amount,
             'accountNumber' => $request->accountNumber,
             'bankName' => $bankName,
-            'status' => 'pending', // Reset status ke pending apabila update
+            'status' => 'pending', // Reset status apabila update
         ]);
 
-        return redirect()->route('commission.index')
+        return redirect()->route('staff.commission.index')
             ->with('success', 'Commission updated successfully! Status reset to pending.');
     }
 
-    // Optional: Function untuk delete receipt
+    /**
+     * Approve commission (ADMIN ONLY)
+     */
+    public function approve($id)
+    {
+        // Admin only
+        /*
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+        */
+
+        $commission = Commission::findOrFail($id);
+        
+        $commission->update([
+            'status' => 'approved',
+        ]);
+        
+        return redirect()->route('admin.commissionVerify.index')
+            ->with('success', 'Commission #' . $commission->commissionID . ' approved successfully!');
+    }
+
+    /**
+     * Reject commission (ADMIN ONLY)
+     */
+    public function reject($id)
+    {
+        // Admin only
+        /*
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+        */
+
+        $commission = Commission::findOrFail($id);
+        
+        $commission->update([
+            'status' => 'rejected',
+        ]);
+        
+        return redirect()->route('admin.commissionVerify.index')
+            ->with('success', 'Commission #' . $commission->commissionID . ' rejected!');
+    }
+
+    /**
+     * Delete receipt (STAFF ONLY)
+     */
     public function deleteReceipt($id)
     {
+        // Staff only
+        if (auth()->user()->role === 'admin') {
+            abort(403);
+        }
+
         $commission = Commission::where('commissionID', $id)
             ->where('userID', auth()->user()->userID)
             ->firstOrFail();
@@ -151,9 +283,9 @@ class CommissionController extends Controller
             Storage::disk('public')->delete($commission->receipt_file_path);
             $commission->update(['receipt_file_path' => null]);
             
-            return back()->with('success', 'Receipt deleted successfully.');
+            return response()->json(['success' => true]);
         }
 
-        return back()->with('error', 'No receipt found.');
+        return response()->json(['success' => false], 404);
     }
 }
