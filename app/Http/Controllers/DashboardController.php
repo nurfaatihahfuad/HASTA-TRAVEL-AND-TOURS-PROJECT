@@ -9,6 +9,8 @@ use App\Models\Booking;
 use App\Models\Vehicle;
 use App\Models\Customer;
 use App\Models\BlacklistedCust;
+use App\Models\Inspection; 
+use App\Models\DamageCase;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -141,9 +143,7 @@ class DashboardController extends Controller
     // ============================
     
     //yg ni Auni dh ubah jadi coding asal semula
-    //dina komen bawah ni
-    
-    public function staffSalesperson()
+    /*public function staffSalesperson()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
@@ -184,7 +184,7 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    }
+    }*/
 
     // Display bookings for verification (Staff)
     /**
@@ -232,7 +232,7 @@ class DashboardController extends Controller
     // ============================
     // Staff Runner Dashboard
     // ============================
-    public function staffRunner()
+    /*public function staffRunner()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
@@ -252,7 +252,46 @@ class DashboardController extends Controller
             'statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
+    }*/
+    public function staffRunner()
+    {
+        // ============================
+        // 1. KPI INSPECTION
+        // ============================
+        $totalInspections = Inspection::count();
+
+        $inspectionToday = Inspection::whereDate('created_at', now())->count();
+
+        $damagedCount = Inspection::where('damageDetected', 1)->count();
+        $okCount      = Inspection::where('damageDetected', 0)->count();
+
+        // ============================
+        // 2. WEEKLY INSPECTION (BAR)
+        // ============================
+        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        
+        $weeklyData = [];
+        foreach ($weeklyLabels as $day) {
+            $weeklyData[] = Inspection::whereRaw('DAYNAME(created_at) = ?', [$day])->count();
+        }
+
+        // ============================
+        // 3. ALL INSPECTIONS (TABLE)
+        // ============================
+        $inspections = Inspection::with('vehicle')->orderBy('created_at', 'desc')->get();
+
+        return view('dashboard.staff_runner', compact(
+            'totalInspections',
+            'inspectionToday',
+            'damagedCount',
+            'okCount',
+            'weeklyLabels',
+            'weeklyData',
+            'inspections'
+        ));
     }
+
+    
 
     // ============================
     // Customer Dashboard
@@ -344,43 +383,6 @@ class DashboardController extends Controller
                     
         return view('customer.dashboard', compact('bookings'));
     }
-
-    // Customer Profile View
-    public function customerProfile()
-    {
-        $user = Auth::user();
-        $customer = $user->customer; // assuming you have a relation User -> Customer
-
-        return view('customers.profile', compact('user', 'customer'));
-    }
-    // Customer Profile Update
-    public function customerUpdateProfile(Request $request)
-    {
-        $user = Auth::user();
-        $customer = $user->customer;
-
-        // validate input
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'noHP' => 'required|string|max:20',
-            'accountNumber' => 'required|string|max:20',
-            'bankType' => 'required|string|max:20',
-        ]);
-
-        // update user basic info
-        $user->name = $request->name;
-        $user->noHP = $request->noHP;
-        $user->save();
-
-        // update customer-specific info
-        $customer->accountNumber = $request->accountNumber;
-        $customer->bankType = $request->bankType;
-        $customer->save();
-
-        return redirect()->route('customer.profile')->with('success', 'Profile updated successfully!');
-    }
-
-
 
     // ============================
     // Admin Customer Management
@@ -798,5 +800,46 @@ class DashboardController extends Controller
             'search',
         ));
     }
+    
+     public function staffSalesperson()
+    {
+        // HITUNG STATISTIK UTAMA
+        $returnInspections = Inspection::where('inspectionType', 'return')->count();
+        $pickupInspections = Inspection::where('inspectionType', 'pickup')->count();
+        $totalInspections = Inspection::count();
+        
+        // HITUNG STATISTIK TAMBAHAN (optional)
+        $todayInspections = Inspection::whereDate('created_at', Carbon::today())->count();
+        $pendingInspectionsCount = Inspection::whereNull('remark')->count();
+        
+        // STATISTIK DAMAGE
+        $damageFreeInspections = Inspection::where('damageDetected', 0)->count();
+        $damageDetectedInspections = Inspection::where('damageDetected', 1)->count();
+        
+        // INSPEKSI TERBARU
+        $recentInspections = Inspection::with(['vehicle', 'booking'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('staff.salesperson.dashboard', compact(
+            // UTAMA
+            'returnInspections',
+            'pickupInspections', 
+            'totalInspections',
+            
+            // TAMBAHAN
+            'todayInspections',
+            'pendingInspectionsCount',
+            
+            // DAMAGE
+            'damageFreeInspections',
+            'damageDetectedInspections',
+            
+            // RECENT
+            'recentInspections'
+        ));
+    }
+   
 }
 

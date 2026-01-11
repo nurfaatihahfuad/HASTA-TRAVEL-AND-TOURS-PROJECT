@@ -439,6 +439,35 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         ->name('commissionVerify.reject');
 });
 
+// Staff Inspection Management Routes
+Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->name('staff.')->group(function () {
+    
+    // Inspections - View and Manage
+    Route::prefix('inspections')->name('inspections.')->group(function () {
+        // Index - View ALL inspections
+        Route::get('/', [InspectionController::class, 'staffIndex'])->name('index');
+        
+        // Show single inspection
+        Route::get('/{id}', [InspectionController::class, 'show'])->name('show');
+        
+        // Edit inspection (form)
+        Route::get('/{id}/edit', [InspectionController::class, 'staffEdit'])->name('edit');
+        
+        // Update inspection
+        Route::put('/{id}', [InspectionController::class, 'staffUpdate'])->name('update');
+        
+        // Delete inspection
+        Route::delete('/{id}', [InspectionController::class, 'destroy'])->name('destroy');
+        
+        // Verify inspection
+        Route::post('/{id}/verify', [InspectionController::class, 'verify'])->name('verify');
+        
+        // Special views
+        Route::get('/today', [InspectionController::class, 'todayInspections'])->name('today');
+        Route::get('/pending', [InspectionController::class, 'pendingInspections'])->name('pending');
+        Route::get('/with-damage', [InspectionController::class, 'inspectionsWithDamage'])->name('damage');
+    });
+});
 
 // Staff Inspection Management Routes
 Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->name('staff.')->group(function () {

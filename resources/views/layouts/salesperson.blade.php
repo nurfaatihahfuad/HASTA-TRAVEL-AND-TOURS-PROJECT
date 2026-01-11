@@ -1,5 +1,3 @@
-<!--Salesperson Navbar-->
-<!--Admin Navbar-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,29 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Staff Dashboard') - HASTA</title>
     
-    
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Chart.js (if needed) -->
     @stack('styles')
     
     <style>
         :root {
-            --sidebar-width: 250px;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 70px;
             --primary-color: #dc3545;
             --secondary-color: #c82333;
+            --transition-speed: 0.3s;
         }
         
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
         }
         
-        /* Sidebar */
+        /* Sidebar Base */
         .sidebar {
             position: fixed;
             top: 0;
@@ -39,164 +35,178 @@
             background: white;
             z-index: 1000;
             box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-            overflow-y: auto;
+            transition: width var(--transition-speed) ease;
+            overflow-x: hidden;
         }
         
+        /* Sidebar Collapsed State */
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
         .sidebar-header {
             padding: 20px;
             border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            white-space: nowrap;
         }
         
         .sidebar-header h5 {
             color: var(--primary-color);
-            font-weight: 600;
+            font-weight: 700;
             margin: 0;
+            display: inline-block;
         }
-        
+
+        /* Hide text when collapsed */
+        .sidebar.collapsed .sidebar-header h5,
+        .sidebar.collapsed .menu-text,
+        .sidebar.collapsed hr {
+            display: none;
+        }
+
         .sidebar-nav {
-            padding: 15px;
+            padding: 10px;
         }
         
         .sidebar-link {
-            display: block;
-            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
             color: #495057;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 5px;
-            transition: all 0.3s;
+            transition: all var(--transition-speed);
+            white-space: nowrap;
         }
         
         .sidebar-link:hover, .sidebar-link.active {
-            background-color: #f8f9fa;
+            background-color: #fff1f2;
             color: var(--primary-color);
         }
         
         .sidebar-link i {
-            width: 20px;
+            font-size: 1.2rem;
+            min-width: 35px;
             text-align: center;
-            margin-right: 10px;
+        }
+
+        /* Center icons when collapsed */
+        .sidebar.collapsed .sidebar-link {
+            justify-content: center;
+            padding: 12px 0;
         }
         
-        /* Main content */
+        .sidebar.collapsed .sidebar-link i {
+            margin: 0;
+        }
+
+        /* Main content adjustment */
         .main-content {
             margin-left: var(--sidebar-width);
-            padding: 20px;
+            padding: 30px;
             min-height: 100vh;
+            transition: margin-left var(--transition-speed) ease;
         }
-        
-        /* Cards */
-        .section-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed-width);
         }
-        
-        .metric-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        
-        .metric-title {
-            font-size: 0.9rem;
+
+        #toggleBtn {
+            cursor: pointer;
             color: #6c757d;
-            margin-bottom: 5px;
+            border: none;
+            background: none;
+            font-size: 1.2rem;
         }
-        
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #212529;
-        }
-        
-        .metric-delta {
-            font-size: 0.8rem;
-            color: #28a745;
-        }
-        
-        /* Responsive */
+
+        /* Responsive Mobile */
         @media (max-width: 768px) {
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
+                left: -100%;
             }
-            
+            .sidebar.show-mobile {
+                left: 0;
+                width: var(--sidebar-width) !important;
+            }
             .main-content {
-                margin-left: 0;
+                margin-left: 0 !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h5><i class="fas fa-car me-2"></i>HASTA</h5>
+            <button id="toggleBtn"><i class="fas fa-bars"></i></button>
         </div>
         
         <div class="sidebar-nav">
-            @php
-                $currentRoute = request()->route()->getName();
-            @endphp
+            @php $currentRoute = request()->route()->getName(); @endphp
             
             <a class="sidebar-link @if($currentRoute == 'staff_salesperson.dashboard') active @endif" 
                href="{{ route('staff_salesperson.dashboard') }}">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
+                <i class="fas fa-tachometer-alt"></i>
+                <span class="menu-text">Dashboard</span>
             </a>
             
             <a class="sidebar-link" href="{{ route('record.payment') }}">
-                <i class="fas fa-clipboard-check"></i> Payment Record
+                <i class="fas fa-clipboard-check"></i>
+                <span class="menu-text">Payment Record</span>
             </a>
 
             <a class="sidebar-link" href="{{ route('commission.index') }}">
-                <i class="fas fa-clipboard-check"></i> Commission
+                <i class="fas fa-coins"></i>
+                <span class="menu-text">Commission</span>
             </a>
 
             <a class="sidebar-link" href="{{ route('inspection.index') }}">
-                <i class="fas fa-chart-bar"></i> Car Inspection Checklist
+                <i class="fas fa-file-invoice"></i>
+                <span class="menu-text">Inspections</span>
             </a>
 
             <a class="sidebar-link" href="{{ route('damagecase.index') }}">
-                <i class="fas fa-chart-bar"></i> Damage Case Checklist 
+                <i class="fas fa-car-burst"></i>
+                <span class="menu-text">Damage Cases</span>
             </a>
             
             <hr>
             
             <a class="sidebar-link" href="#">
-                <i class="fas fa-user"></i> Profile
-            </a>
-            
-            <a class="sidebar-link" href="#">
-                <i class="fas fa-cog"></i> Settings
+                <i class="fas fa-user"></i>
+                <span class="menu-text">Profile</span>
             </a>
             
             <form method="POST" action="{{ route('logout') }}" class="mt-3">
                 @csrf
-                <button type="submit" class="btn btn-outline-danger w-100">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                <button type="submit" class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="menu-text ms-2">Logout</span>
                 </button>
             </form>
         </div>
     </div>
     
-    <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         @yield('content')
     </div>
     
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Chart.js (if needed) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleBtn = document.getElementById('toggleBtn');
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

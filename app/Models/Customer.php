@@ -17,7 +17,8 @@ class Customer extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'userID', 'referred_byCode', 'accountNumber', 'bankType', 'customerType', 'customerStatus'
+        'userID', 'referred_byCode', 'accountNumber', 'bankType', 'customerType', 'customerStatus', 'referral_count'
+
     ];
 
     // relationship with User
@@ -84,6 +85,13 @@ class Customer extends Model
                 
             ]);
         });
+    }
+
+    // Customer has many vouchers
+    public function vouchers()
+    {
+        return $this->belongsToMany(Voucher::class, 'customer_voucher', 'customerID', 'voucherCode')
+                    ->withPivot('redeemed_at');
     }
 
 }

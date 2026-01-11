@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Commission extends Model
@@ -16,6 +17,7 @@ class Commission extends Model
 
     protected $fillable = [
         'commissionID',
+        'userID',
         'commissionType',
         'receipt_file_path',
         'status',
@@ -23,7 +25,7 @@ class Commission extends Model
         'amount',
         'accountNumber', 
         'bankName',    
-        'userID',
+        'receipt_path',
     ];
 
     public function user()
