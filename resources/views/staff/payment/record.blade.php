@@ -30,8 +30,8 @@
                 <select name="booking_status" class="form-select">
                     <option value="">All Status</option>
                     <option value="pending" {{ request('booking_status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="booked" {{ request('booking_status') == 'booked' ? 'selected' : '' }}>Booked</option>
-                    <option value="cancelled" {{ request('booking_status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    <option value="successful" {{ request('booking_status') == 'successful' ? 'selected' : '' }}>Successful</option>
+                    <option value="rejected" {{ request('booking_status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                 </select>
             </div>
             <div class="col-md-3">
@@ -186,7 +186,8 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <!-- Quick Approve/Reject Booking -->
-                                    @if($b->paymentStatus == 'pending' && $b->bookingStatus == 'pending')
+                                    @if($b->bookingStatus == 'pending')
+                                        <!-- HANYA check booking status -->
                                         <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID) }}" class="d-inline">
                                             @csrf
                                             @method('PUT')
@@ -203,6 +204,11 @@
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
+                                    @else
+                                        <!-- Show booking status badge -->
+                                        <span class="badge bg-{{ $b->bookingStatus == 'successful' ? 'success' : 'danger' }}">
+                                            {{ ucfirst($b->bookingStatus) }}
+                                        </span>
                                     @endif
                                     
                                     <!-- View Details -->
@@ -256,11 +262,13 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        @if($b->paymentStatus == 'pending')
+                                        
+                                        <!-- Booking Actions in Modal -->
+                                        @if($b->bookingStatus == 'pending')
                                             <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID ) }}" class="d-inline">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit" name="status" value="approved" 
+                                                <button type="submit" name="status" value="successful" 
                                                         class="btn btn-success"
                                                         onclick="return confirm('Approve this booking?')">
                                                     <i class="fas fa-check me-1"></i> Approve Booking
@@ -271,6 +279,35 @@
                                                     <i class="fas fa-times me-1"></i> Reject Booking
                                                 </button>
                                             </form>
+                                        @endif
+                                        
+                                        <!-- Payment Actions in Modal -->
+                                        @if($b->paymentStatus == 'pending')
+                                            @php
+                                                $payment = \App\Models\Payment::where('bookingID', $b->bookingID)->first();
+                                            @endphp
+                                            
+                                            @if($payment)
+                                                <div class="vr mx-2"></div>
+                                                <span class="text-muted me-2">Payment Actions:</span>
+                                                <form method="POST" action="{{ route('payment.approve', $payment->paymentID) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-success"
+                                                            onclick="return confirm('Approve this payment?')">
+                                                        <i class="fas fa-check me-1"></i> Approve
+                                                    </button>
+                                                </form>
+                                                
+                                                <form method="POST" action="{{ route('payment.reject', $payment->paymentID) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-danger"
+                                                            onclick="return confirm('Reject this payment?')">
+                                                        <i class="fas fa-times me-1"></i> Reject
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>
