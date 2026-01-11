@@ -10,32 +10,63 @@ use App\Models\Payment;
 class PaymentController extends Controller
 {
     public function show($bookingID, Request $request)
-    {
-        $booking = Booking::with('vehicle')->findOrFail($bookingID);
-
-        $vehicle = [
-            'price_per_hour' => $booking->vehicle->price_per_hour,
-        ];
-
-        $pickup = Carbon::parse($booking->pickup_dateTime);
-        $return = Carbon::parse($booking->return_dateTime);
-        $totalHours = $pickup->diffInHours($return);
-        $totalAmount = round($totalHours * $vehicle['price_per_hour']);
-        $vehicleName = $booking->vehicle->vehicleName;
-        $paymentType = $request->input('paymentType'); 
-        $amountToPay = null; 
-        
-        if ($paymentType === 'Full Payment') 
-        { 
-            $amountToPay = $totalAmount; 
-        } 
-        elseif ($paymentType === 'Deposit Payment') 
-        { 
-            $amountToPay = 50; 
-        } 
-        return view('payment', compact('booking', 'totalHours', 'totalAmount', 'paymentType', 'amountToPay')); 
-        //return redirect()->route('customer.dashboard')->with('success', 'Payment saved!');
+{
+    $booking = Booking::with('vehicle')->findOrFail($bookingID);
+    
+    // Debug: Pastikan vehicle data ada
+    if (!$booking->vehicle) {
+        abort(404, 'Vehicle not found for this booking');
     }
+    
+    // Debug: Check price per hour
+    if (!$booking->vehicle->price_per_hour || $booking->vehicle->price_per_hour <= 0) {
+        abort(400, 'Vehicle price is not set or invalid');
+    }
+    
+    // Kira total hours
+    $pickup = Carbon::parse($booking->pickup_dateTime);
+    $return = Carbon::parse($booking->return_dateTime);
+    $totalHours = $pickup->diffInHours($return);
+    
+    // Kira total amount
+    $totalAmount = round($totalHours * $booking->vehicle->price_per_hour);
+    
+    // Dapatkan payment type dengan default
+    $paymentType = $request->input('paymentType', 'Deposit Payment'); // Default ke Deposit
+    
+    // Kira amount to pay
+    $amountToPay = 0;
+    
+    if ($paymentType === 'Full Payment') { 
+        $amountToPay = $totalAmount; 
+    } 
+    elseif ($paymentType === 'Deposit Payment') { 
+        $amountToPay = 50; 
+    }
+    
+    // Debug info - boleh uncomment untuk test
+    /*
+    dd([
+        'bookingID' => $bookingID,
+        'vehicle_name' => $booking->vehicle->vehicleName,
+        'price_per_hour' => $booking->vehicle->price_per_hour,
+        'pickup' => $booking->pickup_dateTime,
+        'return' => $booking->return_dateTime,
+        'total_hours' => $totalHours,
+        'total_amount' => $totalAmount,
+        'payment_type' => $paymentType,
+        'amount_to_pay' => $amountToPay
+    ]);
+    */
+    
+    return view('payment', compact(
+        'booking', 
+        'totalHours', 
+        'totalAmount', 
+        'paymentType', 
+        'amountToPay'
+    ));
+}
 
      public function store(Request $request)
         {

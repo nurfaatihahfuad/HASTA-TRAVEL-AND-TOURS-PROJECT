@@ -415,7 +415,7 @@ Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustom
 Route::middleware(['auth'])->group(function () {
     // Staff commission routes (accessible by staff/salesperson)
     Route::get('/commission', [CommissionController::class, 'staffIndex'])->name('commission.index');
-    //Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
+    Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
     Route::get('/commission/create', [CommissionController::class, 'create'])->name('commission.create');
     Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
     Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
