@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Models\Vehicle;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -19,6 +20,26 @@ class BookingController extends Controller
 
         $pickup_dateTime = $request->input('pickup_dateTime');
         $return_dateTime = $request->input('return_dateTime');
+
+        // Calculate total hours and total price
+        $pickup = Carbon::parse($pickup_dateTime);
+        $return = Carbon::parse($return_dateTime);
+        
+        $totalHours = $pickup->diffInHours($return);
+        $totalHours = $totalHours == 0 ? 1 : $totalHours; // Minimum 1 hour
+        
+        $pricePerHour = $vehicle->price_per_hour; // Convert daily rate to hourly
+        $totalPrice = $pricePerHour * $totalHours;
+        
+        // Pass additional data to view
+        return view('booking', compact(
+            'vehicle', 
+            'pickup_dateTime', 
+            'return_dateTime',
+            'totalHours',
+            'totalPrice',
+            'pricePerHour'
+        ));
 
         return view('booking', compact('vehicle', 'pickup_dateTime', 'return_dateTime'));
     }
