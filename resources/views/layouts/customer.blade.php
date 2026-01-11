@@ -256,15 +256,20 @@
             </div>
             <div class="profile-name">{{ auth()->user()->name }}</div>
             <div class="profile-email">{{ auth()->user()->email }}</div>
-            
             @php
-                $customer = auth()->user()->customer;
-                $status = $customer ? $customer->customerStatus : 'pending';
+                $status = auth()->user()->customer->customerStatus ?? 'inactive';
+
+                $statusClass = match($status) {
+                    'active' => 'bg-success',
+                    'inactive' => 'bg-warning text-dark',
+                    'blacklisted' => 'bg-dark',
+                    default => 'bg-secondary'
+                };
             @endphp
-            
-            <div class="profile-status status-{{ $status }}">
+
+            <span class="badge {{ $statusClass }} small profile-status">
                 {{ ucfirst($status) }}
-            </div>
+            </span>
         </div>
         
         <div class="sidebar-nav">
@@ -295,10 +300,10 @@
                 <i class="fas fa-user"></i> Profile
             </a>
             
-            <a class="sidebar-link @if($currentRoute == 'customer.settings') active @endif" 
+            <!--<a class="sidebar-link @if($currentRoute == 'customer.settings') active @endif" 
                href="#">
                 <i class="fas fa-cog"></i> Settings
-            </a>
+            </a>-->
             
             <a class="sidebar-link @if($currentRoute == 'browse.vehicle') active @endif" 
                href="{{ route('browse.vehicle') }}" style="background-color: var(--customer-primary); color: white;">

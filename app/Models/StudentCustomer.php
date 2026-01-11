@@ -11,6 +11,8 @@ class StudentCustomer extends Model
     use HasFactory, Notifiable;
 
     protected $table = 'studentcustomer';
+    protected $primaryKey = 'userID';
+    protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [

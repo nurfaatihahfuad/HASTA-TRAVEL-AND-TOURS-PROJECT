@@ -264,18 +264,6 @@ class InspectionController extends Controller
     }
     
     /**
-     * Staff: View ALL inspections (including customer submissions)
-     */
-    /*public function staffIndex()
-    {
-        // Get ALL inspections, latest first
-        $inspections = Inspection::with(['booking', 'vehicle', 'staffUser'])
-            ->latest()
-            ->paginate(20);
-        
-        return view('staff.inspections.index', compact('inspections'));
-    }*/
-    /**
      * Staff: Edit existing inspection (created by customer)
      */
     public function staffEdit($id)
@@ -315,6 +303,10 @@ class InspectionController extends Controller
             ->with('success', 'Inspection updated successfully!');
     }
     
+    /**
+     * Staff: View ALL inspections with filters and statistics
+     * UPDATED: Added $totalInspections variable for view
+     */
     public function staffIndex(Request $request)
     {
         // Start query
@@ -350,11 +342,14 @@ class InspectionController extends Controller
         $inspections = $query->latest()->paginate(20);
         
         // Get stats for filters
+        $totalInspections = Inspection::count(); // ← FIXED: Added this line
         $pickupCount = Inspection::where('inspectionType', 'pickup')->count();
         $returnCount = Inspection::where('inspectionType', 'return')->count();
         $damageCount = Inspection::where('damageDetected', true)->count();
         $todayCount = Inspection::whereDate('created_at', now()->format('Y-m-d'))->count();
-        $pendingCount = Inspection::where('status', 'pending')->count();
+        
+        // Define pendingCount (inspections without remarks)
+        $pendingCount = Inspection::whereNull('remark')->count();
         
         // Condition stats
         $excellentCount = Inspection::where('carCondition', 'excellent')->count();
@@ -369,8 +364,19 @@ class InspectionController extends Controller
         $fairPercentage = $totalConditions > 0 ? ($fairCount / $totalConditions) * 100 : 0;
         $poorPercentage = $totalConditions > 0 ? ($poorCount / $totalConditions) * 100 : 0;
         
+        // Log statistics for debugging
+        Log::info('Inspection Statistics', [
+            'total' => $totalInspections,
+            'pickup' => $pickupCount,
+            'return' => $returnCount,
+            'damage' => $damageCount,
+            'today' => $todayCount,
+            'pending' => $pendingCount,
+        ]);
+        
         return view('staff.inspections.index', compact(
             'inspections',
+            'totalInspections', // ← FIXED: Now included
             'pickupCount',
             'returnCount',
             'damageCount',

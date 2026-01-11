@@ -149,7 +149,7 @@
         <div class="sidebar-nav">
             @php $currentRoute = request()->route()->getName(); @endphp
             
-            <a class="sidebar-link @if($currentRoute == 'staff_salesperson.dashboard') active @endif" 
+            <a class="sidebar-link @if($currentRoute == 'salesperson.dashboard') active @endif" 
                href="{{ route('staff_salesperson.dashboard') }}">
                 <i class="fas fa-tachometer-alt"></i>
                 <span class="menu-text">Dashboard</span>
@@ -165,7 +165,7 @@
                 <span class="menu-text">Commission</span>
             </a>
 
-            <a class="sidebar-link" href="{{ route('inspection.index') }}">
+            <a class="sidebar-link" href="{{ route('staff.inspections.index') }}">
                 <i class="fas fa-file-invoice"></i>
                 <span class="menu-text">Inspections</span>
             </a>

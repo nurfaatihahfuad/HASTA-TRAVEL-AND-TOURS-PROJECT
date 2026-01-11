@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Customer;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Models\College;
 
 class CustomerProfileController extends Controller
 {
     public function show()
     {
         $user = Auth::user();
-        
+        $colleges = College::all();
+
         // Eager load all relationships
         $customer = Customer::with([
             'loyaltyCard',
@@ -41,7 +43,7 @@ class CustomerProfileController extends Controller
             return redirect()->route('home')->with('error', 'Customer profile not found!');
         }
         
-        return view('customers.profile', compact('user', 'customer'));
+        return view('customers.profile', compact('user', 'customer','colleges'));
     }
     
     public function update(Request $request)
@@ -54,6 +56,7 @@ class CustomerProfileController extends Controller
             'noHP' => 'required|string|max:20',
             'accountNumber' => 'required|string|max:50',
             'bankType' => 'required|string|max:50',
+            'collegeID' => 'required|string|max:50',
         ]);
         
         $user->update([
@@ -65,6 +68,11 @@ class CustomerProfileController extends Controller
             'accountNumber' => $validated['accountNumber'],
             'bankType' => $validated['bankType'],
         ]);
+        if ($customer->customerType === 'student' && $customer->studentCustomer) {
+            $customer->studentCustomer->update([
+                'collegeID' => $request->collegeID,
+            ]);
+        }
         
         return back()->with('success', 'Profile updated successfully!');
     }

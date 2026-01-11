@@ -40,7 +40,7 @@
                     <span class="badge 
                         @if($customer->customerStatus == 'active') bg-success
                         @elseif($customer->customerStatus == 'inactive') bg-warning
-                        @elseif($customer->customerStatus == 'blacklisted') bg-danger
+                        @elseif($customer->customerStatus == 'blacklisted') bg-dark
                         @else bg-secondary @endif mb-3">
                         {{ ucfirst($customer->customerStatus) }}
                     </span>
