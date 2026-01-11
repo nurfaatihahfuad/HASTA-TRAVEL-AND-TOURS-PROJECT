@@ -272,8 +272,8 @@
                                                 method="POST" 
                                                 class="d-inline">
                                                 @csrf
-                                                <button type="submit" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-check-circle"></i> Mark as Used
+                                                <button type="submit" class="btn btn-sm btn-outline-success px-3">
+                                                    <i class="fas fa-check-circle me-1"></i> Mark as Used
                                                 </button>
                                             </form>
                                             
@@ -285,13 +285,14 @@
                                             @endif
                                             
                                         @elseif($voucher->pivot->redeemed_at)
-                                            <!-- ALREADY REDEEMED -->
-                                            <div class="alert alert-success p-2 mb-0" style="display: inline-block;">
-                                                <i class="fas fa-check-circle"></i> 
-                                                <strong>Used</strong>
-                                            </div>
+                                            <span class="badge bg-info text-dark px-3 py-2">
+                                                <i class="fas fa-check me-1"></i> Used
+                                            </span>
+
                                         @elseif($voucher->status == 'expired')
-                                            <span class="badge bg-danger">Expired</span>
+                                            <span class="badge bg-dark px-3 py-2">
+                                                Expired
+                                            </span>
                                         @else
                                             <span class="badge bg-warning">{{ ucfirst($voucher->status) }}</span>
                                         @endif
@@ -304,7 +305,9 @@
             @else
                 <div class="text-center py-4 text-muted">
                     <i class="fas fa-ticket-alt fa-3x mb-3"></i>
-                    <p>No vouchers yet</p>
+                    <h5>No vouchers yet</h5>
+                    <p class="text-muted">You haven't earned any vouchers yet.</p>
+                    <p>Refer friends to earn vouchers!</p>
                 </div>
             @endif
         </div>
