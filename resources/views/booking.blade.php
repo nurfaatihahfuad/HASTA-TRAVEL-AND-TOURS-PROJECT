@@ -121,8 +121,24 @@
 
                     <!-- Submit button -->
                     <div class="button-group">
-                        <button type="button" id="submitBookingBtn" class="submit-btn">Submit Booking</button>
+                        <button type="submit" id="submitBookingBtn" class="submit-btn">Submit Booking</button>
+
+                        <button type="button" id="backBtn" class="submit-btn">Back</button>
                     </div>
+
+                    <script>
+                        document.getElementById('backBtn').addEventListener('click', function() {
+                            // Try to go back in history
+                            if (window.history.length > 1) {
+                                window.history.back();
+                            } else {
+                                // If no history, go to vehicles page
+                                window.location.href = "/vehicles"; // Adjust this URL
+                            }
+                        });
+                    </script>
+
+                   
                 </form>
             </div>
 
