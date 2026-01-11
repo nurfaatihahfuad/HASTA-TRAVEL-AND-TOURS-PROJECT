@@ -25,7 +25,7 @@ class BookingController extends Controller
         $pickup = Carbon::parse($pickup_dateTime);
         $return = Carbon::parse($return_dateTime);
         
-        $totalHours = $pickup->diffInHours($return);
+        $totalHours = round($pickup->diffInHours($return));
         $totalHours = $totalHours == 0 ? 1 : $totalHours; // Minimum 1 hour
         
         $pricePerHour = $vehicle->price_per_hour; // Convert daily rate to hourly
