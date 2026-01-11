@@ -754,6 +754,47 @@ class DashboardController extends Controller
             'recentInspections'
         ));
     }
+    // DashboardController.php
+public function inspectionCustomer()
+{
+    $userID = auth()->user()->userID;
+    
+    // Get latest 5 inspections for dashboard
+    $inspections = Inspection::whereHas('booking', function($query) use ($userID) {
+            $query->where('userID', $userID);
+        })
+        ->with(['vehicle'])
+        ->latest()
+        ->limit(5)
+        ->get();
+    
+    // Get inspection stats for dashboard
+    $allInspections = Inspection::whereHas('booking', function($query) use ($userID) {
+            $query->where('userID', $userID);
+        })->get();
+    
+    $totalInspections = $allInspections->count();
+    $pickupCount = $allInspections->where('inspectionType', 'pickup')->count();
+    $returnCount = $allInspections->where('inspectionType', 'return')->count();
+    $damageCount = $allInspections->where('damageDetected', true)->count();
+    
+    // Other dashboard data...
+    $totalBookings = Booking::where('userID', $userID)->count();
+    $activeBookings = Booking::where('userID', $userID)
+        ->whereIn('status', ['confirmed', 'paid'])
+        ->count();
+    
+    // Pass all variables to view
+    return view('customer.dashboard', compact(
+        'inspections',
+        'totalInspections',
+        'pickupCount',
+        'returnCount',
+        'damageCount',
+        'totalBookings',
+        'activeBookings'
+    ));
+}
    
 }
 

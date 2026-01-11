@@ -443,4 +443,87 @@ public function staffShow($id)
     // You can use the same method or create a different view
     return $this->show($id);
 }
+/**
+ * Show single inspection for customer
+ */
+public function customerShow($id)
+{
+    $userID = auth()->user()->userID;
+    
+    // Ensure customer can only view their own inspection
+    $inspection = Inspection::whereHas('booking', function($query) use ($userID) {
+            $query->where('userID', $userID);
+        })
+        ->with(['vehicle', 'booking.user', 'staffUser'])
+        ->findOrFail($id);
+    
+    return view('customer.inspections.show', compact('inspection'));
+}
+// InspectionController.php - customerIndex() method
+// InspectionController.php - REPLACE current customerIndex() method dengan ini:
+public function customerIndex()
+{
+    $userID = auth()->user()->userID;
+    
+    \Log::info("=== DEBUG CUSTOMER INSPECTIONS ===");
+    \Log::info("User ID: " . $userID);
+    
+    // DEBUG: Check bookings for this user
+    $userBookings = Booking::where('userID', $userID)->get();
+    \Log::info("Total bookings for user: " . $userBookings->count());
+    
+    if ($userBookings->count() > 0) {
+        \Log::info("Booking IDs: " . $userBookings->pluck('bookingID')->implode(', '));
+    }
+    
+    // Get all inspections for this customer with pagination
+    $inspections = Inspection::whereHas('booking', function($query) use ($userID) {
+            $query->where('userID', $userID);
+        })
+        ->with(['vehicle', 'booking'])
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+    
+    \Log::info("Paginated inspections count: " . $inspections->count());
+    \Log::info("Total inspections (paginated total): " . $inspections->total());
+    
+    // Get customer's recent bookings
+    $bookings = Booking::where('userID', $userID)
+        ->with(['vehicle', 'inspections'])
+        ->orderBy('created_at', 'desc')
+        ->limit(5)
+        ->get();
+    
+    // Get statistics - FIXED: Use get() bukan all()
+    $allInspections = Inspection::whereHas('booking', function($query) use ($userID) {
+            $query->where('userID', $userID);
+        })->get();
+    
+    \Log::info("All inspections (non-paginated) count: " . $allInspections->count());
+    
+    $totalInspections = $allInspections->count();
+    $pickupCount = $allInspections->where('inspectionType', 'pickup')->count();
+    $returnCount = $allInspections->where('inspectionType', 'return')->count();
+    $damageCount = $allInspections->where('damageDetected', true)->count();
+    
+    \Log::info("Stats - Total: $totalInspections, Pickup: $pickupCount, Return: $returnCount, Damage: $damageCount");
+    
+    // Debug: Show each inspection
+    foreach ($allInspections as $index => $inspection) {
+        \Log::info("Inspection #" . ($index + 1) . 
+                  " - ID: " . ($inspection->inspectionID ?? 'N/A') . 
+                  ", Type: " . ($inspection->inspectionType ?? 'N/A') . 
+                  ", Booking ID: " . ($inspection->bookingID ?? 'N/A') .
+                  ", Vehicle ID: " . ($inspection->vehicleID ?? 'N/A'));
+    }
+    
+    return view('customer.inspections.index', compact(
+        'inspections', 
+        'bookings',
+        'totalInspections',
+        'pickupCount',
+        'returnCount',
+        'damageCount'
+    ));
+}
 }

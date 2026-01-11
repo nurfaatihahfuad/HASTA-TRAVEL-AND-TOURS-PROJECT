@@ -313,7 +313,7 @@ Route::middleware('auth')->group(function () {
     //    ->middleware(['auth']);
 
     // Customer routes
-    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    /*Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
         // Resource routes (index, create, store, edit, update)
         Route::get('/customer/inspections', [InspectionController::class, 'index'])->name('customer.inspections.index');        
         // Pickup inspection
@@ -328,7 +328,28 @@ Route::middleware('auth')->group(function () {
         Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
             ->name('inspection.storeReturnInspection');
     
-    });
+    });*/
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    // View inspections list
+    Route::get('/customer/inspections', [InspectionController::class, 'customerIndex'])
+        ->name('customer.inspections.index');
+    
+    // View single inspection
+    Route::get('/customer/inspections/{id}', [InspectionController::class, 'customerShow'])
+        ->name('customer.inspections.show');
+    
+    // Pickup inspection
+    Route::get('/booking/{id}/pickup-inspection', [InspectionController::class, 'pickupInspection'])
+        ->name('inspection.pickupInspection');
+    Route::post('/booking/{id}/pickup-inspection', [InspectionController::class, 'storePickupInspection'])
+        ->name('inspection.storePickupInspection');
+
+    // Return inspection
+    Route::get('/booking/{id}/return-inspection', [InspectionController::class, 'returnInspection'])
+        ->name('inspection.returnInspection');
+    Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
+        ->name('inspection.storeReturnInspection');
+});
 
     // Staff routes
     // ✅ BETUL - Tambah `()` selepas `group`
@@ -446,6 +467,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     
     Route::post('/commission-verify/{id}/reject', [CommissionController::class, 'reject'])
         ->name('commissionVerify.reject');
+});
+// Dalam web.php
+/*Route::middleware('auth')->group(function() {
+    Route::get('/inspection-checklist', function() {
+        return view('customer.inspections.index');
+    })->name('inspection.checklist');
+});*/
+Route::middleware(['auth'])->group(function() {
+    Route::get('/inspection-checklist', function() {
+        // Redirect terus ke customer inspections index
+        return redirect()->route('customer.inspections.index');
+    })->name('inspection.checklist');
 });
 
 
