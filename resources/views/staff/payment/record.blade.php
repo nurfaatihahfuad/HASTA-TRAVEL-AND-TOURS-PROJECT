@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-1">Bookings Verification</h4>
+            <h4 class="mb-1">Bookings and Payments Verification</h4>
             <p class="text-muted mb-0">Verify payments and approve/reject bookings</p>
         </div>
     </div>
