@@ -329,12 +329,21 @@
         </div>
 
         
-        <!-- Pagination 
-        @if($bookings->hasPages())
-            <div class="d-flex justify-content-center mt-4">
-                {{ $bookings->links() }}
-            </div>
-        @endif -->
+        <!--Pagination-->
+       @if ($bookings->lastPage() > 1)
+        <div class="flex justify-center gap-3 mt-6">
+
+            @for ($i = 1; $i <= $bookings->lastPage(); $i++)
+                <a href="{{ $bookings->url($i) }}"
+                class="px-4 py-2 border
+                {{ $bookings->currentPage() == $i ? 'bg-blue-500 text-white' : 'bg-white' }}">
+                    {{ $i }}
+                </a>
+            @endfor
+
+        </div>
+        @endif
+
     </div>
 </div>
 @endsection
