@@ -9,11 +9,11 @@ class BlacklistedCust extends Model
     protected $table = 'blacklistedcust';   
     protected $primaryKey = 'blacklistID';  
     public $timestamps = false;
-    public $incrementing = false;
-    protected $keyType = 'string';             
+    public $incrementing = true; //dina tukar true asal,false
+    protected $keyType = 'int';               
 
     protected $fillable = [
-        'blacklistID',
+        //'blacklistID', -tak incelude sbb auto increment
         'customerID',
         'reason',
         'adminID',

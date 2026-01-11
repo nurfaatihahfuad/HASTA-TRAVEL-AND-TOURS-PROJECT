@@ -36,12 +36,11 @@ class ReportController extends Controller
                     ->orderBy('booking.created_at', 'desc')
                     ->get();
 
-                // PERUBAHAN: Sesuaikan dengan ENUM yang ada
                 $summary = [
                     'total'     => $data->count(),
-                    'successful' => $data->where('bookingStatus', 'successful')->count(), // changed from 'completed'
+                    'successful' => $data->where('bookingStatus', 'successful')->count(),
                     'pending'   => $data->where('bookingStatus', 'pending')->count(),
-                    'rejected'  => $data->where('bookingStatus', 'rejected')->count(), // changed from 'cancelled'
+                    'rejected'  => $data->where('bookingStatus', 'rejected')->count(),
                 ];
 
                 if (request()->ajax() || str_contains(request()->url(), '/ajax')) {
@@ -55,12 +54,10 @@ class ReportController extends Controller
 
             case 'revenue':
                 try {
-                    // PERUBAHAN: Guna 'successful' bukan 'completed'
                     $data = DB::table('booking')
                         ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
                         ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
-                        ->where('booking.bookingStatus', 'successful') // CHANGED: 'successful' bukan 'completed'
-                        // REMOVED: ->whereIn('payment.paymentStatus', ['approved'])
+                        ->where('booking.bookingStatus', 'successful')
                         ->select(
                             'payment.paymentID',
                             'booking.bookingID',
@@ -80,7 +77,6 @@ class ReportController extends Controller
                         'completed_payments' => $data->where('paymentStatus', 'approved')->count(),
                     ];
                     
-                    // Create chart data
                     $chart = ['labels' => [], 'data' => []];
                     
                     if ($data->count() > 0) {
@@ -91,7 +87,6 @@ class ReportController extends Controller
                         ];
                     }
                     
-                    // AJAX response
                     if (request()->ajax() || str_contains(request()->url(), '/ajax')) {
                         return response()->json([
                             'data' => $data,
@@ -125,13 +120,39 @@ class ReportController extends Controller
                 }
 
             case 'top_college':
-                $data = $this->getTopCollegeData(new Request());
-                
-                if (request()->ajax() || str_contains(request()->url(), '/ajax')) {
-                    return response()->json(['data' => $data]);
+                try {
+                    // DEBUG: Log start
+                    \Log::info('=== TOP COLLEGE REPORT START ===');
+                    
+                    $data = $this->getTopCollegeData(new Request());
+                    
+                    // DEBUG: Log data count
+                    \Log::info('Top College Data Count: ' . $data->count());
+                    if ($data->count() > 0) {
+                        \Log::info('Sample data: ' . json_encode($data->first()));
+                    }
+                    
+                    if (request()->ajax() || str_contains(request()->url(), '/ajax')) {
+                        return response()->json(['data' => $data]);
+                    }
+                    
+                    \Log::info('=== TOP COLLEGE REPORT END ===');
+                    return view('admin.report.partials.top_college', compact('data'));
+                    
+                } catch (\Exception $e) {
+                    \Log::error('Top college report error: ' . $e->getMessage());
+                    
+                    $errorData = [
+                        'data' => collect([]),
+                        'error' => 'Error loading top college report: ' . $e->getMessage()
+                    ];
+                    
+                    if (request()->ajax() || str_contains(request()->url(), '/ajax')) {
+                        return response()->json($errorData, 500);
+                    }
+                    
+                    return view('admin.report.partials.top_college', $errorData);
                 }
-                
-                return view('admin.report.partials.top_college', compact('data'));
 
             case 'blacklisted':
                 $data = User::where('blacklisted', 1)->get();
@@ -151,15 +172,68 @@ class ReportController extends Controller
     
     public function filterTopCollege(Request $request)
     {
-        $month = $request->month;
-        $year = $request->year;
-    
-        $data = Booking::where('collegeName', '!=', null)
-            ->when($month, fn($q) => $q->whereMonth('pickup_dateTime', $month))
-            ->when($year, fn($q) => $q->whereYear('pickup_dateTime', $year))
-            ->get();
-    
-        return response()->json($data);
+        try {
+            // 1. Cari top college berdasarkan filter
+            $topCollegeQuery = DB::table('booking')
+                ->join('user', 'booking.userID', '=', 'user.userID')
+                ->join('customer', 'user.userID', '=', 'customer.userID')
+                ->join('studentCustomer', 'customer.userID', '=', 'studentCustomer.userID')
+                ->join('college', 'studentCustomer.collegeID', '=', 'college.collegeID');
+
+            if ($request->month) {
+                $topCollegeQuery->whereMonth('booking.pickup_dateTime', $request->month);
+            }
+            if ($request->year) {
+                $topCollegeQuery->whereYear('booking.pickup_dateTime', $request->year);
+            }
+
+            $topCollege = $topCollegeQuery
+                ->select(
+                    'college.collegeName',
+                    DB::raw('COUNT(*) as total_bookings')
+                )
+                ->groupBy('college.collegeName')
+                ->orderByDesc('total_bookings')
+                ->first();
+
+            if (!$topCollege) {
+                return response()->json([]);
+            }
+
+            // 2. Ambil data booking untuk top college tersebut
+            $query = DB::table('booking')
+                ->join('user', 'booking.userID', '=', 'user.userID')
+                ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
+                ->join('customer', 'user.userID', '=', 'customer.userID')
+                ->join('studentCustomer', 'customer.userID', '=', 'studentCustomer.userID')
+                ->join('college', 'studentCustomer.collegeID', '=', 'college.collegeID')
+                ->where('college.collegeName', $topCollege->collegeName)
+                ->select(
+                    'booking.bookingID',
+                    'booking.userID',
+                    'user.name',
+                    'college.collegeName',
+                    'vehicles.vehicleName',
+                    'booking.pickup_dateTime',
+                    'booking.return_dateTime',
+                    'booking.bookingStatus'
+                );
+
+            if ($request->month) {
+                $query->whereMonth('booking.pickup_dateTime', $request->month);
+            }
+            if ($request->year) {
+                $query->whereYear('booking.pickup_dateTime', $request->year);
+            }
+
+            $data = $query->orderBy('booking.pickup_dateTime', 'desc')->get();
+
+            return response()->json($data);
+
+        } catch (\Exception $e) {
+            \Log::error('Filter top college error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function filterTotalBooking(Request $request)
@@ -187,7 +261,6 @@ class ReportController extends Controller
             ->orderBy('booking.created_at', 'desc')
             ->get();
 
-        // PERUBAHAN: Sesuaikan dengan ENUM
         $summary = [
             'total'     => $data->count(),
             'successful' => $data->where('bookingStatus', 'successful')->count(),
@@ -203,11 +276,10 @@ class ReportController extends Controller
 
     public function filterRevenue(Request $request)
     {
-        // PERUBAHAN: Guna 'successful' bukan 'completed'
         $query = DB::table('booking')
             ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
             ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
-            ->where('booking.bookingStatus', 'successful'); // CHANGED
+            ->where('booking.bookingStatus', 'successful');
 
         if ($request->month) {
             $query->whereMonth('booking.pickup_dateTime', $request->month);
@@ -274,7 +346,6 @@ class ReportController extends Controller
 
         $data = $query->orderBy('booking.created_at', 'desc')->get();
 
-        // PERUBAHAN: Sesuaikan dengan ENUM
         $summary = [
             'total'     => $data->count(),
             'successful' => $data->where('bookingStatus', 'successful')->count(),
@@ -293,11 +364,10 @@ class ReportController extends Controller
 
     public function exportRevenuePdf(Request $request)
     {
-        // PERUBAHAN: Guna 'successful' bukan 'completed'
         $query = DB::table('booking')
             ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
             ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
-            ->where('booking.bookingStatus', 'successful'); // CHANGED
+            ->where('booking.bookingStatus', 'successful');
 
         if ($request->month) {
             $query->whereMonth('booking.pickup_dateTime', $request->month);
@@ -401,11 +471,10 @@ class ReportController extends Controller
 
     public function exportRevenueExcel(Request $request)
     {
-        // PERUBAHAN: Guna 'successful' bukan 'completed'
         $query = DB::table('booking')
             ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
             ->join('payment', 'booking.bookingID', '=', 'payment.bookingID')
-            ->where('booking.bookingStatus', 'successful'); // CHANGED
+            ->where('booking.bookingStatus', 'successful');
 
         if ($request->month) {
             $query->whereMonth('booking.pickup_dateTime', $request->month);
@@ -475,12 +544,43 @@ class ReportController extends Controller
 
     private function getTopCollegeData(Request $request)
     {
+        // 1. Cari kolej dengan jumlah booking terbanyak
+        $topCollegeQuery = DB::table('booking')
+            ->join('user', 'booking.userID', '=', 'user.userID')
+            ->join('customer', 'user.userID', '=', 'customer.userID')
+            ->join('studentCustomer', 'customer.userID', '=', 'studentCustomer.userID')
+            ->join('college', 'studentCustomer.collegeID', '=', 'college.collegeID');
+
+        // Apply month/year filter jika ada
+        if ($request->month) {
+            $topCollegeQuery->whereMonth('booking.pickup_dateTime', $request->month);
+        }
+        if ($request->year) {
+            $topCollegeQuery->whereYear('booking.pickup_dateTime', $request->year);
+        }
+
+        $topCollege = $topCollegeQuery
+            ->select(
+                'college.collegeName',
+                DB::raw('COUNT(*) as total_bookings')
+            )
+            ->groupBy('college.collegeName')
+            ->orderByDesc('total_bookings')
+            ->first(); // Ambil yang pertama (tertinggi)
+
+        // Jika tak ada data, return kosong
+        if (!$topCollege) {
+            return collect();
+        }
+
+        // 2. Ambil SEMUA booking untuk kolej tersebut
         $query = DB::table('booking')
             ->join('user', 'booking.userID', '=', 'user.userID')
             ->join('vehicles', 'booking.vehicleID', '=', 'vehicles.vehicleID')
             ->join('customer', 'user.userID', '=', 'customer.userID')
             ->join('studentCustomer', 'customer.userID', '=', 'studentCustomer.userID')
             ->join('college', 'studentCustomer.collegeID', '=', 'college.collegeID')
+            ->where('college.collegeName', $topCollege->collegeName) // Filter hanya untuk top college
             ->select(
                 'booking.bookingID',
                 'booking.userID',
@@ -492,6 +592,7 @@ class ReportController extends Controller
                 'booking.bookingStatus'
             );
 
+        // Apply month/year filter lagi untuk data spesifik
         if ($request->month) {
             $query->whereMonth('booking.pickup_dateTime', $request->month);
         }
@@ -499,6 +600,6 @@ class ReportController extends Controller
             $query->whereYear('booking.pickup_dateTime', $request->year);
         }
 
-        return $query->orderBy('college.collegeName')->get();
+        return $query->orderBy('booking.pickup_dateTime', 'desc')->get();
     }
 }

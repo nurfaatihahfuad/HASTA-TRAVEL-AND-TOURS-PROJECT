@@ -565,7 +565,7 @@ class DashboardController extends Controller
     }
 
     // Toggle customer status
-    public function toggleCustomerStatus(Request $request, $userId)
+    /*public function toggleCustomerStatus(Request $request, $userId)
     {
         // Find customer using model
         $customer = Customer::where('userID', $userId)->first();
@@ -652,49 +652,132 @@ class DashboardController extends Controller
         return back()->with('error', 
             'Only active customers can be blacklisted. Current status: ' . 
             ucfirst($customer->customerStatus));
+    }*/
+
+    public function toggleCustomerStatus(Request $request, $userId)
+    {
+        // Find customer
+        $customer = DB::table('customer')
+            ->where('userID', $userId)
+            ->first();
+
+        if (!$customer) {
+            abort(404, 'Customer not found');
+        }
+
+        // Check if customer is already blacklisted
+        if ($customer->customerStatus == 'blacklisted') {
+            return back()->with('error', 'This customer is already blacklisted.');
+        }
+
+        // Only allow changing from active to blacklisted
+        if ($customer->customerStatus == 'active') {
+            // Validate the reason
+            $validated = $request->validate([
+                'reason' => 'required|string|max:100|min:10'
+            ]);
+
+            DB::beginTransaction();
+            
+            try {
+                // 1. Update customer status
+                DB::table('customer')
+                    ->where('userID', $userId)
+                    ->update(['customerStatus' => 'blacklisted']);
+                
+                // 2. Create blacklist record (JANGAN generate ID - biar auto-increment)
+                DB::table('blacklistedcust')->insert([
+                    'customerID' => $userId,
+                    'reason' => $validated['reason'],
+                    'adminID' => auth()->id() // Pastikan ini sesuai dengan format adminID
+                ]);
+
+                // 3. Dapatkan blacklistID yang baru dibuat
+                $blacklistID = DB::getPdo()->lastInsertId();
+
+                DB::commit();
+                
+                // Log the action
+                \Log::info('Customer blacklisted', [
+                    'customerID' => $userId,
+                    'blacklistID' => $blacklistID,
+                    'adminID' => auth()->id(),
+                    'reason' => $validated['reason'],
+                    'timestamp' => now()->toDateTimeString()
+                ]);
+                
+                return back()->with('success', 
+                    'Customer has been blacklisted successfully. ' .
+                    'Blacklist ID: BL' . $blacklistID); // Tambah prefix jika perlu
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                
+                \Log::error('Failed to blacklist customer', [
+                    'customerID' => $userId,
+                    'adminID' => auth()->id(),
+                    'error' => $e->getMessage()
+                ]);
+                
+                return back()->with('error', 
+                    'Failed to blacklist customer: ' . $e->getMessage());
+            }
+        }
+
+        return back()->with('error', 
+            'Only active customers can be blacklisted. Current status: ' . 
+            ucfirst($customer->customerStatus));
     }
 
     public function blacklistedCustomers(Request $request)
     {
-        // Get search and filter parameters
         $search = $request->get('search');
         
-        // Base query for blacklisted customers
+        \Log::info('=== BLACKLISTED CUSTOMERS QUERY START ===');
+        
+        // BASE QUERY - SIMPLE VERSION DULU
         $query = DB::table('customer')
             ->join('user', 'customer.userID', '=', 'user.userID')
-            ->join('blacklistedcust', 'customer.userID', '=', 'blacklistedcust.customerID')
-            ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+            ->leftJoin('blacklistedcust', 'customer.userID', '=', 'blacklistedcust.customerID')
             ->select(
                 'user.userID',
                 'user.name',
                 'user.email',
                 'user.noHP',
-                'user.noIC',
-                'customer.customerType',
                 'customer.customerStatus',
                 'blacklistedcust.blacklistID',
                 'blacklistedcust.reason',
-                'blacklistedcust.adminID',
-                'admin.name as adminName'
+                'blacklistedcust.adminID'
             )
             ->where('customer.customerStatus', 'blacklisted');
 
-        // Apply search filter
+        // Debug: Lihat query SQL
+        \Log::info('Query SQL: ' . $query->toSql());
+        
+        // Get count before pagination
+        $count = $query->count();
+        \Log::info('Total blacklisted customers found: ' . $count);
+
+        // Apply search
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('user.name', 'like', "%{$search}%")
                 ->orWhere('user.email', 'like', "%{$search}%")
-                ->orWhere('user.noHP', 'like', "%{$search}%")
-                ->orWhere('user.userID', 'like', "%{$search}%")
-                ->orWhere('blacklistedcust.blacklistID', 'like', "%{$search}%");
+                ->orWhere('user.userID', 'like', "%{$search}%");
             });
         }
 
-
-        // Get paginated results
+        // Get results
         $blacklistedCustomers = $query->paginate(20)->withQueryString();
+        
+        \Log::info('Paginated results: ' . $blacklistedCustomers->count());
+        
+        // DEBUG: Dump first record jika ada
+        if ($blacklistedCustomers->count() > 0) {
+            \Log::info('First record:', (array) $blacklistedCustomers->first());
+        }
 
-        // Get statistics
+        // Statistics
         $totalBlacklisted = DB::table('customer')
             ->where('customerStatus', 'blacklisted')
             ->count();
@@ -704,6 +787,8 @@ class DashboardController extends Controller
         $blacklistPercentage = $totalCustomers > 0 
             ? round(($totalBlacklisted / $totalCustomers) * 100, 2) 
             : 0;
+
+        \Log::info('=== BLACKLISTED CUSTOMERS QUERY END ===');
 
         return view('admin.blacklisted.index', compact(
             'blacklistedCustomers',

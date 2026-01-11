@@ -18,6 +18,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DamageCaseController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\CommissionController;
+use App\Http\Controllers\CustomerProfileController;
 
 
 // ============================
@@ -56,10 +57,46 @@ Route::get('/register/customer/success', [CustomerRegistrationController::class,
 Route::get('/customer/dashboard', [DashboardController::class, 'customer'])
     ->middleware(['auth', RoleMiddleware::class.':customer'])
     ->name('customer.dashboard');
-Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
-    Route::get('/customer/profile', [DashboardController::class, 'customerProfile'])->name('customer.profile');
-    Route::post('/customer/profile', [DashboardController::class, 'customerUpdateProfile'])->name('customer.profile.update');
+
+// Customer Profile & Vouchers
+Route::middleware(['auth'])->group(function () {
+    // Profile
+    Route::get('/customer/profile', [CustomerProfileController::class, 'show'])->name('customer.profile');
+    Route::put('/customer/profile', [CustomerProfileController::class, 'update'])->name('customer.profile.update');
+    
+    // Voucher redemption - MUST HAVE voucherCode PARAMETER
+    Route::post('/customer/voucher/{voucherCode}/redeem', [CustomerProfileController::class, 'redeem'])
+        ->name('customer.voucher.redeem');
 });
+
+// In routes/web.php
+Route::get('/test-raw-update/{voucherCode}', function($voucherCode) {
+    $customer = Auth::user()->customer;
+    
+    \Log::info("🔧 === TEST RAW UPDATE ===");
+    \Log::info("🔧 Customer: {$customer->userID}");
+    \Log::info("🔧 Voucher: {$voucherCode}");
+    
+    // Method that worked in SQL test
+    $result = DB::update("
+        UPDATE customer_voucher 
+        SET redeemed_at = NOW() 
+        WHERE customerID = ? AND voucherCode = ?
+    ", [$customer->userID, $voucherCode]);
+    
+    \Log::info("🔧 Raw SQL update: {$result} rows affected");
+    
+    // Verify
+    $after = DB::table('customer_voucher')
+        ->where('customerID', $customer->userID)
+        ->where('voucherCode', $voucherCode)
+        ->first();
+    
+    \Log::info("🔧 After - redeemed_at: " . ($after->redeemed_at ?? 'NULL'));
+    
+    return redirect()->route('customer.profile')
+        ->with('info', "Test: {$result} rows updated, redeemed_at = " . ($after->redeemed_at ?? 'NULL'));
+})->middleware('auth');
         
 // Admin 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
@@ -206,7 +243,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/revenue/export-excel', [ReportController::class, 'exportRevenueExcel'])
             ->name('revenue.exportExcel');
     });
-
 });
 
     // ============================
@@ -254,16 +290,44 @@ Route::middleware('auth')->group(function () {
         ->name('payment.reject');
 
     // ============================
-    // Inspection Routes
+    // Pickup Return
     // ============================
 
     // Customer boleh index, create, store, edit, update
-    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
-        Route::resource('inspection', InspectionController::class)
-            ->only(['index','create','store','edit','update']);
-    });
+    //Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','create','store','edit','update']);
+    //});
 
     // Staff hanya index, edit, update
+    //Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
+    //    Route::resource('inspection', InspectionController::class)
+    //        ->only(['index','edit','update']);
+    //});
+
+    // ============================
+    // Inspection Routes
+    // ============================
+
+    // Customer routes
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+        // Resource routes (index, create, store, edit, update)
+        Route::get('/customer/inspections', [InspectionController::class, 'index'])->name('customer.inspections.index');        
+        // Pickup inspection
+        Route::get('/booking/{id}/pickup-inspection', [InspectionController::class, 'pickupInspection'])
+            ->name('inspection.pickupInspection');
+        Route::post('/booking/{id}/pickup-inspection', [InspectionController::class, 'storePickupInspection'])
+            ->name('inspection.storePickupInspection');
+
+        // Return inspection
+        Route::get('/booking/{id}/return-inspection', [InspectionController::class, 'returnInspection'])
+            ->name('inspection.returnInspection');
+        Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
+            ->name('inspection.storeReturnInspection');
+    
+    });
+
+    // Staff routes
     Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
         Route::resource('inspection', InspectionController::class)
             ->only(['index','edit','update']);
@@ -282,16 +346,18 @@ Route::middleware('auth')->group(function () {
         Route::post('damagecase/{caseID}/resolve', [DamageCaseController::class, 'resolve'])
         ->name('damagecase.resolve');
     });
+    // ============================
+    // Pickup Return Button
+    // ============================
+    Route::post('/booking/{id}/pickup', [BookingController::class, 'markPickup'])->name('booking.pickup');
+    Route::post('/booking/{id}/return', [BookingController::class, 'markReturn'])->name('booking.return');
+
 
 // ============================
 // Payment routes
 // ============================
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
-
-// Staff dashboard: verify payments
-//Route::get('/verify', [verifypaymentController::class, 'index'])->name('payment.index');
-//Route::post('/verify/{paymentID}', [verifypaymentController::class, 'verify'])->name('payment.verify');
 
 // ============================
 // Staff Management (Admin only)
@@ -340,17 +406,66 @@ Route::post('/admin/customers/{userId}/blacklist', [DashboardController::class, 
 // Blacklisted customers list
 Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustomers'])->name('admin.blacklisted.index');
 
-//================
-//Commission
-//================
-// Commission Routes
-Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
-Route::get('/commission/create', [CommissionController::class, 'create'])->name('commission.create');
-Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
-Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
-Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
-Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
-    ->name('commission.deleteReceipt');
+//==============================
+// Commission Routes (for STAFF)
+//==============================
+Route::middleware(['auth'])->group(function () {
+    // Staff commission routes (accessible by staff/salesperson)
+    Route::get('/commission', [CommissionController::class, 'staffIndex'])->name('commission.index');
+    //Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
+    Route::get('/commission/create', [CommissionController::class, 'create'])->name('commission.create');
+    Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
+    Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
+    Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
+    Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
+        ->name('commission.deleteReceipt');
+});
+
+///========================================
+// Commission Verification (for ADMIN only)
+//=========================================
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    // Admin commission routes
+    Route::get('/commission-verify', [CommissionController::class, 'adminIndex'])
+        ->name('commissionVerify.index');
+    
+    Route::get('/commission-verify/{id}', [CommissionController::class, 'adminShow'])
+        ->name('commissionVerify.show');
+    
+    Route::post('/commission-verify/{id}/approve', [CommissionController::class, 'approve'])
+        ->name('commissionVerify.approve');
+    
+    Route::post('/commission-verify/{id}/reject', [CommissionController::class, 'reject'])
+        ->name('commissionVerify.reject');
+});
 
 
-
+// Staff Inspection Management Routes
+Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->name('staff.')->group(function () {
+    
+    // Inspections - View and Manage
+    Route::prefix('inspections')->name('inspections.')->group(function () {
+        // Index - View ALL inspections
+        Route::get('/', [InspectionController::class, 'staffIndex'])->name('index');
+        
+        // Show single inspection
+        Route::get('/{id}', [InspectionController::class, 'show'])->name('show');
+        
+        // Edit inspection (form)
+        Route::get('/{id}/edit', [InspectionController::class, 'staffEdit'])->name('edit');
+        
+        // Update inspection
+        Route::put('/{id}', [InspectionController::class, 'staffUpdate'])->name('update');
+        
+        // Delete inspection
+        Route::delete('/{id}', [InspectionController::class, 'destroy'])->name('destroy');
+        
+        // Verify inspection
+        Route::post('/{id}/verify', [InspectionController::class, 'verify'])->name('verify');
+        
+        // Special views
+        Route::get('/today', [InspectionController::class, 'todayInspections'])->name('today');
+        Route::get('/pending', [InspectionController::class, 'pendingInspections'])->name('pending');
+        Route::get('/with-damage', [InspectionController::class, 'inspectionsWithDamage'])->name('damage');
+    });
+});
