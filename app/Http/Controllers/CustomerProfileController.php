@@ -59,7 +59,6 @@ class CustomerProfileController extends Controller
             'noHP' => 'required|string|max:20',
             'accountNumber' => 'required|string|max:50',
             'bankType' => 'required|string|max:50',
-            'collegeID' => 'required|string|max:50',
         ]);
         
         $user->update([

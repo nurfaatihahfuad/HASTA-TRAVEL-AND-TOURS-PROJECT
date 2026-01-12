@@ -187,6 +187,7 @@
                                 <div class="btn-group" role="group">
                                     <!-- Quick Approve/Reject Booking -->
                                     @if($b->bookingStatus == 'pending')
+                                    <div class="d-inline-block me-2">
                                         <!-- HANYA check booking status -->
                                         <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID) }}" class="d-inline">
                                             @csrf
@@ -206,18 +207,26 @@
                                         </form>
                                     @else
                                         <!-- Show booking status badge -->
-                                        <span class="badge bg-{{ $b->bookingStatus == 'successful' ? 'success' : 'danger' }}">
-                                            {{ ucfirst($b->bookingStatus) }}
+                                         <span class="badge
+                                            @if($b->bookingStatus == 'pending') bg-warning
+                                            @elseif($b->bookingStatus == 'successful') bg-info
+                                            @elseif($b->bookingStatus == 'completed') bg-success
+                                            @elseif($b->bookingStatus == 'rejected') bg-danger
+                                            @else bg-secondary
+                                            @endif">
+                                                {{ ucfirst($b->bookingStatus) }}
                                         </span>
                                     @endif
-                                    
+                                    </div>
                                     <!-- View Details -->
+                                    <div class="d-inline-block">
                                     <button type="button" 
                                             class="btn btn-primary btn-sm"
                                             data-bs-toggle="modal" 
                                             data-bs-target="#bookingModal{{ $b->bookingID }}">
                                         <i class="fas fa-info-circle"></i>
                                     </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>

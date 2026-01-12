@@ -107,6 +107,11 @@ Route::middleware(['auth', RoleMiddleware::class.':admin'])
             ->name('show');
     });
 
+// Admin Check Vehicle Availability
+Route::post('/admin/check-availability', [AdminController::class, 'checkAvailability'])
+    ->middleware(['auth', RoleMiddleware::class.':admin'])
+    ->name('admin.checkAvailability');
+
 
 // Staff Runner Dashboard ---ROUTE CHECKED
 Route::get('/staff/runner/dashboard', [DashboardController::class, 'staffRunner'])

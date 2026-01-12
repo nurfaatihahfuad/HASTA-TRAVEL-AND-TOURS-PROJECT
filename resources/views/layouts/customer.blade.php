@@ -22,6 +22,8 @@
         :root {
             --sidebar-width: 250px;
             --sidebar-collapsed-width: 70px;
+            --footer-width: calc(100% - var(--sidebar-width));
+            --footer-collapsed-width: calc(100% - var(--sidebar-collapsed-width));
             --primary-color: #dc3545;
             --secondary-color: #c82333;
             --customer-primary: #dc3545;
@@ -244,14 +246,16 @@
             background-color: #f8f9fa;
             padding: 3rem 0;
             margin-top: auto;
-            margin-left: 0;
-            width:100%;
+            margin-left: var(--sidebar-width);
+            width: var(--footer-width);
             border-top: 1px solid #dee2e6;
-            transition: margin-left 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
         
         .footer-main.expanded {
-            margin-left: 0;
+            margin-left: var(--sidebar-collapsed-width);
+            width: calc(100% - var(--sidebar-collapsed-width));
         }
         
         .footer-main a {
@@ -285,6 +289,13 @@
         .footer-main .d-flex.gap-2 a:hover {
             color: var(--customer-primary);
         }
+
+        /* Ensure the footer container is properly centered */
+        .footer-main .container {
+            max-width: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -301,6 +312,12 @@
             
             .footer-main {
                 margin-left: 0;
+                width: 100%;
+            }
+
+            .footer-main.expanded {
+                margin-left: 0;
+                width: 100%;
             }
             
             .sidebar-logo {
@@ -494,3 +511,42 @@
     @stack('scripts')
 </body>
 </html>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const footerMain = document.getElementById('footerMain');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    toggleBtn.addEventListener('click', () => {
+        // Toggle sidebar collapsed state
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+        footerMain.classList.toggle('expanded');
+        
+        // Update footer position
+        updateFooterPosition();
+    });
+
+    function updateFooterPosition() {
+        if (sidebar.classList.contains('collapsed')) {
+            // When sidebar is collapsed
+            footerMain.style.marginLeft = '70px';
+            footerMain.style.width = 'calc(100% - 70px)';
+        } else {
+            // When sidebar is expanded
+            footerMain.style.marginLeft = '250px';
+            footerMain.style.width = 'calc(100% - 250px)';
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateFooterPosition();
+        
+        // Update on window resize
+        window.addEventListener('resize', function() {
+            setTimeout(updateFooterPosition, 100);
+        });
+    });
+</script>

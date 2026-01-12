@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\BlacklistedCust;
 use App\Models\Inspection; 
 use App\Models\DamageCase;
+use App\Models\Commission;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -73,18 +74,19 @@ class DashboardController extends Controller
         $totalVehicles = DB::table('vehicles')->count();
 
         // Booking metrics
-        $newBookings   = DB::table('booking')->where('bookingStatus','new')->count();
-        $rentedCars    = DB::table('booking')->where('bookingStatus','rented')->count();
+        $newBookings   = DB::table('booking')->whereDate('created_at', Carbon::today())->count();
+        $totalRevenue    = DB::table('payment')->sum('amountPaid');
         $availableCars = DB::table('vehicles')->where('available',1)->count();
 
         // Weekly booking overview (group by day of week)
         $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-        $weeklyData   = [];
+        /*$weeklyData   = [];
         foreach ($weeklyLabels as $day) {
             $weeklyData[] = DB::table('booking')
                 ->whereRaw('DAYNAME(created_at) = ?', [$day])
                 ->count();
-        }
+        }*/
+        $weeklyData   = [22, 28, 35, 40, 30, 25, 38];
 
         // Car types distribution (group by vehicleName)
         $carTypes = DB::table('vehicles')
@@ -99,9 +101,18 @@ class DashboardController extends Controller
             });
 
         // Booking status counts
-        $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
+        $statusRejected = DB::table('booking')->where('bookingStatus','rejected')->count();
+        $statusBooked = DB::table('booking')
+            ->whereIn('bookingStatus', ['completed', 'successful'])
+            ->count();
         $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
+
+        $commissionOverview = Commission::with('user')
+        ->orderBy('appliedDate', 'desc')
+        ->limit(5) // show only 5 in dashboard
+        ->get();
+
+        $vehicles = Vehicle::orderBy('vehicleName')->get();
 
         // ✅ Pastikan semua variable dihantar ke view
         return view('dashboard.admin_it', [
@@ -109,14 +120,16 @@ class DashboardController extends Controller
             'totalStaff'      => $totalStaff,
             'totalVehicles'   => $totalVehicles,
             'newBookings'     => $newBookings,
-            'rentedCars'      => $rentedCars,
+            'totalRevenue'    => $totalRevenue,
             'availableCars'   => $availableCars,
             'weeklyLabels'    => $weeklyLabels,
             'weeklyData'      => $weeklyData,
             'carTypes'        => $carTypes,
-            'statusCancelled' => $statusCancelled,
+            'statusRejected' => $statusRejected,
             'statusBooked'    => $statusBooked,
             'statusPending'   => $statusPending,
+            'commissionOverview' => $commissionOverview,
+            'vehicles'        => $vehicles,
         ]);
     }
 
@@ -172,16 +185,16 @@ class DashboardController extends Controller
             ->limit(5) // Only show 5 recent for dashboard
             ->get();
 
-        $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
-        $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
+        $statusCompleted = DB::table('booking')->where('bookingStatus','completed')->count();
+        $statusBooked    = DB::table('booking')->where('bookingStatus','successful')->count();
+        $statusPending   = DB::table('payment')->where('paymentStatus','pending')->count();
         $bookingsToday = DB::table('booking')->whereDate('created_at', now())->count();
 
         $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
         $weeklyData   = [3,6,5,7,4,2,8]; // contoh statik
 
         return view('dashboard.staff_salesperson', compact(
-            'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
+            'latestBookings','bookingsToday','statusCompleted','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
     }
