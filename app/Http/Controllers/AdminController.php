@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -302,4 +303,38 @@ class AdminController extends Controller
 
         return back()->with('success', 'Password changed successfully!');
     }*/
+
+    // View Booking
+    public function bookingIndex(Request $request)
+    {
+        $query = Booking::with(['user', 'vehicle']);
+
+        // 🔍 Filter by status
+        if ($request->filled('status')) {
+            $query->where('bookingStatus', $request->status);
+        }
+
+        // 📅 Filter by date range (pickup)
+        if ($request->filled('from')) {
+            $query->whereDate('pickup_dateTime', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('pickup_dateTime', '<=', $request->to);
+        }
+
+        $bookings = $query
+            ->orderBy('pickup_dateTime', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.bookings.index', compact('bookings'));
+    }
+
+    public function bookingShow(Booking $booking)
+    {
+        $booking->load(['user', 'vehicle', 'payments', 'inspections']);
+
+        return view('admin.bookings.show', compact('booking'));
+    }
 }

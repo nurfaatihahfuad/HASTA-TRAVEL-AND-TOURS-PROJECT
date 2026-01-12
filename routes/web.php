@@ -69,34 +69,15 @@ Route::middleware(['auth'])->group(function () {
         ->name('customer.voucher.redeem');
 });
 
-// In routes/web.php
-Route::get('/test-raw-update/{voucherCode}', function($voucherCode) {
-    $customer = Auth::user()->customer;
-    
-    \Log::info("🔧 === TEST RAW UPDATE ===");
-    \Log::info("🔧 Customer: {$customer->userID}");
-    \Log::info("🔧 Voucher: {$voucherCode}");
-    
-    // Method that worked in SQL test
-    $result = DB::update("
-        UPDATE customer_voucher 
-        SET redeemed_at = NOW() 
-        WHERE customerID = ? AND voucherCode = ?
-    ", [$customer->userID, $voucherCode]);
-    
-    \Log::info("🔧 Raw SQL update: {$result} rows affected");
-    
-    // Verify
-    $after = DB::table('customer_voucher')
-        ->where('customerID', $customer->userID)
-        ->where('voucherCode', $voucherCode)
-        ->first();
-    
-    \Log::info("🔧 After - redeemed_at: " . ($after->redeemed_at ?? 'NULL'));
-    
-    return redirect()->route('customer.profile')
-        ->with('info', "Test: {$result} rows updated, redeemed_at = " . ($after->redeemed_at ?? 'NULL'));
-})->middleware('auth');
+// Customer Booking History
+Route::middleware(['auth'])->prefix('customers')->group(function () {
+    Route::get('/BookingHistory', [CustomerProfileController::class, 'bookingIndex'])
+        ->name('customers.BookingHistory.index');
+
+    Route::get('/BookingHistory/{booking}', [CustomerProfileController::class, 'bookingShow'])
+        ->name('customers.BookingHistory.show');
+});
+
         
 // Admin 
 Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
@@ -108,15 +89,24 @@ Route::get('/admin/it/dashboard', [DashboardController::class, 'adminIT'])
     ->middleware(['auth', RoleMiddleware::class.':admin'])
     ->name('admin_it.dashboard');
 
-// Admin IT Manage Users 
-/*Route::get('/admin/it/users', [AdminUserController::class, 'index']) 
-    ->middleware(['auth', RoleMiddleware::class.':adminIT']) 
-    ->name('admin.it.users');*/
-
 // Admin Finance Dashboard
 Route::get('/admin/finance/dashboard', [DashboardController::class, 'adminFinance'])
     ->middleware(['auth', RoleMiddleware::class.':adminFinance'])
     ->name('admin_finance.dashboard');
+
+// Admin Booking Management Dashboard
+Route::middleware(['auth', RoleMiddleware::class.':admin'])
+    ->prefix('admin')
+    ->name('admin.bookings.')
+    ->group(function () {
+
+        Route::get('/bookings', [AdminController::class, 'bookingIndex'])
+            ->name('index');
+
+        Route::get('/bookings/{booking}', [AdminController::class, 'bookingShow'])
+            ->name('show');
+    });
+
 
 // Staff Runner Dashboard ---ROUTE CHECKED
 Route::get('/staff/runner/dashboard', [DashboardController::class, 'staffRunner'])

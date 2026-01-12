@@ -361,9 +361,9 @@
                 <i class="fas fa-tachometer-alt"></i>
                 <span class="menu-text">Dashboard</span>
             </a>
-            
-            <a class="sidebar-link @if($currentRoute == 'customer.bookings') active @endif" 
-               href="#">
+
+            <a class="sidebar-link @if($currentRoute == 'customers.BookingHistory.index') active @endif" 
+               href="{{ route('customers.BookingHistory.index') }}">
                 <i class="fas fa-history"></i>
                 <span class="menu-text">Booking History</span>
             </a>

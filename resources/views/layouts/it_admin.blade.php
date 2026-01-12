@@ -148,8 +148,8 @@
                 <i class="fas fa-tachometer-alt"></i>
                 <span class="menu-text">Dashboard</span>
             </a>
-            
-            <a class="sidebar-link" href="#">
+
+            <a class="sidebar-link @if($currentRoute == 'admin.bookings.index') active @endif" href="{{ route('admin.bookings.index') }}">
                 <i class="fas fa-calendar-check"></i>
                 <span class="menu-text">Booking</span>
             </a>
