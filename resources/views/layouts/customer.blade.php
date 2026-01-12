@@ -340,7 +340,8 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h6><i class="fas fa-car me-2"></i>HASTA</h6>
+            
+            <h6><img src="{{ asset('img/hasta.jpeg') }}" alt="Hasta Logo" style="max-width:80px;"></h6>
             <button id="toggleBtn"><i class="fas fa-bars"></i></button>
         </div>
         

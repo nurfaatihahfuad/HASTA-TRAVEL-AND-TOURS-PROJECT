@@ -201,7 +201,7 @@
 <body>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5><i class="fas fa-car me-2"></i>HASTA</h5>
+            <h5><img src="{{ asset('img/hasta.jpeg') }}" alt="Hasta Logo" style="max-width:100px;"></h5>
             <button id="toggleBtn"><i class="fas fa-bars"></i></button>
         </div>
         
