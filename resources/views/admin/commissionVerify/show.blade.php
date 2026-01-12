@@ -83,34 +83,34 @@
                     
                     <!-- Action Buttons -->
                     <div class="mt-4">
-                        @if($commission->status === 'pending')
-                            <form action="{{ route('admin.commissionVerify.approve', $commission->commissionID) }}" 
-                                  method="POST" class="d-inline"
-                                  onsubmit="return confirm('Are you sure you want to APPROVE this commission?')">
-                                @csrf
-                                <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="fas fa-check-circle"></i> Approve Commission
-                                </button>
-                            </form>
-                            
-                            <form action="{{ route('admin.commissionVerify.reject', $commission->commissionID) }}" 
-                                  method="POST" class="d-inline"
-                                  onsubmit="return confirm('Are you sure you want to REJECT this commission?')">
-                                @csrf
-                                <button type="submit" class="btn btn-danger btn-lg ms-2">
-                                    <i class="fas fa-times-circle"></i> Reject Commission
-                                </button>
-                            </form>
-                        @else
-                            <div class="alert alert-info">
-                                This commission has already been {{ $commission->status ?? 'processed' }}.
-                            </div>
-                        @endif
-                        
-                        <a href="{{ route('admin.commissionVerify.index') }}" class="btn btn-secondary ms-2" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
-                            <i class="fas fa-arrow-left"></i> Back to List
-                        </a>
-                    </div>
+    @if($commission->status === 'pending')
+        <form action="{{ route('admin.commissionVerify.approve', $commission->commissionID) }}" 
+              method="POST" class="d-inline"
+              onsubmit="return confirm('Are you sure you want to APPROVE this commission?')">
+            @csrf
+            <button type="submit" class="btn btn-success" style="padding: 0.375rem 0.75rem; font-size: 0.875rem;">
+                <i class="fas fa-check-circle"></i> Approve Commission
+            </button>
+        </form>
+        
+        <form action="{{ route('admin.commissionVerify.reject', $commission->commissionID) }}" 
+              method="POST" class="d-inline"
+              onsubmit="return confirm('Are you sure you want to REJECT this commission?')">
+            @csrf
+            <button type="submit" class="btn btn-danger ms-2" style="padding: 0.375rem 0.75rem; font-size: 0.875rem;">
+                <i class="fas fa-times-circle"></i> Reject Commission
+            </button>
+        </form>
+    @else
+        <div class="alert alert-info" style="padding: 0.375rem 0.75rem; margin-bottom: 0.5rem;">
+            This commission has already been {{ $commission->status ?? 'processed' }}.
+        </div>
+    @endif
+    
+    <a href="{{ route('admin.commissionVerify.index') }}" class="btn btn-secondary ms-2" style="padding: 0.375rem 0.75rem; font-size: 0.875rem;">
+        <i class="fas fa-arrow-left"></i> Back to List
+    </a>
+</div>
                 </div>
             </div>
         </div>
@@ -127,7 +127,7 @@
                              alt="Receipt" class="img-fluid mb-3" style="max-height: 300px;">
                         <a href="{{ asset('storage/' . $commission->receipt_file_path) }}" 
                             target="_blank" class="btn btn-primary px-3 py-1">
-                            <i class="fas fa-download"></i> Download Receipt
+                            <i class="fas fa-download"></i> View Receipt
                         </a>
                     @else
                         <div class="alert alert-warning">

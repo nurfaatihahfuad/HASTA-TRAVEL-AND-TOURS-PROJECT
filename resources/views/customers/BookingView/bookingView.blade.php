@@ -32,8 +32,9 @@
                 <img src="{{ asset('img/payment.png') }}" alt="QR Code" width="150" height="150"> 
                 <form action="{{ route('payment.uploadReceipt', $payment->paymentID) }}" method="POST" enctype="multipart/form-data"> 
                 @csrf 
-                <input type="file" name="receipt_file" required> 
-                <button type="submit" class="btn btn-primary" style="position: absolute; right: 10px;">Upload Receipt</button> 
+                <input type="file" name="receipt_file" required 
+                    style="flex: 1; padding: 8px; border-radius: 4px;"> 
+                <button type="submit" class="btn btn-primary">Upload Receipt</button>  
             </form> 
             </div> 
             @endif
