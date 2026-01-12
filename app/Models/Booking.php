@@ -82,4 +82,20 @@ class Booking extends Model
     {
         return $this->hasMany(Inspection::class, 'bookingID', 'bookingID');
     }
-       }
+
+    public function hasReturnInspection(): bool
+    {
+        return $this->inspections()
+            ->where('inspectionType', 'return')
+            ->exists();
+    }
+
+    public function shouldAutoComplete(): bool
+    {
+        return
+            $this->bookingStatus !== 'completed' &&
+            $this->bookingStatus !== 'cancelled' &&
+            Carbon::now()->greaterThan(Carbon::parse($this->return_dateTime)) &&
+            $this->hasReturnInspection();
+    }
+}

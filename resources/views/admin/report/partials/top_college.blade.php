@@ -1,21 +1,12 @@
+{{-- admin/report/partials/top_college.blade.php --}}
 <div class="section-card">
     <h5 class="mb-3">Top College Booking Report</h5>
 
     @if(!empty($isPdf))
         <style>
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 12px;
-            }
-            th, td {
-                border: 1px solid #000;
-                padding: 6px;
-                text-align: left;
-            }
-            th {
-                background-color: #f2f2f2;
-            }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+            th { background-color: #f2f2f2; }
         </style>
     @endif
 
@@ -74,20 +65,28 @@
                 </tr>
             </thead>
             <tbody id="reportTableBody">
-            @forelse($data as $row)
+            @forelse($data ?? [] as $row)
                 <tr>
-                    <td>{{ $row->bookingID }}</td>
-                    <td>{{ $row->userID }}</td>
-                    <td>{{ $row->name }}</td>
-                    <td>{{ $row->collegeName }}</td>
-                    <td>{{ $row->vehicleName }}</td>
+                    <td>{{ $row->bookingID ?? 'N/A' }}</td>
+                    <td>{{ $row->userID ?? 'N/A' }}</td>
+                    <td>{{ $row->name ?? 'N/A' }}</td>
+                    <td>{{ $row->collegeName ?? 'N/A' }}</td>
+                    <td>{{ $row->vehicleName ?? 'N/A' }}</td>
                     <td>
-                        {{ \Carbon\Carbon::parse($row->pickup_dateTime)->format('d M Y H:i') }}
-                        - {{ \Carbon\Carbon::parse($row->return_dateTime)->format('d M Y H:i') }}
+                        @if(isset($row->pickup_dateTime) && isset($row->return_dateTime))
+                            {{ \Carbon\Carbon::parse($row->pickup_dateTime)->format('d M Y H:i') }}
+                            - {{ \Carbon\Carbon::parse($row->return_dateTime)->format('d M Y H:i') }}
+                        @else
+                            N/A
+                        @endif
                     </td>
                     <td>
-                        <span class="badge bg-{{ $row->bookingStatus === 'completed' ? 'success' : ($row->bookingStatus === 'pending' ? 'warning' : 'secondary') }}">
-                            {{ ucfirst($row->bookingStatus) }}
+                        <span class="badge bg-{{ 
+                            ($row->bookingStatus ?? '') === 'successful' ? 'success' : 
+                            (($row->bookingStatus ?? '') === 'pending' ? 'warning' : 
+                            (($row->bookingStatus ?? '') === 'rejected' ? 'danger' : 'secondary')) 
+                        }}">
+                            {{ isset($row->bookingStatus) ? ucfirst($row->bookingStatus) : 'Unknown' }}
                         </span>
                     </td>
                 </tr>
@@ -96,7 +95,14 @@
                     <td colspan="7" class="text-center py-4">
                         <div class="text-muted">
                             <i class="fas fa-info-circle fa-2x mb-2"></i>
-                            <p class="mb-0">No bookings found for the selected filter</p>
+                            <p class="mb-0">No college booking data found</p>
+                            <small class="text-muted">
+                                @if(isset($error))
+                                    {{ $error }}
+                                @else
+                                    There might be no bookings from students with college information yet.
+                                @endif
+                            </small>
                         </div>
                     </td>
                 </tr>
@@ -106,7 +112,9 @@
     </div>
 </div>
 
+@if(empty($isPdf))
 <script>
+// JavaScript untuk filter form (ini untuk non-AJAX view)
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById('filterForm');
     const tbody = document.getElementById('reportTableBody');
@@ -115,46 +123,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-
         const params = new URLSearchParams(new FormData(form));
-
-        fetch("{{ url('/admin/reports/top_college/filter') }}?" + params, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            tbody.innerHTML = '';
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr>
-                    <td colspan="7" class="text-center py-4">
-                        <div class="text-muted">
-                            <i class="fas fa-info-circle fa-2x mb-2"></i>
-                            <p class="mb-0">No bookings found for the selected filter</p>
-                        </div>
-                    </td>
-                </tr>`;
-            } else {
-                data.forEach(row => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${row.bookingID}</td>
-                            <td>${row.userID}</td>
-                            <td>${row.name}</td>
-                            <td>${row.collegeName}</td>
-                            <td>${row.vehicleName}</td>
-                            <td>${row.pickup_dateTime} - ${row.return_dateTime}</td>
-                            <td>
-                                <span class="badge bg-${row.bookingStatus === 'completed' ? 'success' : (row.bookingStatus === 'pending' ? 'warning' : 'secondary')}">
-                                    ${row.bookingStatus.charAt(0).toUpperCase() + row.bookingStatus.slice(1)}
-                                </span>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-        })
-        .catch(() => alert('Something went wrong. Please try again.'));
+        window.location.href = "{{ url()->current() }}?" + params;
     });
 });
 </script>
+@endif
