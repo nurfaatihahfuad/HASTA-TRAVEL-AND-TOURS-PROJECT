@@ -67,7 +67,7 @@
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Payment Proof</th>
-                        <th>Payment Status</th>
+                        <!--<th>Payment Status</th> -->
                         <th>Payment Actions</th>
                         <th>Amount</th>
                         <th>Created At</th>
@@ -108,6 +108,7 @@
                             </td>
                             
                             <!-- Payment Status Column -->
+                            <!--
                             <td>
                                 <span class="badge 
                                     @if($b->paymentStatus == 'approved') bg-success
@@ -116,7 +117,7 @@
                                     @else bg-secondary @endif">
                                     {{ $b->paymentStatus ?? 'No payment' }}
                                 </span>
-                            </td>
+                            </td> -->
                             
                             <!-- Payment Actions Column -->
                             <td>
@@ -184,7 +185,8 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <!-- Quick Approve/Reject Booking -->
-                                    @if($b->paymentStatus == 'pending' && $b->bookingStatus == 'pending')
+                                    @if($b->bookingStatus == 'pending')
+                                        <!-- HANYA check booking status -->
                                         <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID) }}" class="d-inline">
                                             @csrf
                                             @method('PUT')
@@ -201,6 +203,11 @@
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
+                                    @else
+                                        <!-- Show booking status badge -->
+                                        <span class="badge bg-{{ $b->bookingStatus == 'successful' ? 'success' : 'danger' }}">
+                                            {{ ucfirst($b->bookingStatus) }}
+                                        </span>
                                     @endif
                                     
                                     <!-- View Details -->
@@ -254,11 +261,13 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        @if($b->paymentStatus == 'pending')
+                                        
+                                        <!-- Booking Actions in Modal -->
+                                        @if($b->bookingStatus == 'pending')
                                             <form method="POST" action="{{ route('booking.updateStatus', $b->bookingID ) }}" class="d-inline">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit" name="status" value="approved" 
+                                                <button type="submit" name="status" value="successful" 
                                                         class="btn btn-success"
                                                         onclick="return confirm('Approve this booking?')">
                                                     <i class="fas fa-check me-1"></i> Approve Booking
@@ -270,6 +279,35 @@
                                                 </button>
                                             </form>
                                         @endif
+                                        
+                                        <!-- Payment Actions in Modal -->
+                                        @if($b->paymentStatus == 'pending')
+                                            @php
+                                                $payment = \App\Models\Payment::where('bookingID', $b->bookingID)->first();
+                                            @endphp
+                                            
+                                            @if($payment)
+                                                <div class="vr mx-2"></div>
+                                                <span class="text-muted me-2">Payment Actions:</span>
+                                                <form method="POST" action="{{ route('payment.approve', $payment->paymentID) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-success"
+                                                            onclick="return confirm('Approve this payment?')">
+                                                        <i class="fas fa-check me-1"></i> Approve
+                                                    </button>
+                                                </form>
+                                                
+                                                <form method="POST" action="{{ route('payment.reject', $payment->paymentID) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-danger"
+                                                            onclick="return confirm('Reject this payment?')">
+                                                        <i class="fas fa-times me-1"></i> Reject
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -280,7 +318,7 @@
                                 <div class="text-muted">
                                     <i class="fas fa-clipboard-list fa-2x mb-3"></i>
                                     <h5>No bookings found</h5>
-                                    <p>No recent bookings to display</p>
+                                    <p>No bookings match your criteria</p>
                                 </div>
                             </td>
                         </tr>

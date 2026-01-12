@@ -143,7 +143,7 @@ class DashboardController extends Controller
     // ============================
     
     //yg ni Auni dh ubah jadi coding asal semula
-    /*public function staffSalesperson()
+    public function staffSalesperson()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
@@ -184,7 +184,7 @@ class DashboardController extends Controller
             'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    }*/
+    }
 
     // Display bookings for verification (Staff)
     /**
@@ -232,7 +232,7 @@ class DashboardController extends Controller
     // ============================
     // Staff Runner Dashboard
     // ============================
-    /*public function staffRunner()
+    public function staffRunner()
     {
         $staffID = auth()->user()->staff->staffID ?? null;
 
@@ -252,8 +252,8 @@ class DashboardController extends Controller
             'statusCancelled','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
-    }*/
-    public function staffRunner()
+    }
+    /*public function staffRunner()
     {
         // ============================
         // 1. KPI INSPECTION
@@ -289,7 +289,7 @@ class DashboardController extends Controller
             'weeklyData',
             'inspections'
         ));
-    }
+    }*/
 
     
 
@@ -800,8 +800,7 @@ class DashboardController extends Controller
             'search',
         ));
     }
-    
-     public function staffSalesperson()
+     public function Salesperson()
     {
         // HITUNG STATISTIK UTAMA
         $returnInspections = Inspection::where('inspectionType', 'return')->count();
@@ -822,7 +821,7 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('staff.salesperson.dashboard', compact(
+        return view('dashboard.staff_salesperson', compact(
             // UTAMA
             'returnInspections',
             'pickupInspections', 
@@ -840,6 +839,47 @@ class DashboardController extends Controller
             'recentInspections'
         ));
     }
+    // DashboardController.php
+public function inspectionCustomer()
+{
+    $userID = auth()->user()->userID;
+    
+    // Get latest 5 inspections for dashboard
+    $inspections = Inspection::whereHas('booking', function($query) use ($userID) {
+            $query->where('userID', $userID);
+        })
+        ->with(['vehicle'])
+        ->latest()
+        ->limit(5)
+        ->get();
+    
+    // Get inspection stats for dashboard
+    $allInspections = Inspection::whereHas('booking', function($query) use ($userID) {
+            $query->where('userID', $userID);
+        })->get();
+    
+    $totalInspections = $allInspections->count();
+    $pickupCount = $allInspections->where('inspectionType', 'pickup')->count();
+    $returnCount = $allInspections->where('inspectionType', 'return')->count();
+    $damageCount = $allInspections->where('damageDetected', true)->count();
+    
+    // Other dashboard data...
+    $totalBookings = Booking::where('userID', $userID)->count();
+    $activeBookings = Booking::where('userID', $userID)
+        ->whereIn('status', ['confirmed', 'paid'])
+        ->count();
+    
+    // Pass all variables to view
+    return view('customer.dashboard', compact(
+        'inspections',
+        'totalInspections',
+        'pickupCount',
+        'returnCount',
+        'damageCount',
+        'totalBookings',
+        'activeBookings'
+    ));
+}
    
 }
 

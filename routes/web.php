@@ -299,18 +299,21 @@ Route::middleware('auth')->group(function () {
     //        ->only(['index','create','store','edit','update']);
     //});
 
-    // Staff hanya index, edit, update
-    //Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
-    //    Route::resource('inspection', InspectionController::class)
-    //        ->only(['index','edit','update']);
-    //});
-
     // ============================
     // Inspection Routes
     // ============================
+    // Route untuk salesperson dashboard
+    Route::get('/salesperson/dashboard', function () {
+        return view('salesperson.dashboard');
+    })->name('salesperson.dashboard')->middleware(['auth']);
+
+    // Atau jika guna controller:
+    //Route::get('/salesperson/dashboard', [SalespersonController::class, 'dashboard'])
+    //    ->name('salesperson.dashboard')
+    //    ->middleware(['auth']);
 
     // Customer routes
-    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    /*Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
         // Resource routes (index, create, store, edit, update)
         Route::get('/customer/inspections', [InspectionController::class, 'index'])->name('customer.inspections.index');        
         // Pickup inspection
@@ -325,13 +328,36 @@ Route::middleware('auth')->group(function () {
         Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
             ->name('inspection.storeReturnInspection');
     
-    });
+    });*/
+    Route::middleware(['auth', RoleMiddleware::class.':customer'])->group(function () {
+    // View inspections list
+    Route::get('/customer/inspections', [InspectionController::class, 'customerIndex'])
+        ->name('customer.inspections.index');
+    
+    // View single inspection
+    Route::get('/customer/inspections/{id}', [InspectionController::class, 'customerShow'])
+        ->name('customer.inspections.show');
+    
+    // Pickup inspection
+    Route::get('/booking/{id}/pickup-inspection', [InspectionController::class, 'pickupInspection'])
+        ->name('inspection.pickupInspection');
+    Route::post('/booking/{id}/pickup-inspection', [InspectionController::class, 'storePickupInspection'])
+        ->name('inspection.storePickupInspection');
+
+    // Return inspection
+    Route::get('/booking/{id}/return-inspection', [InspectionController::class, 'returnInspection'])
+        ->name('inspection.returnInspection');
+    Route::post('/booking/{id}/return-inspection', [InspectionController::class, 'storeReturnInspection'])
+        ->name('inspection.storeReturnInspection');
+});
 
     // Staff routes
-    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
-        Route::resource('inspection', InspectionController::class)
-            ->only(['index','edit','update']);
+    // ✅ BETUL - Tambah `()` selepas `group`
+Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->name('staff.')->group(function () {
+    Route::prefix('inspections')->name('inspections.')->group(function () {
+        Route::get('/', [InspectionController::class, 'staffIndex'])->name('index');
     });
+});
 
 
     // ============================
@@ -358,7 +384,8 @@ Route::middleware('auth')->group(function () {
 // ============================
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment', [PaymentController::class, 'submit'])->name('payment.submit');
-
+Route::post('/payment/{paymentID}/upload-receipt', [PaymentController::class, 'uploadReceipt'])
+    ->name('payment.uploadReceipt');
 // ============================
 // Staff Management (Admin only)
 // ============================
@@ -412,13 +439,16 @@ Route::get('/admin/blacklisted', [DashboardController::class, 'blacklistedCustom
 Route::middleware(['auth'])->group(function () {
     // Staff commission routes (accessible by staff/salesperson)
     Route::get('/commission', [CommissionController::class, 'staffIndex'])->name('commission.index');
-    //Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
+    Route::get('/commission', [CommissionController::class, 'index'])->name('commission.index');
     Route::get('/commission/create', [CommissionController::class, 'create'])->name('commission.create');
     Route::post('/commission', [CommissionController::class, 'store'])->name('commission.store');
     Route::get('/commission/{id}/edit', [CommissionController::class, 'edit'])->name('commission.edit');
     Route::put('/commission/{id}', [CommissionController::class, 'update'])->name('commission.update');
     Route::delete('/commission/{id}/receipt', [CommissionController::class, 'deleteReceipt'])
         ->name('commission.deleteReceipt');
+    Route::get('/admin/commission-verify/{id}', [CommissionController::class, 'adminShow'])
+    ->name('admin.commissionVerify.show')
+    ->middleware('auth');
 });
 
 ///========================================
@@ -437,6 +467,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     
     Route::post('/commission-verify/{id}/reject', [CommissionController::class, 'reject'])
         ->name('commissionVerify.reject');
+});
+// Dalam web.php
+/*Route::middleware('auth')->group(function() {
+    Route::get('/inspection-checklist', function() {
+        return view('customer.inspections.index');
+    })->name('inspection.checklist');
+});*/
+Route::middleware(['auth'])->group(function() {
+    Route::get('/inspection-checklist', function() {
+        // Redirect terus ke customer inspections index
+        return redirect()->route('customer.inspections.index');
+    })->name('inspection.checklist');
 });
 
 // Staff Inspection Management Routes

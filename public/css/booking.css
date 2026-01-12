@@ -176,6 +176,7 @@ select:focus {
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-bottom: 10px;
 }
 
 .submit-btn:hover {

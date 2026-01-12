@@ -107,7 +107,7 @@
                             </div>
                         @endif
                         
-                        <a href="{{ route('admin.commissionVerify.index') }}" class="btn btn-secondary btn-lg ms-2">
+                        <a href="{{ route('admin.commissionVerify.index') }}" class="btn btn-secondary ms-2" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                             <i class="fas fa-arrow-left"></i> Back to List
                         </a>
                     </div>
@@ -118,7 +118,7 @@
         <!-- Receipt/Proof Section -->
         <div class="col-md-4">
             <div class="card shadow">
-                <div class="card-header bg-info text-white">
+                <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Receipt/Proof Section</h5>
                 </div>
                 <div class="card-body text-center">
@@ -126,8 +126,8 @@
                         <img src="{{ asset('storage/' . $commission->receipt_file_path) }}" 
                              alt="Receipt" class="img-fluid mb-3" style="max-height: 300px;">
                         <a href="{{ asset('storage/' . $commission->receipt_file_path) }}" 
-                           target="_blank" class="btn btn-primary">
-                           <i class="fas fa-download"></i> Download Receipt
+                            target="_blank" class="btn btn-primary px-3 py-1">
+                            <i class="fas fa-download"></i> Download Receipt
                         </a>
                     @else
                         <div class="alert alert-warning">

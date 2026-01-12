@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="mb-1">Bookings Verification</h4>
+            <h4 class="mb-1">Bookings and Payments Verification</h4>
             <p class="text-muted mb-0">Verify payments and approve/reject bookings</p>
         </div>
     </div>
@@ -69,7 +69,7 @@
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Payment Proof</th>
-                        <th>Payment Status</th>
+                        <!--<th>Payment Status</th> -->
                         <th>Payment Actions</th>
                         <th>Amount</th>
                         <th>Created At</th>
@@ -109,7 +109,7 @@
                                 @endif
                             </td>
                             
-                            <!-- Payment Status Column -->
+                            <!-- Payment Status Column 
                             <td>
                                 <span class="badge 
                                     @if($b->paymentStatus == 'approved') bg-success
@@ -118,7 +118,7 @@
                                     @else bg-secondary @endif">
                                     {{ $b->paymentStatus ?? 'No payment' }}
                                 </span>
-                            </td>
+                            </td> -->
                             
                             <!-- Payment Actions Column -->
                             <td>
@@ -328,12 +328,22 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        @if($bookings->hasPages())
-            <div class="d-flex justify-content-center mt-4">
-                {{ $bookings->links() }}
-            </div>
+        
+        <!--Pagination-->
+       @if ($bookings->lastPage() > 1)
+        <div class="flex justify-center gap-3 mt-6">
+
+            @for ($i = 1; $i <= $bookings->lastPage(); $i++)
+                <a href="{{ $bookings->url($i) }}"
+                class="px-4 py-2 border
+                {{ $bookings->currentPage() == $i ? 'bg-blue-500 text-white' : 'bg-white' }}">
+                    {{ $i }}
+                </a>
+            @endfor
+
+        </div>
         @endif
+
     </div>
 </div>
 @endsection

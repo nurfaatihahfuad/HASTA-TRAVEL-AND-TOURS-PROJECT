@@ -43,6 +43,37 @@
                         <input type="hidden" name="return_dateTime" value="{{ $return_dateTime }}">
                     </div>
 
+                    <!-- Display Booking Duration and Price Summary -->
+                    <div class="price-summary" style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #dee2e6;">
+                        <h3 style="margin-top: 0; color: #333;">Booking Summary</h3>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Duration:</span>
+                            <span><strong>{{ $totalHours }} hours</strong></span>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Price per hour:</span>
+                            <span>RM {{ number_format($pricePerHour, 2) }}</span>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Price per day:</span>
+                            <span>RM {{ number_format($vehicle->price_per_day, 2) }}</span>
+                        </div>
+                        
+                        <hr style="margin: 10px 0;">
+                        
+                        <div style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; color: #28a745;">
+                            <span>Total Price:</span>
+                            <span>RM {{ number_format($totalPrice, 2) }}</span>
+                        </div>
+                        
+                        <div style="font-size: 0.9em; color: #6c757d; margin-top: 5px;">
+                            <i>Note: Minimum booking duration is 1 hour</i>
+                        </div>
+                    </div>
+
                     <!-- Pickup Location Dropdown -->
                     <div class="form-group">
                         <label for="pickup_location">Pick-up Location<span style="color:red">*</span></label>
@@ -121,8 +152,24 @@
 
                     <!-- Submit button -->
                     <div class="button-group">
-                        <button type="button" id="submitBookingBtn" class="submit-btn">Submit Booking</button>
+                        <button type="submit" id="submitBookingBtn" class="submit-btn">Submit Booking</button>
+
+                        <button type="button" id="backBtn" class="submit-btn">Back</button>
                     </div>
+
+                    <script>
+                        document.getElementById('backBtn').addEventListener('click', function() {
+                            // Try to go back in history
+                            if (window.history.length > 1) {
+                                window.history.back();
+                            } else {
+                                // If no history, go to vehicles page
+                                window.location.href = "/vehicles"; // Adjust this URL
+                            }
+                        });
+                    </script>
+
+                   
                 </form>
             </div>
 
