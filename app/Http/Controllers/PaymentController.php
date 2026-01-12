@@ -102,9 +102,9 @@ class PaymentController extends Controller
         return redirect()->route('customer.dashboard')->with('success', 'Payment uploaded!');
     }
 
- public function uploadReceipt(Request $request, $paymentId)
+ public function uploadReceipt(Request $request, $paymentID)
 {
-    $payment = Payment::findOrFail($paymentId);
+    $payment = Payment::findOrFail($paymentID);
     
     // Delete old file if exists
     if ($payment->receipt_file_path && Storage::exists('public/' . $payment->receipt_file_path)) {
