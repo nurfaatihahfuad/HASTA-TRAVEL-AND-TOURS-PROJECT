@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show confirmation popup dengan semua details
         Swal.fire({
-            title: 'Adakah anda pasti?',
+            title: 'Are you sure?',
             html: `
                 <div class="text-start">
                     <p><strong>Commission Type:</strong> ${commissionType}</p>
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Bank Name:</strong> ${displayBankName}</p>
                     ${receiptInfo}
                     <div class="mt-2 text-warning">
-                        <small><i class="fas fa-exclamation-triangle"></i> Status akan dikembalikan ke "Pending" selepas kemaskini.</small>
+                        <small><i class="fas fa-exclamation-triangle"></i> Status will turn to "Pending" after updated!.</small>
                     </div>
                 </div>
             `,
@@ -372,8 +372,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Kemaskini!',
-            cancelButtonText: 'Batal',
+            confirmButtonText: 'Yes, Updated!',
+            cancelButtonText: 'Cancel',
             reverseButtons: true,
             width: '500px'
         }).then((result) => {
