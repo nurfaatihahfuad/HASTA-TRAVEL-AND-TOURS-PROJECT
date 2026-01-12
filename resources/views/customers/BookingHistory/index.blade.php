@@ -2,6 +2,22 @@
 
 @section('title', 'Booking History')
 
+@push('styles')
+<style>
+    .card {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    .card-header {
+        background: transparent;
+        font-weight: 600;
+        border-bottom: 1px solid #f1f1f1;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container">
 

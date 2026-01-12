@@ -217,6 +217,7 @@
             <i class="fas fa-gift me-2"></i> My Vouchers
         </div>
         <div class="card-body">
+            <p><strong>Referral Code:</strong> {{ $customer->loyaltyCard->referralCode }}</p>
             @if($customer->vouchers->count())
                 <div class="table-responsive">
                     <table class="table table-hover">

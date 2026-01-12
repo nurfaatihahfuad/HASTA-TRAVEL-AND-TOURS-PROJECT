@@ -197,10 +197,11 @@
         }
     </style
 </head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5><i class="fas fa-car me-2"></i>HASTA</h5>
+            <h5><img src="{{ asset('img/hasta.jpeg') }}" alt="Hasta Logo" style="max-width:100px;"></h5>
             <button id="toggleBtn"><i class="fas fa-bars"></i></button>
         </div>
         
@@ -213,29 +214,29 @@
                 <span class="menu-text">Dashboard</span>
             </a>
             
-            <a class="sidebar-link" href="{{ route('record.payment') }}">
+            <a class="sidebar-link @if($currentRoute == 'record.payment') active @endif" href="{{ route('record.payment') }}">
                 <i class="fas fa-clipboard-check"></i>
                 <span class="menu-text">Payment Record</span>
             </a>
 
-            <a class="sidebar-link" href="{{ route('commission.index') }}">
+            <a class="sidebar-link @if($currentRoute == 'commission.index') active @endif" href="{{ route('commission.index') }}">
                 <i class="fas fa-coins"></i>
                 <span class="menu-text">Commission</span>
             </a>
 
-            <a class="sidebar-link" href="{{ route('staff.inspections.index') }}">
+            <a class="sidebar-link @if($currentRoute == 'staff.inspections.index') active @endif" href="{{ route('staff.inspections.index') }}">
                 <i class="fas fa-file-invoice"></i>
                 <span class="menu-text">Inspections</span>
             </a>
 
-            <a class="sidebar-link" href="{{ route('damagecase.index') }}">
+            <a class="sidebar-link @if($currentRoute == 'damagecase.index') active @endif" href="{{ route('damagecase.index') }}">
                 <i class="fas fa-car-burst"></i>
                 <span class="menu-text">Damage Cases</span>
             </a>
             
             <hr>
             
-            <a class="sidebar-link" href="#">
+            <a class="sidebar-link @if($currentRoute == 'salesperson.profile.edit') active @endif" href="{{ route('salesperson.profile.edit') }}">
                 <i class="fas fa-user"></i>
                 <span class="menu-text">Profile</span>
             </a>

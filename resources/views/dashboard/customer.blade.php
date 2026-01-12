@@ -133,12 +133,12 @@
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="#" class="btn btn-outline-danger w-100">
+                    <a href="{{ route('customers.BookingHistory.index') }}" class="btn btn-outline-danger w-100">
                         <i class="fas fa-history me-1"></i> History
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="#" class="btn btn-outline-danger w-100">
+                    <a href="{{ route('customers.BookingHistory.index') }}" class="btn btn-outline-danger w-100">
                         <i class="fas fa-file-invoice me-1"></i> Invoices
                     </a>
                 </div>

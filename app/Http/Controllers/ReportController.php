@@ -17,7 +17,7 @@ class ReportController extends Controller
         return view('admin.report.index');
     }
 
-    public function show($category)
+    public function show($category, Request $request)
     {
         switch ($category) {
             case 'total_booking':
@@ -153,21 +153,84 @@ class ReportController extends Controller
                     
                     return view('admin.report.partials.top_college', $errorData);
                 }
-
-            case 'blacklisted':
-                $data = User::where('blacklisted', 1)->get();
                 
-                if (request()->ajax() || str_contains(request()->url(), '/ajax')) {
-                    return response()->json(['data' => $data]);
-                }
-                
-                return view('admin.report.partials.blacklisted', compact('data'));
-                
-            default:
-                return redirect()->route('reports.index')->with('error', 'Invalid report category');
+                case 'blacklisted':
+                    $search = $request->get('search', '');
+                    $reasonFilter = $request->get('reason', '');
+                    
+                    \Log::info('=== BLACKLIST REPORT QUERY DEBUG ===');
+                    
+                    // QUERY YANG BENAR:
+                    $query = DB::table('blacklistedcust')
+                        ->join('user', 'blacklistedcust.customerID', '=', 'user.userID') // Join ke user untuk data pribadi
+                        ->leftJoin('customer', 'blacklistedcust.customerID', '=', 'customer.userID') // Join ke customer untuk customerType
+                        ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID') // Join ke admin
+                        ->select(
+                            'blacklistedcust.blacklistID',
+                            'blacklistedcust.reason',
+                            'blacklistedcust.adminID',
+                            'user.userID',
+                            'user.name',
+                            'user.email',
+                            'user.noHP',     // Phone number dari tabel user
+                            'user.noIC',     // IC number dari tabel user
+                            'customer.customerType', // customerType dari tabel customer
+                            'admin.name as admin_name',
+                            DB::raw('CURRENT_DATE() as blacklisted_since')
+                        );
+                    
+                    // DEBUG LOG
+                    $debugQuery = clone $query;
+                    $debugData = $debugQuery->limit(1)->get();
+                    \Log::info('Query result sample:', $debugData->toArray());
+                    
+                    // Apply search filters
+                    if ($search) {
+                        $query->where(function($q) use ($search) {
+                            $q->where('user.name', 'like', "%{$search}%")
+                              ->orWhere('user.email', 'like', "%{$search}%")
+                              ->orWhere('user.userID', 'like', "%{$search}%")
+                              ->orWhere('user.noIC', 'like', "%{$search}%")
+                              ->orWhere('user.noHP', 'like', "%{$search}%");
+                        });
+                    }
+                    
+                    if ($reasonFilter) {
+                        $query->where('blacklistedcust.reason', 'like', "%{$reasonFilter}%");
+                    }
+                    
+                    $data = $query->orderBy('blacklistedcust.blacklistID', 'desc')->get();
+                    
+                    // DEBUG: Check jika data ada
+                    \Log::info('Total records: ' . $data->count());
+                    if ($data->count() > 0) {
+                        \Log::info('First record details:', (array) $data->first());
+                        \Log::info('Phone from first record: ' . ($data->first()->noHP ?? 'MISSING'));
+                        \Log::info('IC from first record: ' . ($data->first()->noIC ?? 'MISSING'));
+                    }
+                    
+                    $summary = [
+                        'total' => $data->count(),
+                        'students' => $data->where('customerType', 'student')->count(),
+                        'staff' => $data->where('customerType', 'staff')->count(),
+                    ];
+                    
+                    if (request()->ajax() || str_contains(request()->url(), '/ajax')) {
+                        return response()->json([
+                            'data' => $data,
+                            'summary' => $summary
+                        ]);
+                    }
+                    
+                    return view('admin.report.partials.blacklisted', compact(
+                        'data', 'summary', 'search', 'reasonFilter'
+                    ));
+                    
+                default:
+                    return redirect()->route('reports.index')->with('error', 'Invalid report category');
+            }
         }
-    }
-
+        
     // ========== FILTER METHODS ==========
     
     public function filterTopCollege(Request $request)
@@ -320,6 +383,61 @@ class ReportController extends Controller
         ]);
     }
 
+    public function filterBlacklist(Request $request)
+    {
+        $search = $request->get('search', '');
+        $reasonFilter = $request->get('reason', '');
+        
+        $query = DB::table('blacklistedcust')
+            ->join('user', 'blacklistedcust.customerID', '=', 'user.userID')
+            ->leftJoin('customer', 'blacklistedcust.customerID', '=', 'customer.userID')
+            ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+            ->select(
+                'blacklistedcust.blacklistID',
+                'blacklistedcust.reason',
+                'blacklistedcust.adminID',
+                'user.userID',
+                'user.name',
+                'user.email',
+                'user.noHP',  // Phone
+                'user.noIC',  // IC
+                'customer.customerType',
+                'admin.name as admin_name',
+                DB::raw('CURRENT_DATE() as blacklisted_since')
+            );
+        
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('user.name', 'like', "%{$search}%")
+                      ->orWhere('user.email', 'like', "%{$search}%")
+                      ->orWhere('user.userID', 'like', "%{$search}%")
+                      ->orWhere('user.noIC', 'like', "%{$search}%")
+                      ->orWhere('user.noHP', 'like', "%{$search}%");
+                });
+            }
+            
+            if ($reasonFilter) {
+                $query->where('blacklistedcust.reason', 'like', "%{$reasonFilter}%");
+            }
+        
+        $data = $query->orderBy('blacklistedcust.blacklistID', 'desc')->get();
+        
+        $summary = [
+            'total' => $data->count(),
+            'students' => $data->where('customerType', 'student')->count(),
+            'staff' => $data->where('customerType', 'staff')->count(),
+        ];
+        
+        return response()->json([
+            'data' => $data,
+            'summary' => $summary,
+            'search' => $search,
+            'reason' => $reasonFilter
+        ]);
+    }
+
+    
+
     // ========== EXPORT PDF METHODS ==========
 
     public function exportTotalBookingPdf(Request $request)
@@ -421,6 +539,63 @@ class ReportController extends Controller
         ]);
 
         return $pdf->download('TopCollegeReport_' . date('Ymd_His') . '.pdf');
+    }
+
+    public function exportBlacklistPdf(Request $request)
+    {
+        $search = $request->get('search', '');
+        $reasonFilter = $request->get('reason', '');
+        
+        // PERBAIKI QUERY: Gunakan yang sama dengan method show()
+        $query = DB::table('blacklistedcust')
+            ->join('user', 'blacklistedcust.customerID', '=', 'user.userID')
+            ->leftJoin('customer', 'blacklistedcust.customerID', '=', 'customer.userID')
+            ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+            ->select(
+                'blacklistedcust.blacklistID',
+                'blacklistedcust.reason',
+                'blacklistedcust.adminID',
+                'user.userID',
+                'user.name',
+                'user.email',
+                'user.noHP',
+                'user.noIC',
+                'customer.customerType',
+                'admin.name as admin_name',
+                DB::raw('CURRENT_DATE() as blacklisted_since')
+            );
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('user.name', 'like', "%{$search}%")
+                ->orWhere('user.email', 'like', "%{$search}%")
+                ->orWhere('user.userID', 'like', "%{$search}%")
+                ->orWhere('user.noIC', 'like', "%{$search}%")
+                ->orWhere('user.noHP', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($reasonFilter) {
+            $query->where('blacklistedcust.reason', 'like', "%{$reasonFilter}%");
+        }
+        
+        $data = $query->orderBy('blacklistedcust.blacklistID', 'desc')->get(); 
+        
+        $summary = [
+            'total' => $data->count(),
+            'students' => $data->where('customerType', 'student')->count(),
+            'staff' => $data->where('customerType', 'staff')->count(),
+        ];
+        
+        $pdf = Pdf::loadView('admin.report.partials.blacklisted', [
+            'data' => $data,
+            'summary' => $summary,
+            'isPdf' => true,
+            'search' => $search,
+            'reasonFilter' => $reasonFilter
+        ]);
+        
+        return $pdf->download('BlacklistReport_' . date('Ymd_His') . '.pdf');
     }
 
     // ========== EXPORT EXCEL METHODS ==========
@@ -540,6 +715,71 @@ class ReportController extends Controller
             ->deleteFileAfterSend(true);
     }
 
+    public function exportBlacklistExcel(Request $request)
+    {
+        $search = $request->get('search', '');
+        $reasonFilter = $request->get('reason', '');
+        
+        // PERBAIKI QUERY: Gunakan yang sama dengan method show()
+        $query = DB::table('blacklistedcust')
+            ->join('user', 'blacklistedcust.customerID', '=', 'user.userID')
+            ->leftJoin('customer', 'blacklistedcust.customerID', '=', 'customer.userID')
+            ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+            ->select(
+                'blacklistedcust.blacklistID',
+                'blacklistedcust.reason',
+                'blacklistedcust.adminID',
+                'user.userID',
+                'user.name',
+                'user.email',
+                'user.noHP',
+                'user.noIC',
+                'customer.customerType',
+                'admin.name as admin_name',
+                DB::raw('CURRENT_DATE() as blacklisted_since')
+            );
+        
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('user.name', 'like', "%{$search}%")
+                ->orWhere('user.email', 'like', "%{$search}%")
+                ->orWhere('user.userID', 'like', "%{$search}%")
+                ->orWhere('user.noIC', 'like', "%{$search}%")
+                ->orWhere('user.noHP', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($reasonFilter) {
+            $query->where('blacklistedcust.reason', 'like', "%{$reasonFilter}%");
+        }
+        
+        $data = $query->orderBy('blacklistedcust.blacklistID', 'desc')->get();
+        
+        $rows = [];
+        foreach ($data as $item) {
+            $rows[] = [
+                'Blacklist ID' => $item->blacklistID,
+                'Customer ID'  => $item->userID,
+                'Name'         => $item->name,
+                'Email'        => $item->email,
+                'Phone'        => $item->noHP ? $item->noHP : 'N/A',
+                'IC Number'    => $item->noIC ? $item->noIC : 'N/A',
+                'Customer Type'=> ucfirst($item->customerType),
+                'Reason'       => $item->reason,
+                'Admin Name'   => $item->admin_name ?? 'N/A',
+                'Admin ID'     => $item->adminID,
+                'Blacklisted Since' => $item->blacklisted_since,
+            ];
+        }
+        
+        $tempPath = storage_path('app/temp_blacklist_' . time() . '.xlsx');
+        SimpleExcelWriter::create($tempPath)->addRows($rows);
+        
+        return Response::download($tempPath, 'BlacklistReport_' . date('Ymd_His') . '.xlsx')
+            ->deleteFileAfterSend(true);
+    }
+
+
     // ========== PRIVATE HELPER METHODS ==========
 
     private function getTopCollegeData(Request $request)
@@ -601,5 +841,7 @@ class ReportController extends Controller
         }
 
         return $query->orderBy('booking.pickup_dateTime', 'desc')->get();
+        
     }
+
 }

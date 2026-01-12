@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\BlacklistedCust;
 use App\Models\Inspection; 
 use App\Models\DamageCase;
+use App\Models\Commission;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -73,18 +74,19 @@ class DashboardController extends Controller
         $totalVehicles = DB::table('vehicles')->count();
 
         // Booking metrics
-        $newBookings   = DB::table('booking')->where('bookingStatus','new')->count();
-        $rentedCars    = DB::table('booking')->where('bookingStatus','rented')->count();
+        $newBookings   = DB::table('booking')->whereDate('created_at', Carbon::today())->count();
+        $totalRevenue    = DB::table('payment')->sum('amountPaid');
         $availableCars = DB::table('vehicles')->where('available',1)->count();
 
         // Weekly booking overview (group by day of week)
         $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-        $weeklyData   = [];
+        /*$weeklyData   = [];
         foreach ($weeklyLabels as $day) {
             $weeklyData[] = DB::table('booking')
                 ->whereRaw('DAYNAME(created_at) = ?', [$day])
                 ->count();
-        }
+        }*/
+        $weeklyData   = [22, 28, 35, 40, 30, 25, 38];
 
         // Car types distribution (group by vehicleName)
         $carTypes = DB::table('vehicles')
@@ -99,9 +101,18 @@ class DashboardController extends Controller
             });
 
         // Booking status counts
-        $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
+        $statusRejected = DB::table('booking')->where('bookingStatus','rejected')->count();
+        $statusBooked = DB::table('booking')
+            ->whereIn('bookingStatus', ['completed', 'successful'])
+            ->count();
         $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
+
+        $commissionOverview = Commission::with('user')
+        ->orderBy('appliedDate', 'desc')
+        ->limit(5) // show only 5 in dashboard
+        ->get();
+
+        $vehicles = Vehicle::orderBy('vehicleName')->get();
 
         // ✅ Pastikan semua variable dihantar ke view
         return view('dashboard.admin_it', [
@@ -109,14 +120,16 @@ class DashboardController extends Controller
             'totalStaff'      => $totalStaff,
             'totalVehicles'   => $totalVehicles,
             'newBookings'     => $newBookings,
-            'rentedCars'      => $rentedCars,
+            'totalRevenue'    => $totalRevenue,
             'availableCars'   => $availableCars,
             'weeklyLabels'    => $weeklyLabels,
             'weeklyData'      => $weeklyData,
             'carTypes'        => $carTypes,
-            'statusCancelled' => $statusCancelled,
+            'statusRejected' => $statusRejected,
             'statusBooked'    => $statusBooked,
             'statusPending'   => $statusPending,
+            'commissionOverview' => $commissionOverview,
+            'vehicles'        => $vehicles,
         ]);
     }
 
@@ -172,16 +185,16 @@ class DashboardController extends Controller
             ->limit(5) // Only show 5 recent for dashboard
             ->get();
 
-        $statusCancelled = DB::table('booking')->where('bookingStatus','cancelled')->count();
-        $statusBooked    = DB::table('booking')->where('bookingStatus','booked')->count();
-        $statusPending   = DB::table('booking')->where('bookingStatus','pending')->count();
+        $statusCompleted = DB::table('booking')->where('bookingStatus','completed')->count();
+        $statusBooked    = DB::table('booking')->where('bookingStatus','successful')->count();
+        $statusPending   = DB::table('payment')->where('paymentStatus','pending')->count();
         $bookingsToday = DB::table('booking')->whereDate('created_at', now())->count();
 
         $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
         $weeklyData   = [3,6,5,7,4,2,8]; // contoh statik
 
         return view('dashboard.staff_salesperson', compact(
-            'latestBookings','bookingsToday','statusCancelled','statusBooked','statusPending',
+            'latestBookings','bookingsToday','statusCompleted','statusBooked','statusPending',
             'weeklyLabels','weeklyData'
         ));
     }
@@ -317,15 +330,18 @@ class DashboardController extends Controller
                         ->count();
         
         // Calculate total days (example logic)
-        $totalDays = $user->bookings()
+        // Gunakan TIMESTAMPDIFF dengan HOUR
+        $totalHours = $user->bookings()
             ->where('bookingStatus', 'successful')
+            ->whereNotNull('pickup_dateTime')
+            ->whereNotNull('return_dateTime')
+            ->selectRaw('TIMESTAMPDIFF(HOUR, pickup_dateTime, return_dateTime) as hours')
             ->get()
-            ->sum(function($booking) {
-                $pickup = \Carbon\Carbon::parse($booking->pickup_dateTime);
-                $return = \Carbon\Carbon::parse($booking->return_dateTime);
-                return $return->diffInDays($pickup);
-            });
-        
+            ->sum('hours');
+
+        // Convert ke days jika perlu
+        $totalDays = $totalHours / 24;
+                
         // Most rented car
         $mostCar = $user->bookings()
         ->selectRaw('vehicles.vehicleName as carModel, count(*) as count')
@@ -566,8 +582,8 @@ class DashboardController extends Controller
         }
     }
 
-    // Toggle customer status
-    /*public function toggleCustomerStatus(Request $request, $userId)
+    // Toggle customer status - max punya
+    public function toggleCustomerStatus(Request $request, $userId)
     {
         // Find customer using model
         $customer = Customer::where('userID', $userId)->first();
@@ -654,9 +670,69 @@ class DashboardController extends Controller
         return back()->with('error', 
             'Only active customers can be blacklisted. Current status: ' . 
             ucfirst($customer->customerStatus));
-    }*/
+    }
 
-    public function toggleCustomerStatus(Request $request, $userId)
+    public function blacklistedCustomers(Request $request)
+    {
+        // Get search and filter parameters
+        $search = $request->get('search');
+        
+        // Base query for blacklisted customers
+        $query = DB::table('customer')
+            ->join('user', 'customer.userID', '=', 'user.userID')
+            ->join('blacklistedcust', 'customer.userID', '=', 'blacklistedcust.customerID')
+            ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+            ->select(
+                'user.userID',
+                'user.name',
+                'user.email',
+                'user.noHP',
+                'user.noIC',
+                'customer.customerType',
+                'customer.customerStatus',
+                'blacklistedcust.blacklistID',
+                'blacklistedcust.reason',
+                'blacklistedcust.adminID',
+                'admin.name as adminName'
+            )
+            ->where('customer.customerStatus', 'blacklisted');
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('user.name', 'like', "%{$search}%")
+                ->orWhere('user.email', 'like', "%{$search}%")
+                ->orWhere('user.noHP', 'like', "%{$search}%")
+                ->orWhere('user.userID', 'like', "%{$search}%")
+                ->orWhere('blacklistedcust.blacklistID', 'like', "%{$search}%");
+            });
+        }
+
+
+        // Get paginated results
+        $blacklistedCustomers = $query->paginate(20)->withQueryString();
+
+        // Get statistics
+        $totalBlacklisted = DB::table('customer')
+            ->where('customerStatus', 'blacklisted')
+            ->count();
+        
+        $totalCustomers = DB::table('customer')->count();
+        
+        $blacklistPercentage = $totalCustomers > 0 
+            ? round(($totalBlacklisted / $totalCustomers) * 100, 2) 
+            : 0;
+
+        return view('admin.blacklisted.index', compact(
+            'blacklistedCustomers',
+            'totalBlacklisted',
+            'totalCustomers',
+            'blacklistPercentage',
+            'search',
+        ));
+    }
+
+    /*public function toggleCustomerStatus(Request $request, $userId)
     {
         // Find customer
         $customer = DB::table('customer')
@@ -729,9 +805,9 @@ class DashboardController extends Controller
         return back()->with('error', 
             'Only active customers can be blacklisted. Current status: ' . 
             ucfirst($customer->customerStatus));
-    }
+    }*/
 
-    public function blacklistedCustomers(Request $request)
+    /*public function blacklistedCustomers(Request $request)
     {
         $search = $request->get('search');
         
@@ -799,7 +875,9 @@ class DashboardController extends Controller
             'blacklistPercentage',
             'search',
         ));
-    }
+    }*/
+
+
      public function Salesperson()
     {
         // HITUNG STATISTIK UTAMA

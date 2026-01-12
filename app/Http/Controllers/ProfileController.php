@@ -57,4 +57,35 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function staffEdit()
+    {
+        $user = auth()->user();
+        return view('staff.profile', compact('user'));
+    }
+
+    public function staffUpdate(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'noHP'   => 'required|string|max:20',
+            'password' => 'nullable|min:8|confirmed',
+        ]);
+
+        $user->update([
+            'name'  => $request->name,
+            'noHP'  => $request->noHP,
+        ]);
+
+        // Update password only if filled
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+        }
+
+        return back()->with('success', 'Profile updated successfully');
+    }
 }

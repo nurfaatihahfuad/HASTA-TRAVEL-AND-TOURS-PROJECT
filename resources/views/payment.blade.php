@@ -63,11 +63,12 @@
             <input type="file" name="payment_proof" accept=".pdf,.jpeg,.jpg,.png" required>
 
             <div class="button-group">
-                <button type="submit" class="submit-btn">Submit Payment</button>
+                
                 <a href="{{ route('booking.form', ['vehicleID' => $booking->vehicleID]) }}" 
                     class="back-btn">
                     <i class="fas fa-arrow-left"></i> Back to Booking Form
                 </a>
+                <button type="submit" class="submit-btn">Submit Payment</button>
             </div>
         </form>
         @else

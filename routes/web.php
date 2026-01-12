@@ -107,6 +107,11 @@ Route::middleware(['auth', RoleMiddleware::class.':admin'])
             ->name('show');
     });
 
+// Admin Check Vehicle Availability
+Route::post('/admin/check-availability', [AdminController::class, 'checkAvailability'])
+    ->middleware(['auth', RoleMiddleware::class.':admin'])
+    ->name('admin.checkAvailability');
+
 
 // Staff Runner Dashboard ---ROUTE CHECKED
 Route::get('/staff/runner/dashboard', [DashboardController::class, 'staffRunner'])
@@ -165,10 +170,9 @@ Route::middleware('auth')->group(function () {
 // Protected routes (auth required)
 // ============================
 Route::middleware('auth')->group(function () {
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Staff Profile
+    Route::get('/profile', [ProfileController::class, 'staffEdit'])->name('salesperson.profile.edit');
+    Route::post('/profile', [ProfileController::class, 'staffUpdate'])->name('salesperson.profile.update');
 
     // CRUD
     Route::resource('crud', CRUDController::class);
@@ -194,44 +198,53 @@ Route::middleware('auth')->group(function () {
     ->name('reports.')
     ->group(function () {
 
-        // Page utama report (ada dropdown)
+        // Page utama report
         Route::get('/', [ReportController::class, 'index'])->name('index');
 
-        // ✅ FIX: Route untuk show report by category (untuk halaman penuh)
+        // ✅ Route untuk show report by category
         Route::get('/{category}', [ReportController::class, 'show'])->name('show');
         
         // AJAX untuk tukar kategori tanpa reload page
         Route::get('/{category}/ajax', [ReportController::class, 'show'])->name('ajax');
 
-        // ✅ FIX: Filter routes (tukar ke POST untuk form submission)
+        // Filter routes
         Route::post('/total_booking/filter', [ReportController::class, 'filterTotalBooking'])
             ->name('total_booking.filter');
-
-        // ✅ ADD: Filter untuk Revenue (belum ada)
+        
         Route::post('/revenue/filter', [ReportController::class, 'filterRevenue'])
             ->name('revenue.filter');
-
+        
         Route::post('/top_college/filter', [ReportController::class, 'filterTopCollege'])
             ->name('top_college.filter');
-
-        // ✅ FIX: Export routes structure (remove duplicate /reports/)
-        Route::get('/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
-            ->name('top_college.exportPdf');
-
-        Route::get('/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
-            ->name('top_college.exportExcel');
-
+        
+        Route::post('/blacklisted/filter', [ReportController::class, 'filterBlacklist']) // ✅ TAMBAH INI
+            ->name('blacklisted.filter');
+        
+        // Export routes
         Route::get('/total_booking/export-pdf', [ReportController::class, 'exportTotalBookingPdf'])
             ->name('total_booking.exportPdf');
-
+        
         Route::get('/total_booking/export-excel', [ReportController::class, 'exportTotalBookingExcel'])
             ->name('total_booking.exportExcel');
-
-        // ✅ Export Revenue 
+        
         Route::get('/revenue/export-pdf', [ReportController::class, 'exportRevenuePdf'])
             ->name('revenue.exportPdf'); 
+        
         Route::get('/revenue/export-excel', [ReportController::class, 'exportRevenueExcel'])
             ->name('revenue.exportExcel');
+        
+        Route::get('/top_college/export-pdf', [ReportController::class, 'exportTopCollegePdf'])
+            ->name('top_college.exportPdf');
+        
+        Route::get('/top_college/export-excel', [ReportController::class, 'exportTopCollegeExcel'])
+            ->name('top_college.exportExcel');
+        
+        // ✅ BLACKLIST EXPORT ROUTES
+        Route::get('/blacklisted/export-pdf', [ReportController::class, 'exportBlacklistPdf'])
+            ->name('blacklisted.exportPdf');
+            
+        Route::get('/blacklisted/export-excel', [ReportController::class, 'exportBlacklistExcel'])
+            ->name('blacklisted.exportExcel');
     });
 });
 

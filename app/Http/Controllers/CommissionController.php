@@ -14,23 +14,7 @@ class CommissionController extends Controller
     /**
      * Display a listing of commissions FOR STAFF
      */
-    public function staffIndex()
-    {
-        // Staff only - jika admin cuba access, redirect ke admin page
-        if (auth()->user()->role === 'admin') {
-            return redirect()->route('admin.commission.index');
-        }
-        
-        // STAFF VIEW: commissions sendiri sahaja
-        $userID = auth()->user()->userID;
-        $commissions = Commission::where('userID', $userID)
-            ->orderBy('appliedDate', 'desc')
-            ->get();
-        
-        return view('staff.commission.index', compact('commissions'));
-    }
-
-    public function staffIndex()
+    public function index()
     {
         // Staff only - jika admin cuba access, redirect ke admin page
         if (auth()->user()->role === 'admin') {
