@@ -368,10 +368,11 @@
                 <span class="menu-text">Booking History</span>
             </a>
 
-            <a class="sidebar-link" href="{{ route('inspection.index') }}">
-                <i class="fas fa-chart-bar"></i>
-                <span class="menu-text">Car Inspection Checklist</span>
-            </a>
+            @if(auth()->user()->role === 'customer')
+    <a class="sidebar-link" href="{{ route('customer.inspections.index') }}">
+        <i class="fas fa-chart-bar"></i> My Vehicle Inspections
+    </a>
+@endif
 
             <a class="sidebar-link" href="{{ route('damagecase.index') }}">
                 <i class="fas fa-chart-bar"></i>

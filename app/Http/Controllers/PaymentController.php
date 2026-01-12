@@ -101,6 +101,63 @@ class PaymentController extends Controller
         return redirect()->route('customer.dashboard')->with('success', 'Payment uploaded!');
     }
 
+  public function uploadReceipt(Request $request, $paymentID)
+{
+    try {
+        // Debug
+        \Log::info("=== Starting uploadReceipt for: {$paymentID} ===");
+        
+        // Find payment
+        $payment = Payment::where('paymentID', $paymentID)->firstOrFail();
+        \Log::info("Found payment. Current receipt: " . ($payment->receipt_file_path ?? 'NULL'));
+        
+        // Validate file
+        $request->validate([
+            'receipt' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+        
+        // Delete old file if exists
+        if ($payment->receipt_file_path && \Storage::disk('public')->exists($payment->receipt_file_path)) {
+            \Storage::disk('public')->delete($payment->receipt_file_path);
+            \Log::info("Deleted old file: {$payment->receipt_file_path}");
+        }
+        
+        // Store new file
+        $file = $request->file('receipt');
+        $fileName = 'receipt_' . $paymentID . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filePath = $file->storeAs('receipts', $fileName, 'public');
+        
+        \Log::info("New file stored: {$filePath}");
+        
+        // **INI YANG PENTING - GUNA paymentStatus BUKAN payment_status**
+        $updateData = [
+            'receipt_file_path' => $filePath,
+            'paymentStatus' => 'pending',  // atau 'pending_verification' jika itu status anda
+            'updated_at' => now(),
+        ];
+        
+        \Log::info("Attempting update with:", $updateData);
+        
+        // Try update
+        $result = $payment->update($updateData);
+        
+        \Log::info("Update result: " . ($result ? 'SUCCESS' : 'FAILED'));
+        
+        // Refresh and verify
+        $payment->refresh();
+        \Log::info("After update - receipt_file_path: " . ($payment->receipt_file_path ?? 'NULL'));
+        \Log::info("After update - paymentStatus: " . ($payment->paymentStatus ?? 'NULL'));
+        
+        return redirect()->back()->with('success', 'Receipt uploaded successfully! Status updated to pending.');
+        
+    } catch (\Exception $e) {
+        \Log::error("Upload receipt error: " . $e->getMessage());
+        \Log::error($e->getTraceAsString());
+        
+        return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+    }
+}
+
     public function bookingSummary($bookingID)
     {
         $booking = Booking::with('vehicle')->findOrFail($bookingID);
