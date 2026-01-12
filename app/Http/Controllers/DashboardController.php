@@ -566,8 +566,8 @@ class DashboardController extends Controller
         }
     }
 
-    // Toggle customer status
-    /*public function toggleCustomerStatus(Request $request, $userId)
+    // Toggle customer status - max punya
+    public function toggleCustomerStatus(Request $request, $userId)
     {
         // Find customer using model
         $customer = Customer::where('userID', $userId)->first();
@@ -654,9 +654,69 @@ class DashboardController extends Controller
         return back()->with('error', 
             'Only active customers can be blacklisted. Current status: ' . 
             ucfirst($customer->customerStatus));
-    }*/
+    }
 
-    public function toggleCustomerStatus(Request $request, $userId)
+    public function blacklistedCustomers(Request $request)
+    {
+        // Get search and filter parameters
+        $search = $request->get('search');
+        
+        // Base query for blacklisted customers
+        $query = DB::table('customer')
+            ->join('user', 'customer.userID', '=', 'user.userID')
+            ->join('blacklistedcust', 'customer.userID', '=', 'blacklistedcust.customerID')
+            ->leftJoin('user as admin', 'blacklistedcust.adminID', '=', 'admin.userID')
+            ->select(
+                'user.userID',
+                'user.name',
+                'user.email',
+                'user.noHP',
+                'user.noIC',
+                'customer.customerType',
+                'customer.customerStatus',
+                'blacklistedcust.blacklistID',
+                'blacklistedcust.reason',
+                'blacklistedcust.adminID',
+                'admin.name as adminName'
+            )
+            ->where('customer.customerStatus', 'blacklisted');
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('user.name', 'like', "%{$search}%")
+                ->orWhere('user.email', 'like', "%{$search}%")
+                ->orWhere('user.noHP', 'like', "%{$search}%")
+                ->orWhere('user.userID', 'like', "%{$search}%")
+                ->orWhere('blacklistedcust.blacklistID', 'like', "%{$search}%");
+            });
+        }
+
+
+        // Get paginated results
+        $blacklistedCustomers = $query->paginate(20)->withQueryString();
+
+        // Get statistics
+        $totalBlacklisted = DB::table('customer')
+            ->where('customerStatus', 'blacklisted')
+            ->count();
+        
+        $totalCustomers = DB::table('customer')->count();
+        
+        $blacklistPercentage = $totalCustomers > 0 
+            ? round(($totalBlacklisted / $totalCustomers) * 100, 2) 
+            : 0;
+
+        return view('admin.blacklisted.index', compact(
+            'blacklistedCustomers',
+            'totalBlacklisted',
+            'totalCustomers',
+            'blacklistPercentage',
+            'search',
+        ));
+    }
+
+    /*public function toggleCustomerStatus(Request $request, $userId)
     {
         // Find customer
         $customer = DB::table('customer')
@@ -729,9 +789,9 @@ class DashboardController extends Controller
         return back()->with('error', 
             'Only active customers can be blacklisted. Current status: ' . 
             ucfirst($customer->customerStatus));
-    }
+    }*/
 
-    public function blacklistedCustomers(Request $request)
+    /*public function blacklistedCustomers(Request $request)
     {
         $search = $request->get('search');
         
@@ -799,7 +859,9 @@ class DashboardController extends Controller
             'blacklistPercentage',
             'search',
         ));
-    }
+    }*/
+
+
      public function Salesperson()
     {
         // HITUNG STATISTIK UTAMA
