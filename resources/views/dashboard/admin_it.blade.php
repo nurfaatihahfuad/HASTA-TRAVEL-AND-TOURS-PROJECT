@@ -3,7 +3,7 @@
 
 @section('content')
 
-<!-- Metrics -->
+<!-- Metrics 
 <h3 class="mb-4">Welcome, {{ auth()->user()->name }}</h3>
 <div class="row g-3 mb-4">
     <div class="col-md-4">
@@ -27,7 +27,7 @@
             <div class="metric-delta">↑ 7.2%</div>
         </div>
     </div>
-</div>
+</div>  -->
 
 <!-- Charts + Availability -->
 <div class="row g-3 mb-4">
@@ -129,6 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         options: { responsive: true }
     });
 });
-</script>
+</script>   
 @endpush
 @endsection

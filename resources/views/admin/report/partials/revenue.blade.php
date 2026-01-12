@@ -1,6 +1,68 @@
 <div class="section-card">
     <h5 class="mb-3">Revenue Report</h5>
 
+
+    <!-- Filter Form - SAMA SEPERTI DALAM JS -->
+    @if(empty($isPdf))
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <select id="filterMonth" class="form-select">
+                <option value="">All Months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select id="filterYear" class="form-select">
+                <option value="">All Years</option>
+                @php
+                    $currentYear = date('Y');
+                    for($year = $currentYear; $year >= $currentYear - 5; $year--) {
+                        echo "<option value='{$year}'>{$year}</option>";
+                    }
+                @endphp
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button id="applyFilter" class="btn btn-primary w-100">
+                <i class="fas fa-filter me-2"></i> Filter
+            </button>
+        </div>
+        <div class="col-md-3">
+            <button id="resetFilter" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-redo me-1"></i> Reset
+            </button>
+        </div>
+    </div>
+    @endif
+
+    <!-- Export Buttons -->
+    @if(empty($isPdf))
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <a href="/admin/reports/revenue/export-pdf" class="btn btn-danger me-2" id="pdfExportBtn">
+                <i class="fas fa-file-pdf me-1"></i> Export PDF
+            </a>
+            <a href="/admin/reports/revenue/export-excel" class="btn btn-success" id="excelExportBtn">
+                <i class="fas fa-file-excel me-1"></i> Export Excel
+            </a>
+        </div>
+        <div class="text-muted">
+            <small><i class="fas fa-info-circle me-1"></i> Export will use current filter</small>
+        </div>
+    </div>
+    @endif
+
     @if(!empty($isPdf))
         <style>
             table {
