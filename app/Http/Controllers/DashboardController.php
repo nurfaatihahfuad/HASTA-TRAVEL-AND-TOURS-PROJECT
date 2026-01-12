@@ -330,15 +330,18 @@ class DashboardController extends Controller
                         ->count();
         
         // Calculate total days (example logic)
-        $totalDays = $user->bookings()
+        // Gunakan TIMESTAMPDIFF dengan HOUR
+        $totalHours = $user->bookings()
             ->where('bookingStatus', 'successful')
+            ->whereNotNull('pickup_dateTime')
+            ->whereNotNull('return_dateTime')
+            ->selectRaw('TIMESTAMPDIFF(HOUR, pickup_dateTime, return_dateTime) as hours')
             ->get()
-            ->sum(function($booking) {
-                $pickup = \Carbon\Carbon::parse($booking->pickup_dateTime);
-                $return = \Carbon\Carbon::parse($booking->return_dateTime);
-                return $return->diffInDays($pickup);
-            });
-        
+            ->sum('hours');
+
+        // Convert ke days jika perlu
+        $totalDays = $totalHours / 24;
+                
         // Most rented car
         $mostCar = $user->bookings()
         ->selectRaw('vehicles.vehicleName as carModel, count(*) as count')
