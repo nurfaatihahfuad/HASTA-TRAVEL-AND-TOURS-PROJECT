@@ -3,7 +3,7 @@
 
 @section('content')
 
-<!-- Metrics -->
+<!-- Metrics 
 <h3 class="mb-4">Welcome, {{ auth()->user()->name }}</h3>
 <div class="row g-3 mb-4">
     <div class="col-md-4">
@@ -34,7 +34,7 @@
             <i class="fas fa-car fa-2x text-info"></i>
         </div>
     </div>
-</div>
+</div>  -->
 
 <!-- Charts + Availability -->
 <div class="row g-3 mb-4">
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
-</script>
+</script>   
 @endpush
 
 @endsection

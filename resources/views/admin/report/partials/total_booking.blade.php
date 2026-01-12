@@ -91,16 +91,21 @@
             </div>
         </div>
 
-        <!-- Export buttons -->
-        <div class="mb-3">
-            <a href="{{ route('reports.total_booking.exportPdf', ['month' => request('month'), 'year' => request('year')]) }}" 
-               class="btn btn-danger me-2">
-                <i class="fas fa-file-pdf me-1"></i> Export to PDF
-            </a>
-            <a href="{{ route('reports.total_booking.exportExcel', ['month' => request('month'), 'year' => request('year')]) }}" 
-               class="btn btn-success">
-                <i class="fas fa-file-excel me-1"></i> Export to Excel
-            </a>
+        <!-- Export buttons - fixed at top -->
+        <div class="mb-3 sticky-top bg-white p-3 shadow-sm" style="z-index: 1020;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Export Reports</h5>
+                <div>
+                    <a href="{{ route('reports.total_booking.exportPdf', ['month' => request('month'), 'year' => request('year')]) }}" 
+                    class="btn btn-danger me-2">
+                        <i class="fas fa-file-pdf me-1"></i> Export to PDF
+                    </a>
+                    <a href="{{ route('reports.total_booking.exportExcel', ['month' => request('month'), 'year' => request('year')]) }}" 
+                    class="btn btn-success">
+                        <i class="fas fa-file-excel me-1"></i> Export to Excel
+                    </a>
+                </div>
+            </div>
         </div>
     @endif
 
