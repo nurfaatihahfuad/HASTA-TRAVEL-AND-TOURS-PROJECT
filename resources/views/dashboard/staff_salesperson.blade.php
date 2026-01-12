@@ -23,13 +23,13 @@
         </div>
         <div class="col-md-3">
             <div class="metric-card">
-                <div class="metric-title">Cancelled Bookings</div>
-                <div class="metric-value">{{ $statusCancelled }}</div>
+                <div class="metric-title">Completed Bookings</div>
+                <div class="metric-value">{{ $statusCompleted }}</div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="metric-card">
-                <div class="metric-title">Confirmed Bookings</div>
+                <div class="metric-title">Active Bookings</div>
                 <div class="metric-value">{{ $statusBooked }}</div>
             </div>
         </div>
@@ -205,7 +205,13 @@
                                         </form>
                                     @else
                                         <!-- Show booking status badge -->
-                                        <span class="badge bg-{{ $b->bookingStatus == 'successful' ? 'success' : 'danger' }}">
+                                         <span class="badge
+                                            @if($b->bookingStatus == 'pending') bg-warning
+                                            @elseif($b->bookingStatus == 'successful') bg-info
+                                            @elseif($b->bookingStatus == 'completed') bg-success
+                                            @elseif($b->bookingStatus == 'rejected') bg-danger
+                                            @else bg-secondary
+                                            @endif">
                                             {{ ucfirst($b->bookingStatus) }}
                                         </span>
                                     @endif
@@ -351,10 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
     new Chart(ctxPie, {
         type: 'pie',
         data: {
-            labels: ['Cancelled', 'Booked', 'Pending'],
+            labels: ['Completed', 'Booked', 'Pending'],
             datasets: [{
-                data: [{{ $statusCancelled }}, {{ $statusBooked }}, {{ $statusPending }}],
-                backgroundColor: ['#adb5bd', '#0d6efd', '#ffc107']
+                data: [{{ $statusCompleted }}, {{ $statusBooked }}, {{ $statusPending }}],
+                backgroundColor: ['#28a745', '#0d6efd', '#ffc107']
             }]
         },
         options: { responsive: true }

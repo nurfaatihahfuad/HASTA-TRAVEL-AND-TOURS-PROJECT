@@ -3,6 +3,7 @@
 @section('title', 'Booking Details')
 
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/bookingView.css') }}">
 <div class="container">
 
     <a href="{{ route('customers.BookingHistory.show',$booking->bookingID) }}"
@@ -45,21 +46,27 @@
                 @if($payment->paymentType === 'Deposit Payment') 
                 <div class="qr-section">
                     <img src="{{ asset('img/payment.png') }}" alt="QR Code" width="150" height="150"> 
-                    <form action="{{ route('payment.submit', $booking->bookingID) }}" method="POST" enctype="multipart/form-data"> 
+                    <form action="{{ route('payment.uploadReceipt', $payment->paymentID) }}" method="POST" enctype="multipart/form-data"> 
                     @csrf 
                     <input type="file" name="receipt_file" required> 
-                    <button type="submit" class="btn btn-primary">Upload Receipt</button> 
+                    <button type="submit" class="btn btn-primary" >Upload Receipt</button> 
                 </form> 
                 </div> 
                 @endif
 
-                @if($payment->file_path)
+                @if($payment->receipt_file_path)
                     <p><strong>Proof File:</strong> 
-                        <a href="{{ asset('storage/' . $payment->file_path) }}" target="_blank">View Proof</a>
+                        <a href="{{ asset('storage/' . $payment->receipt_file_path) }}" target="_blank">View Proof</a>
                     </p>
                 @endif
             @else
                 <p><em>No payment record found for this booking.</em></p>
+            @endif
+
+            @if(session('success'))
+                <div class="alert-success">
+                    {{ session('success') }}
+                </div>
             @endif
         </div>
     </div>

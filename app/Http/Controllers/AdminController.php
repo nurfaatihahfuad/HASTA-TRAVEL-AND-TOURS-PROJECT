@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -337,4 +338,39 @@ class AdminController extends Controller
 
         return view('admin.bookings.show', compact('booking'));
     }
+
+    // Check vehicle availability in dashboard
+    public function checkAvailability(Request $request)
+    {
+        
+        $request->validate([
+            'vehicleID' => 'required',
+            'pickup_dateTime' => 'required|date',
+            'return_dateTime' => 'required|date|after:pickup_dateTime',
+        ]);
+
+        $pickup = Carbon::createFromFormat('Y-m-d\TH:i', $request->pickup_dateTime);
+        $return = Carbon::createFromFormat('Y-m-d\TH:i', $request->return_dateTime);
+        $conflict = Booking::where('vehicleID', $request->vehicleID)
+            ->whereIn('bookingStatus', ['successful'])
+            ->where(function ($query) use ($pickup, $return) {
+                $query->whereBetween('pickup_dateTime', [$pickup, $return])
+                    ->orWhereBetween('return_dateTime', [$pickup, $return])
+                    ->orWhere(function ($q) use ($pickup, $return) {
+                        $q->where('pickup_dateTime', '<=', $pickup)
+                            ->where('return_dateTime', '>=', $return);
+                    });
+            })
+            ->exists();
+
+        return back()->with(
+            $conflict ? 'error' : 'success',
+            $conflict
+                ? 'Vehicle is NOT available for the selected time.'
+                : 'Vehicle is available ✅'
+        );
+
+        
+    }
+
 }

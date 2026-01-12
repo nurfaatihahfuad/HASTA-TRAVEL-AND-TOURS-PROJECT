@@ -132,8 +132,14 @@
             .sidebar.show-mobile { left: 0; width: var(--sidebar-width) !important; }
             .main-content { margin-left: 0 !important; }
         }
+
+        .table-responsive {
+            max-height: 260px;
+            overflow-y: auto;
+        }
     </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body>
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">

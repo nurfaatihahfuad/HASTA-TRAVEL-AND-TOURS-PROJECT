@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show confirmation popup dengan semua details
         Swal.fire({
-            title: 'Adakah anda pasti?',
+            title: 'Is The Information Correct?',
             html: `
                 <div class="text-start">
                     <p><strong>Commission Type:</strong> ${commissionType}</p>
@@ -282,8 +282,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Simpan!',
-            cancelButtonText: 'Batal',
+            confirmButtonText: 'Yes, Keep!',
+            cancelButtonText: 'Cancel',
             reverseButtons: true,
             width: '500px'
         }).then((result) => {
@@ -308,14 +308,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (hasChanges) {
             Swal.fire({
-                title: 'Adakah anda pasti?',
+                title: 'Is the Information Correct?',
                 text: "Semua maklumat yang belum disimpan akan hilang.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Batal',
-                cancelButtonText: 'Kembali',
+                confirmButtonText: 'Yes, Cancelled',
+                cancelButtonText: 'Back',
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
