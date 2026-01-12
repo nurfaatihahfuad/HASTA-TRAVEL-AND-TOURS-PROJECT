@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\College;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Models\Inspection;
 use Carbon\Carbon;
 
 class CustomerProfileController extends Controller
@@ -196,6 +197,16 @@ class CustomerProfileController extends Controller
         // ambil semua payment untuk booking tu
         $payments = Payment::where('bookingID', $booking->bookingID)->get();
 
+        // get inspection pickup & return
+        $pickupInspection = $booking->inspections
+            ->where('inspectionType', 'pickup')
+            ->first();
+
+        $returnInspection = $booking->inspections
+            ->where('inspectionType', 'return')
+            ->first();
+
+
         // ambil payment latest
         $payment = $payments->last();
 
@@ -208,6 +219,6 @@ class CustomerProfileController extends Controller
         $booking->load(['vehicle', 'payments']);
 
 
-        return view('customers.BookingHistory.show', compact('booking', 'payment', 'payments', 'totalHours', 'totalPayment'));
+        return view('customers.BookingHistory.show', compact('booking', 'payment', 'payments', 'totalHours', 'totalPayment','pickupInspection','returnInspection'));
     }
 }
