@@ -33,7 +33,7 @@
                 <form action="{{ route('payment.uploadReceipt', $payment->paymentID) }}" method="POST" enctype="multipart/form-data"> 
                 @csrf 
                 <input type="file" name="receipt_file" required> 
-                <button type="submit" class="btn btn-primary">Upload Receipt</button> 
+                <button type="submit" class="btn btn-primary" style="position: absolute; right: 10px;">Upload Receipt</button> 
             </form> 
             </div> 
             @endif

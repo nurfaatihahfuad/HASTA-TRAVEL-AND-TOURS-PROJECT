@@ -244,13 +244,14 @@
             background-color: #f8f9fa;
             padding: 3rem 0;
             margin-top: auto;
-            margin-left: var(--sidebar-width);
+            margin-left: 0;
+            width:100%;
             border-top: 1px solid #dee2e6;
             transition: margin-left 0.3s ease;
         }
         
         .footer-main.expanded {
-            margin-left: var(--sidebar-collapsed-width);
+            margin-left: 0;
         }
         
         .footer-main a {

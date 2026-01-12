@@ -22,7 +22,6 @@
                         @switch($booking->bookingStatus)
                             @case('pending') bg-secondary @break
                             @case('approved') bg-info @break
-                            @case('ongoing') bg-warning @break
                             @case('completed') bg-success @break
                             @case('cancelled') bg-danger @break
                         @endswitch">
@@ -42,7 +41,7 @@
                 <h5 class="mb-3">Customer Information</h5>
                 <p><strong>Name:</strong> {{ $booking->user->name ?? '-' }}</p>
                 <p><strong>Email:</strong> {{ $booking->user->email ?? '-' }}</p>
-                <p><strong>Phone:</strong> {{ $booking->user->phone ?? '-' }}</p>
+                <p><strong>Phone:</strong> +60 {{ $booking->user->noHP ?? '-' }}</p>
             </div>
         </div>
 
@@ -54,7 +53,6 @@
             <div class="card p-3">
                 <h5 class="mb-3">Vehicle Information</h5>
                 <p><strong>Name:</strong> {{ $booking->vehicle->vehicleName ?? '-' }}</p>
-                <p><strong>Type:</strong> {{ $booking->vehicle->type ?? '-' }}</p>
                 <p><strong>Price per Hour:</strong> RM {{ number_format($booking->vehicle->price_per_hour ?? 0, 2) }}</p>
                 <p><strong>Price per Day:</strong> RM {{ number_format($booking->vehicle->price_per_day ?? 0, 2) }}</p>
             </div>
@@ -82,12 +80,12 @@
                             <td>{{ number_format($payment->amount, 2) }}</td>
                             <td>
                                 <span class="badge 
-                                    @switch($payment->status)
+                                    @switch($payment->paymentStatus)
                                         @case('pending') bg-warning @break
                                         @case('approved') bg-success @break
                                         @case('rejected') bg-danger @break
                                     @endswitch">
-                                    {{ ucfirst($payment->status) }}
+                                    {{ ucfirst($payment->paymentStatus) }}
                                 </span>
                             </td>
                             <td>{{ \Carbon\Carbon::parse($payment->created_at)->format('d M Y H:i') }}</td>
@@ -113,7 +111,6 @@
                         <tr>
                             <th>Inspection Type</th>
                             <th>Date</th>
-                            <th>Staff</th>
                             <th>Notes</th>
                         </tr>
                     </thead>
@@ -122,7 +119,6 @@
                         <tr>
                             <td>{{ ucfirst($inspection->inspectionType) }}</td>
                             <td>{{ \Carbon\Carbon::parse($inspection->created_at)->format('d M Y H:i') }}</td>
-                            <td>{{ $inspection->staff->name ?? '-' }}</td>
                             <td>{{ $inspection->notes ?? '-' }}</td>
                         </tr>
                         @empty
