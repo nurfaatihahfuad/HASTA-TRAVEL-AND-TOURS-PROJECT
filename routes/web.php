@@ -170,10 +170,9 @@ Route::middleware('auth')->group(function () {
 // Protected routes (auth required)
 // ============================
 Route::middleware('auth')->group(function () {
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Staff Profile
+    Route::get('/profile', [ProfileController::class, 'staffEdit'])->name('salesperson.profile.edit');
+    Route::post('/profile', [ProfileController::class, 'staffUpdate'])->name('salesperson.profile.update');
 
     // CRUD
     Route::resource('crud', CRUDController::class);
