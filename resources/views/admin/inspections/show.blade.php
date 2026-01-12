@@ -1,4 +1,4 @@
-@extends('layouts.salesperson')
+@extends('layouts.it_admin')
 
 @section('title', 'Inspection Details')
 

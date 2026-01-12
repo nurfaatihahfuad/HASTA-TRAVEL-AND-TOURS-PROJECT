@@ -432,7 +432,7 @@ public function show($id)
         ->limit(5)
         ->get();
     */
-    return view('staff.inspections.show', compact('inspection'));
+        return view('staff.inspections.show', compact('inspection'));
 }
 
 /**
@@ -458,6 +458,15 @@ public function customerShow($id)
         ->findOrFail($id);
     
     return view('customer.inspections.show', compact('inspection'));
+}
+public function adminShow($id)
+{
+    // 1. Cari data inspection berdasarkan ID
+    $inspection = Inspection::with(['booking', 'vehicle', 'staffUser'])->findOrFail($id);
+
+    // 2. PASTI KAN DI SINI : admin.inspections.show
+    // Bukan staff.inspections.show
+    return view('admin.inspections.show', compact('inspection'));
 }
 // InspectionController.php - customerIndex() method
 // InspectionController.php - REPLACE current customerIndex() method dengan ini:
@@ -520,6 +529,54 @@ public function customerIndex()
     return view('customer.inspections.index', compact(
         'inspections', 
         'bookings',
+        'totalInspections',
+        'pickupCount',
+        'returnCount',
+        'damageCount'
+    ));
+}
+/**
+ * Admin: View ALL inspections from all users and staff
+ */
+public function adminIndex(Request $request)
+{
+    $query = Inspection::with(['booking', 'vehicle', 'staffUser']);
+    
+    // Filter berdasarkan input admin
+    if ($request->filled('type')) {
+        $query->where('inspectionType', $request->type);
+    }
+    
+    if ($request->filled('damage')) {
+        $query->where('damageDetected', $request->damage == 'yes');
+    }
+    
+    if ($request->filled('date')) {
+        $query->whereDate('created_at', $request->date);
+    }
+    
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('bookingID', 'LIKE', "%{$search}%")
+              ->orWhere('staffID', 'LIKE', "%{$search}%")
+              ->orWhereHas('vehicle', function($v) use ($search) {
+                  $v->where('vehicleName', 'LIKE', "%{$search}%")
+                    ->orWhere('plateNo', 'LIKE', "%{$search}%");
+              });
+        });
+    }
+
+    $inspections = $query->latest()->paginate(15);
+
+    // Statistik Global untuk Admin
+    $totalInspections = Inspection::count();
+    $pickupCount = Inspection::where('inspectionType', 'pickup')->count();
+    $returnCount = Inspection::where('inspectionType', 'return')->count();
+    $damageCount = Inspection::where('damageDetected', true)->count();
+
+    return view('admin.inspections.index', compact(
+        'inspections',
         'totalInspections',
         'pickupCount',
         'returnCount',

@@ -187,7 +187,7 @@
                 <span class="menu-text">Vehicles</span>
             </a>
 
-            <a class="sidebar-link" href="#">
+            <a class="sidebar-link" href="{{ route('admin.inspections.index') }}">
                 <i class="fas fa-clipboard-check"></i>
                 <span class="menu-text">Inspections</span>
             </a>

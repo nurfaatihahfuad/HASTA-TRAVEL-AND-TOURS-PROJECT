@@ -530,3 +530,16 @@ Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->na
         Route::get('/with-damage', [InspectionController::class, 'inspectionsWithDamage'])->name('damage');
     });
 });
+// Group untuk Admin - TUKAR 'admin' KEPADA RoleMiddleware::class.':admin'
+Route::middleware(['auth', RoleMiddleware::class.':admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Halaman Utama Inspections untuk Admin
+    Route::get('/inspections', [InspectionController::class, 'adminIndex'])->name('inspections.index');
+    
+    // Lihat detail inspection tertentu
+    Route::get('/inspections/{id}', [InspectionController::class, 'adminShow'])->name('inspections.show');
+    
+    // Admin nak delete rekod salah
+    Route::delete('/inspections/{id}', [InspectionController::class, 'destroy'])->name('inspections.destroy');
+    
+});

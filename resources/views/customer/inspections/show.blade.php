@@ -77,7 +77,7 @@
                                 </p>
                             </div>
                             <div class="detail-card">
-                                <strong>Inspected By:</strong>
+                                <strong>Customer Name :</strong>
                                 <p class="text-muted">
                                     {{ $inspection->staffUser->name ?? 'Staff #' . ($inspection->staffID ?? 'N/A') }}
                                 </p>
@@ -157,65 +157,97 @@
             <!-- Evidence Photos Card -->
             @if($inspection->front_view || $inspection->back_view || $inspection->left_view || $inspection->right_view || $inspection->fuel_evidence)
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-images"></i> Inspection Evidence Photos
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="evidence-grid">
-                        @if($inspection->front_view)
-                        <div class="text-center">
-                            <strong>Front View</strong>
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-images me-2"></i> Inspection Evidence Photos
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3"> 
+                    
+                    {{-- Front View --}}
+                    @if($inspection->front_view)
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="text-center border rounded p-2 bg-light">
+                            <small class="d-block mb-2 fw-bold text-muted">Front View</small>
                             <img src="{{ asset('storage/' . $inspection->front_view) }}" 
-                                 alt="Front View" 
-                                 class="inspection-image"
-                                 style="cursor: pointer;" onclick="openImageModal(this.src, 'Front View')">
+                                alt="Front View" 
+                                class="img-fluid rounded shadow-sm inspection-thumbnail"
+                                onclick="openImageModal(this.src, 'Front View')">
                         </div>
-                        @endif
-                        
-                        @if($inspection->back_view)
-                        <div class="text-center">
-                            <strong>Back View</strong>
-                            <img src="{{ asset('storage/' . $inspection->back_view) }}" 
-                                 alt="Back View" 
-                                 class="inspection-image"
-                                 style="cursor: pointer;" onclick="openImageModal(this.src, 'Back View')">
-                        </div>
-                        @endif
-                        
-                        @if($inspection->left_view)
-                        <div class="text-center">
-                            <strong>Left View</strong>
-                            <img src="{{ asset('storage/' . $inspection->left_view) }}" 
-                                 alt="Left View" 
-                                 class="inspection-image"
-                                 style="cursor: pointer;" onclick="openImageModal(this.src, 'Left View')">
-                        </div>
-                        @endif
-                        
-                        @if($inspection->right_view)
-                        <div class="text-center">
-                            <strong>Right View</strong>
-                            <img src="{{ asset('storage/' . $inspection->right_view) }}" 
-                                 alt="Right View" 
-                                 class="inspection-image"
-                                 style="cursor: pointer;" onclick="openImageModal(this.src, 'Right View')">
-                        </div>
-                        @endif
-                        
-                        @if($inspection->fuel_evidence)
-                        <div class="text-center">
-                            <strong>Fuel Evidence</strong>
-                            <img src="{{ asset('storage/' . $inspection->fuel_evidence) }}" 
-                                 alt="Fuel Evidence" 
-                                 class="inspection-image"
-                                 style="cursor: pointer;" onclick="openImageModal(this.src, 'Fuel Evidence')">
-                        </div>
-                        @endif
                     </div>
+                    @endif
+
+                    {{-- Back View --}}
+                    @if($inspection->back_view)
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="text-center border rounded p-2 bg-light">
+                            <small class="d-block mb-2 fw-bold text-muted">Back View</small>
+                            <img src="{{ asset('storage/' . $inspection->back_view) }}" 
+                                alt="Back View" 
+                                class="img-fluid rounded shadow-sm inspection-thumbnail"
+                                onclick="openImageModal(this.src, 'Back View')">
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Left View --}}
+                    @if($inspection->left_view)
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="text-center border rounded p-2 bg-light">
+                            <small class="d-block mb-2 fw-bold text-muted">Left View</small>
+                            <img src="{{ asset('storage/' . $inspection->left_view) }}" 
+                                alt="Left View" 
+                                class="img-fluid rounded shadow-sm inspection-thumbnail"
+                                onclick="openImageModal(this.src, 'Left View')">
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Right View --}}
+                    @if($inspection->right_view)
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="text-center border rounded p-2 bg-light">
+                            <small class="d-block mb-2 fw-bold text-muted">Right View</small>
+                            <img src="{{ asset('storage/' . $inspection->right_view) }}" 
+                                alt="Right View" 
+                                class="img-fluid rounded shadow-sm inspection-thumbnail"
+                                onclick="openImageModal(this.src, 'Right View')">
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Fuel Evidence --}}
+                    @if($inspection->fuel_evidence)
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="text-center border rounded p-2 bg-light">
+                            <small class="d-block mb-2 fw-bold text-muted">Fuel Level</small>
+                            <img src="{{ asset('storage/' . $inspection->fuel_evidence) }}" 
+                                alt="Fuel Evidence" 
+                                class="img-fluid rounded shadow-sm inspection-thumbnail"
+                                onclick="openImageModal(this.src, 'Fuel Evidence')">
+                        </div>
+                    </div>
+                    @endif
+
                 </div>
             </div>
+        </div>
+
+        {{-- Tambah CSS ini di bahagian atas @section('content') atau dalam fail CSS anda --}}
+        <style>
+            .inspection-thumbnail {
+                width: 100%;
+                height: 120px; /* Anda boleh tukar ketinggian ini ikut kesesuaian */
+                object-fit: cover; /* Ini penting supaya gambar tidak nampak penyek/stretched */
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+
+            .inspection-thumbnail:hover {
+                transform: scale(1.05); /* Efek zoom sikit bila mouse lalu */
+            }
+        </style>
             @endif
 
             <!-- Damage Information Card -->
