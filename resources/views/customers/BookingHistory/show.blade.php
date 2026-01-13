@@ -127,11 +127,11 @@
                 <p class="text-muted"><em>No payment record found.</em></p>
             @endif
 
-            @if(session('success'))
+           <!-- @if(session('success'))
                 <div class="alert alert-success mt-3">
                     {{ session('success') }}
                 </div>
-            @endif
+            @endif-->
         </div>
     </div>
 
@@ -182,6 +182,46 @@
                     </div>
                 </div>
 
+                @if($booking->bookingStatus === 'completed')
+                    {{-- FEEDBACK SECTION --}}
+                    <div class="card mt-4">
+                        <div class="card-header bg-white fw-bold">
+                            <i class="fas fa-star me-1"></i> Rental Feedback
+                        </div>
+
+                        <div class="card-body">
+
+                        {{-- SUCCESS MESSAGE (ONLY FOR FEEDBACK) --}}
+                        @if(session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                            @if($booking->feedback)
+                                <p>
+                                    <strong>Rating:</strong>
+                                    {{ $booking->feedback->rate }} / 5
+                                </p>
+
+                                <p>
+                                    <strong>Your Review:</strong><br>
+                                    {{ $booking->feedback->reviewSentences ?? 'No written feedback provided.' }}
+                                </p>
+                            @else
+                                <p class="text-muted">
+                                    You have not submitted feedback for this booking.
+                                </p>
+
+                                <button class="btn btn-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#feedbackModal">
+                                    <i class="fas fa-comment-dots me-1"></i> Leave Feedback
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
             {{-- NOT COMPLETED --}}
             @else
 
@@ -218,4 +258,55 @@
 
 
 </div>
+
+{{-- FEEDBACK MODAL --}}
+<div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="{{ route('feedback.store') }}" method="POST">
+            @csrf
+
+            <input type="hidden" name="bookingID" value="{{ $booking->bookingID }}">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-star me-1"></i> Submit Feedback
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Rating</label>
+                        <select name="rating" class="form-select" required>
+                            <option value="">Select rating</option>
+                            <option value="5">★★★★★ Excellent</option>
+                            <option value="4">★★★★☆ Good</option>
+                            <option value="3">★★★☆☆ Average</option>
+                            <option value="2">★★☆☆☆ Poor</option>
+                            <option value="1">★☆☆☆☆ Very Poor</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Review (Optional)</label>
+                        <textarea name="review"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Share your rental experience..."></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane me-1"></i> Submit
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @endsection

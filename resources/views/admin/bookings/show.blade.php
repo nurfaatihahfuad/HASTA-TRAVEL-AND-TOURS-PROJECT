@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.it_admin')
 
 @section('title', 'Booking Details')
 
@@ -111,6 +111,7 @@
                         <tr>
                             <th>Inspection Type</th>
                             <th>Date</th>
+                            <th>Car Condition</th>
                             <th>Notes</th>
                         </tr>
                     </thead>
@@ -119,7 +120,8 @@
                         <tr>
                             <td>{{ ucfirst($inspection->inspectionType) }}</td>
                             <td>{{ \Carbon\Carbon::parse($inspection->created_at)->format('d M Y H:i') }}</td>
-                            <td>{{ $inspection->notes ?? '-' }}</td>
+                            <td>{{ $inspection->carCondition }}</td>
+                            <td>{{ $inspection->remark ?? '-' }}</td>
                         </tr>
                         @empty
                         <tr>
@@ -131,6 +133,36 @@
             </div>
         </div>
     </div>
+{{-- CUSTOMER FEEDBACK --}}
+@if($booking->bookingStatus === 'completed')
+<div class="row g-4 mt-3">
+    <div class="col-md-12">
+        <div class="card p-3">
+            <h5 class="mb-3">
+                <i class="fas fa-star me-1 text-warning"></i> Customer Feedback
+            </h5>
+
+            @if($booking->feedback)
+                <p>
+                    <strong>Rating:</strong>
+                    {{ $booking->feedback->rate }} / 5
+                </p>
+
+                <p>
+                    <strong>Review:</strong><br>
+                    {{ $booking->feedback->reviewSentences ?? 'No written feedback provided.' }}
+                </p>
+
+            @else
+                <p class="text-muted mb-0">
+                    No feedback has been submitted for this booking.
+                </p>
+            @endif
+
+        </div>
+    </div>
+</div>
+@endif
 
 </div>
 @endsection

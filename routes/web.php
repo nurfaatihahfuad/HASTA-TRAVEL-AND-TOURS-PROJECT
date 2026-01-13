@@ -18,6 +18,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DamageCaseController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\CommissionController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\CustomerProfileController;
 
 
@@ -77,6 +78,12 @@ Route::middleware(['auth'])->prefix('customers')->group(function () {
     Route::get('/BookingHistory/{booking}', [CustomerProfileController::class, 'bookingShow'])
         ->name('customers.BookingHistory.show');
 });
+
+// Customer Feedback Submission
+// routes/web.php
+Route::post('/feedback/store', [FeedbackController::class, 'store'])
+    ->name('feedback.store');
+
 
         
 // Admin 
