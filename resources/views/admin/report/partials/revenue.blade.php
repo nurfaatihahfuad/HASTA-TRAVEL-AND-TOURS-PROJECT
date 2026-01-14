@@ -1,7 +1,6 @@
 <div class="section-card">
     <h5 class="mb-3">Revenue Report</h5>
 
-
     <!-- Filter Form - SAMA SEPERTI DALAM JS -->
     @if(empty($isPdf))
     <div class="row g-3 mb-4">
@@ -102,9 +101,9 @@
             Chart Labels: <span id="chartLabels">{{ count($chart['labels'] ?? []) }}</span>
         </div>
 
-        <!-- Summary Cards -->
+        <!-- Summary Cards - TANPA TOTAL INCOME -->
         <div class="row mb-4">
-            <div class="col-md-3">
+            <div class="col-md-4"> <!-- Changed from col-md-3 to col-md-4 -->
                 <div class="card text-center">
                     <div class="card-body">
                         <h6>Total Sales</h6>
@@ -113,16 +112,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h6>Total Income</h6>
-                        <p class="fs-5 mb-0 text-success">RM {{ number_format($summary['total_income'] ?? 0, 2) }}</p>
-                        <small class="text-muted">Approved payments only</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4"> <!-- Changed from col-md-3 to col-md-4 -->
                 <div class="card text-center">
                     <div class="card-body">
                         <h6>Average Duration</h6>
@@ -131,7 +121,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4"> <!-- Changed from col-md-3 to col-md-4 -->
                 <div class="card text-center">
                     <div class="card-body">
                         <h6>Approved Payments</h6>
@@ -209,10 +199,9 @@
             </div>
         @endif
     @else
-        <!-- PDF Summary Boxes -->
+        <!-- PDF Summary Boxes - TANPA TOTAL INCOME -->
         <div class="summary-box">
             <div>Total Sales: RM {{ number_format($summary['total_sales'] ?? 0, 2) }}</div>
-            <div>Total Income: RM {{ number_format($summary['total_income'] ?? 0, 2) }}</div>
             <div>Avg Duration: {{ number_format($summary['avg_duration'] ?? 0, 1) }} hrs</div>
             <div>Approved Payments: {{ $summary['completed_payments'] ?? 0 }}</div>
         </div>

@@ -162,171 +162,166 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function renderRevenueReport(data) {
-        let html = `
-            <h5 class="mb-3">Revenue Report</h5>
-            
-            <!-- Filter Form -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <select id="filterMonth" class="form-select">
-                        <option value="">All Months</option>
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select id="filterYear" class="form-select">
-                        <option value="">All Years</option>`;
+    let html = `
+        <h5 class="mb-3">Revenue Report</h5>
         
-        // Generate year options
-        const currentYear = new Date().getFullYear();
-        for (let year = currentYear; year >= currentYear - 5; year--) {
-            html += `<option value="${year}">${year}</option>`;
-        }
+        <!-- Filter Form -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <select id="filterMonth" class="form-select">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="filterYear" class="form-select">
+                    <option value="">All Years</option>`;
+    
+    // Generate year options
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= currentYear - 5; year--) {
+        html += `<option value="${year}">${year}</option>`;
+    }
+    
+    html += `
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button id="applyFilter" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i> Filter
+                </button>
+            </div>
+            <div class="col-md-2">
+                <button id="resetFilter" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-redo me-1"></i> Reset
+                </button>
+            </div>
+            
+        </div>
         
-        html += `
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button id="applyFilter" class="btn btn-primary w-100">
-                        <i class="fas fa-filter me-2"></i> Filter
-                    </button>
-                </div>
-                <div class="col-md-2">
-                    <button id="resetFilter" class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-redo me-1"></i> Reset
-                    </button>
-                </div>
-                
+        <!-- Export Buttons -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <a href="/admin/reports/revenue/export-pdf" class="btn btn-danger me-2" id="pdfExportBtn">
+                    <i class="fas fa-file-pdf me-1"></i> Export PDF
+                </a>
+                <a href="/admin/reports/revenue/export-excel" class="btn btn-success" id="excelExportBtn">
+                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                </a>
             </div>
-            
-            <!-- Export Buttons -->
-            <div class="mb-4 d-flex justify-content-between align-items-center">
-                <div>
-                    <a href="/admin/reports/revenue/export-pdf" class="btn btn-danger me-2" id="pdfExportBtn">
-                        <i class="fas fa-file-pdf me-1"></i> Export PDF
-                    </a>
-                    <a href="/admin/reports/revenue/export-excel" class="btn btn-success" id="excelExportBtn">
-                        <i class="fas fa-file-excel me-1"></i> Export Excel
-                    </a>
-                </div>
-                <div class="text-muted">
-                    <small><i class="fas fa-info-circle me-1"></i> Export includes current filter</small>
-                </div>
+            <div class="text-muted">
+                <small><i class="fas fa-info-circle me-1"></i> Export includes current filter</small>
             </div>
-            
-            <!-- Loading for Filter -->
-            <div id="filterLoading" class="text-center py-3" style="display: none;">
-                <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <span class="text-muted">Loading filtered data...</span>
-            </div>
-            
-            <!-- Summary Cards -->
-            <div class="row mb-4" id="summaryCards">
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Total Sales</h6>
-                            <p class="fs-5 mb-0 text-primary" id="totalSales">RM ${parseFloat(data.summary.total_sales || 0).toFixed(2)}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Total Income</h6>
-                            <p class="fs-5 mb-0 text-success" id="totalIncome">RM ${parseFloat(data.summary.total_income || 0).toFixed(2)}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Average Duration</h6>
-                            <p class="fs-5 mb-0 text-warning" id="avgDuration">${parseFloat(data.summary.avg_duration || 0).toFixed(1)} hrs</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Completed Payments</h6>
-                            <p class="fs-5 mb-0 text-info" id="completedPayments">${data.summary.completed_payments || 0}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Chart Section -->
-            <div class="card mb-4" id="chartSection" style="${!data.chart || data.chart.labels.length === 0 ? 'display: none;' : ''}">
-                <div class="card-header">
-                    <h6 class="mb-0">Revenue by Vehicle</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="revenueChart" height="100"></canvas>
-                </div>
-            </div>
-            
-            <!-- Revenue Table -->
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Vehicle</th>
-                            <th>Booking ID</th>
-                            <th>Duration (hrs)</th>
-                            <th>Payment Type</th>
-                            <th>Total Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="revenueTableBody">`;
+        </div>
         
-        if (data.data && data.data.length > 0) {
-            data.data.forEach(row => {
-                html += `
+        <!-- Loading for Filter -->
+        <div id="filterLoading" class="text-center py-3" style="display: none;">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span class="text-muted">Loading filtered data...</span>
+        </div>
+        
+        <!-- Summary Cards - TANPA TOTAL INCOME -->
+        <div class="row mb-4" id="summaryCards">
+            <div class="col-md-4"> <!-- Changed from col-md-3 to col-md-4 -->
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6>Total Sales</h6>
+                        <p class="fs-5 mb-0 text-primary" id="totalSales">RM ${parseFloat(data.summary.total_sales || 0).toFixed(2)}</p>
+                        <small class="text-muted">All payments</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"> <!-- Changed from col-md-3 to col-md-4 -->
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6>Average Duration</h6>
+                        <p class="fs-5 mb-0 text-warning" id="avgDuration">${parseFloat(data.summary.avg_duration || 0).toFixed(1)} hrs</p>
+                        <small class="text-muted">Per booking</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"> <!-- Changed from col-md-3 to col-md-4 -->
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6>Approved Payments</h6>
+                        <p class="fs-5 mb-0 text-info" id="completedPayments">${data.summary.completed_payments || 0}</p>
+                        <small class="text-muted">Successful bookings</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart Section -->
+        <div class="card mb-4" id="chartSection" style="${!data.chart || data.chart.labels.length === 0 ? 'display: none;' : ''}">
+            <div class="card-header">
+                <h6 class="mb-0">Revenue by Vehicle</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="100"></canvas>
+            </div>
+        </div>
+        
+        <!-- Revenue Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
                     <tr>
-                        <td>${row.vehicleName || '-'}</td>
-                        <td>${row.bookingID || '-'}</td>
-                        <td>${row.duration || '0'}</td>
-                        <td>${row.paymentType || '-'}</td>
-                        <td>RM ${parseFloat(row.totalAmount || 0).toFixed(2)}</td>
-                    </tr>`;
-            });
-        } else {
+                        <th>Vehicle</th>
+                        <th>Booking ID</th>
+                        <th>Duration (hrs)</th>
+                        <th>Payment Type</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="revenueTableBody">`;
+    
+    if (data.data && data.data.length > 0) {
+        data.data.forEach(row => {
             html += `
                 <tr>
-                    <td colspan="5" class="text-center py-4">
-                        <div class="text-muted">
-                            <i class="fas fa-info-circle me-2"></i>
-                            No revenue data available. There might be no approved payments yet.
-                        </div>
-                    </td>
+                    <td>${row.vehicleName || '-'}</td>
+                    <td>${row.bookingID || '-'}</td>
+                    <td>${row.duration || '0'}</td>
+                    <td>${row.paymentType || '-'}</td>
+                    <td>RM ${parseFloat(row.totalAmount || 0).toFixed(2)}</td>
                 </tr>`;
-        }
-        
+        });
+    } else {
         html += `
-                    </tbody>
-                </table>
-            </div>`;
-        
-        reportContent.innerHTML = html;
-        
-        // Initialize chart if data exists
-        if (data.chart && data.chart.labels && data.chart.labels.length > 0) {
-            initializeRevenueChart(data.chart);
-        }
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No revenue data available. There might be no approved payments yet.
+                    </div>
+                </td>
+            </tr>`;
+    }
+    
+    html += `
+                </tbody>
+            </table>
+        </div>`;
+    
+    reportContent.innerHTML = html;
+    
+    // Initialize chart if data exists
+    if (data.chart && data.chart.labels && data.chart.labels.length > 0) {
+        initializeRevenueChart(data.chart);
+    }
         
         // Add event listeners for filter buttons
         const applyBtn = document.getElementById('applyFilter');
@@ -411,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update summary cards
                 document.getElementById('totalSales').textContent = `RM ${parseFloat(filteredData.summary.total_sales || 0).toFixed(2)}`;
-                document.getElementById('totalIncome').textContent = `RM ${parseFloat(filteredData.summary.total_income || 0).toFixed(2)}`;
+                //document.getElementById('totalIncome').textContent = `RM ${parseFloat(filteredData.summary.total_income || 0).toFixed(2)}`;
                 document.getElementById('avgDuration').textContent = `${parseFloat(filteredData.summary.avg_duration || 0).toFixed(1)} hrs`;
                 document.getElementById('completedPayments').textContent = filteredData.summary.completed_payments || 0;
                 

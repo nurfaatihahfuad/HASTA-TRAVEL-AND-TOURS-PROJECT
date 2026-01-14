@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 </span>
                             </td>
                         </tr>
-                    `;
+                    `; 
                 });
             }
 
