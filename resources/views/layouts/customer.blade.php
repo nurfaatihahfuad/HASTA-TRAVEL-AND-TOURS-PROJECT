@@ -391,10 +391,10 @@
     <a class="sidebar-link" href="{{ route('customer.inspections.index') }}">
         <i class="fas fa-chart-bar"></i> My Vehicle Inspections
     </a>
-            <a class="sidebar-link" href="{{ route('damagecase.index') }}">
+            <!-- <a class="sidebar-link" href="#">
                 <i class="fas fa-chart-bar"></i>
                 <span class="menu-text">Damage Case Checklist</span>
-            </a>
+            </a> -->
             
             <a class="sidebar-link @if($currentRoute == 'customer.profile') active @endif" 
                href="{{ route('customer.profile') }}">

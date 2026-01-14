@@ -18,13 +18,20 @@ class DamageCaseController extends Controller
     }
 
     // Papar form update
-    public function edit($caseID)
+    /*public function edit($caseID)
     {
         $case = DamageCase::where('caseID', $caseID)->firstOrFail();
         $inspection = Inspection::find($case->inspectionID);
 
         return view('staff.damage_case.update', compact('case','inspection'));
-    }
+    }*/
+    public function edit($id)
+{
+    $damageCase = DamageCase::findOrFail($id);
+    $inspections = Inspection::with('vehicle')->get(); // Add this line
+    
+    return view('staff.damage-cases.edit', compact('damage-case', 'inspection'));
+}    
 
     // Simpan update damage case
     public function update(Request $request, $caseID)

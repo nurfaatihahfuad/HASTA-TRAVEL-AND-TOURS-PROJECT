@@ -373,15 +373,63 @@ Route::middleware(['auth', RoleMiddleware::class.':staff'])->prefix('staff')->na
     // ============================
     // Damage Case Routes
     // ============================
+// Staff Damage Cases Routes
+/*
+Route::prefix('staff')->middleware(['auth', 'role:staff'])->group(function () {
+    Route::get('/damage-cases', [DamageCaseController::class, 'index'])->name('staff.damage-cases.index');
+    Route::get('/damage-cases/create', [DamageCaseController::class, 'create'])->name('staff.damage-cases.create');
+    Route::post('/damage-cases', [DamageCaseController::class, 'store'])->name('staff.damage-cases.store');
+    Route::get('/damage-cases/{damageCase}', [DamageCaseController::class, 'show'])->name('staff.damage-cases.show');
+    Route::get('/damage-cases/{damageCase}/edit', [DamageCaseController::class, 'edit'])->name('staff.damage-cases.edit');
+    Route::put('/damage-cases/{damageCase}', [DamageCaseController::class, 'update'])->name('staff.damage-cases.update');*/
 
-    // Staff hanya index, create, store, edit, update
-    Route::middleware(['auth', RoleMiddleware::class.':staff'])->group(function () {
-        Route::resource('damagecase', DamageCaseController::class)
-            ->only(['index','edit','update','show']); 
-            // tambah 'create','store','destroy' kalau staff perlu
-        Route::post('damagecase/{caseID}/resolve', [DamageCaseController::class, 'resolve'])
-        ->name('damagecase.resolve');
+    // ============================
+// Damage Case Routes (STAFF ONLY)
+// ============================
+Route::prefix('staff')->middleware(['auth', 'role:staff'])->name('staff.')->group(function () {
+    
+    // Update: Use Staff namespace controller
+    Route::prefix('damage-cases')->name('damage-cases.')->group(function () {
+        // Index - List all damage cases
+        Route::get('/', [\App\Http\Controllers\Staff\DamageCaseController::class, 'index'])
+            ->name('index');
+        
+        // Create new damage case
+        Route::get('/create', [\App\Http\Controllers\Staff\DamageCaseController::class, 'create'])
+            ->name('create');
+        Route::post('/', [\App\Http\Controllers\Staff\DamageCaseController::class, 'store'])
+            ->name('store');
+        
+        // Show single damage case
+        Route::get('/{damageCase}', [\App\Http\Controllers\Staff\DamageCaseController::class, 'show'])
+            ->name('show');
+        
+        // Edit damage case
+        Route::get('/{damageCase}/edit', [\App\Http\Controllers\Staff\DamageCaseController::class, 'edit'])
+            ->name('edit');
+        Route::put('/{damageCase}', [\App\Http\Controllers\Staff\DamageCaseController::class, 'update'])
+            ->name('update');
+        
+        // Quick status update (AJAX)
+        Route::post('/{damageCase}/update-status', [\App\Http\Controllers\Staff\DamageCaseController::class, 'updateStatus'])
+            ->name('update-status');
     });
+    
+    // Additional actions
+    Route::post('/damage-cases/{damageCase}/update-status', [DamageCaseController::class, 'updateStatus'])->name('staff.damage-cases.update-status');
+    Route::post('/damage-cases/{damageCase}/assign', [DamageCaseController::class, 'assign'])->name('staff.damage-cases.assign');
+    Route::post('/damage-cases/{damageCase}/photos', [DamageCaseController::class, 'addPhotos'])->name('staff.damage-cases.add-photos');
+    Route::delete('/damage-cases/{damageCase}/photos/{mediaId}', [DamageCaseController::class, 'deletePhoto'])->name('staff.damage-cases.delete-photo');
+    
+    // Export
+    Route::get('/damage-cases/export', [DamageCaseController::class, 'export'])->name('staff.damage-cases.export');
+    
+    // AJAX endpoints
+    Route::get('/damage-cases/{damageCase}/photos', [DamageCaseController::class, 'getPhotos'])->name('staff.damage-cases.get-photos');
+    Route::get('/damage-cases/{damageCase}/activity', [DamageCaseController::class, 'getActivity'])->name('staff.damage-cases.get-activity');
+    Route::get('/damage-cases/{damageCase}/print', [DamageCaseController::class, 'print'])->name('staff.damage-cases.print');
+});
+  
     // ============================
     // Pickup Return Button
     // ============================

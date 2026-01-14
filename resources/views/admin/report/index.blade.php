@@ -767,368 +767,321 @@ document.addEventListener('DOMContentLoaded', function() {
     } // <-- INI PENUTUP renderTopCollegeReport YANG BETUL
     
     function renderTotalBookingReport(data) {
-        let html = `
-            <h5 class="mb-3">Total Booking Report</h5>
-            
-            <!-- Filter Form -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <select id="filterMonth" class="form-select">
-                        <option value="">All Months</option>
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select id="filterYear" class="form-select">
-                        <option value="">All Years</option>`;
+    let html = `
+        <h5 class="mb-3">Total Booking Report</h5>
         
-        // Generate year options
-        const currentYear = new Date().getFullYear();
-        for (let year = currentYear; year >= currentYear - 5; year--) {
-            html += `<option value="${year}">${year}</option>`;
-        }
+        <!-- Filter Form -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <select id="filterMonth" class="form-select">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="filterYear" class="form-select">
+                    <option value="">All Years</option>`;
+    
+    // Generate year options
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= currentYear - 5; year--) {
+        html += `<option value="${year}">${year}</option>`;
+    }
+    
+    html += `
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button id="applyFilter" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i> Filter
+                </button>
+            </div>
+            <div class="col-md-2">
+                <button id="resetFilter" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-redo me-1"></i> Reset
+                </button>
+            </div>
+            
+        </div>
         
-        html += `
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button id="applyFilter" class="btn btn-primary w-100">
-                        <i class="fas fa-filter me-2"></i> Filter
-                    </button>
-                </div>
-                <div class="col-md-2">
-                    <button id="resetFilter" class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-redo me-1"></i> Reset
-                    </button>
-                </div>
-                
-            </div>
-            
-            <!-- Summary Cards - IKUT BLADE TEMPLATE -->
-            <div class="row mb-4" id="summaryCards">
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Total</h6>
-                            <p class="fs-5 mb-0" id="totalCount">${data.summary.total || 0}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Completed</h6>
-                            <p class="fs-5 mb-0 text-success" id="completedCount">${data.summary.completed || 0}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Pending</h6>
-                            <p class="fs-5 mb-0 text-warning" id="pendingCount">${data.summary.pending || 0}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6>Cancelled</h6>
-                            <p class="fs-5 mb-0 text-danger" id="cancelledCount">${data.summary.cancelled || 0}</p>
-                        </div>
+        <!-- Summary Cards - HANYA TOTAL SAHAJA -->
+        <div class="row mb-4" id="summaryCards">
+            <div class="col-md-12">
+                <div class="card text-center bg-light">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Bookings</h6>
+                        <p class="fs-4 mb-0 text-dark" id="totalCount">${data.summary.total || 0}</p>
                     </div>
                 </div>
             </div>
-            
-            <!-- Export Buttons - IKUT BLADE TEMPLATE -->
-            <div class="mb-4 d-flex justify-content-between align-items-center">
-                <div>
-                    <a href="/admin/reports/total_booking/export-pdf" class="btn btn-danger me-2" id="pdfExportBtn">
-                        <i class="fas fa-file-pdf me-1"></i> Export PDF
-                    </a>
-                    <a href="/admin/reports/total_booking/export-excel" class="btn btn-success" id="excelExportBtn">
-                        <i class="fas fa-file-excel me-1"></i> Export Excel
-                    </a>
-                </div>
-                <div class="text-muted">
-                    <small><i class="fas fa-info-circle me-1"></i> Export includes current filter</small>
-                </div>
+        </div>
+        
+        <!-- Export Buttons -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <a href="/admin/reports/total_booking/export-pdf" class="btn btn-danger me-2" id="pdfExportBtn">
+                    <i class="fas fa-file-pdf me-1"></i> Export PDF
+                </a>
+                <a href="/admin/reports/total_booking/export-excel" class="btn btn-success" id="excelExportBtn">
+                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                </a>
             </div>
-            
-            <!-- Loading for Filter -->
-            <div id="filterLoading" class="text-center py-3" style="display: none;">
-                <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <span class="text-muted">Loading filtered data...</span>
+            <div class="text-muted">
+                <small><i class="fas fa-info-circle me-1"></i> Export includes current filter</small>
             </div>
-            
-            <!-- Table - IKUT BLADE TEMPLATE -->
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Booking ID</th>
-                            <th>User ID</th>
-                            <th>Customer Name</th>
-                            <th>Vehicle Name</th>
-                            <th>Booking Period</th>
-                            <th>Status</th>
+        </div>
+        
+        <!-- Loading for Filter -->
+        <div id="filterLoading" class="text-center py-3" style="display: none;">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span class="text-muted">Loading filtered data...</span>
+        </div>
+        
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>User ID</th>
+                        <th>Customer Name</th>
+                        <th>Vehicle Name</th>
+                        <th>Booking Period</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="bookingTableBody">`;
-        
-        if (data.data && data.data.length > 0) {
-            data.data.forEach(row => {
-                // Format dates seperti dalam Blade template
-                const pickupDateTime = formatDateTime(row.pickup_dateTime);
-                const returnDateTime = formatDateTime(row.return_dateTime);
-                
-                // Get status badge color - IKUT BLADE
-                let statusColor = 'secondary';
-                if (row.bookingStatus) {
-                    const status = row.bookingStatus.toLowerCase();
-                    if (status === 'completed' || status === 'successful') {
-                        statusColor = 'success';
-                    } else if (status === 'pending') {
-                        statusColor = 'warning';
-                    } else if (status === 'cancelled' || status === 'rejected') {
-                        statusColor = 'danger';
-                    }
+    
+    if (data.data && data.data.length > 0) {
+        data.data.forEach(row => {
+            // Format dates seperti dalam Blade template
+            const pickupDateTime = formatDateTime(row.pickup_dateTime);
+            const returnDateTime = formatDateTime(row.return_dateTime);
+            
+            // Get status badge color - TUKAR "completed" kepada "successful"
+            let statusColor = 'secondary';
+            let displayStatus = row.bookingStatus;
+            
+            if (row.bookingStatus) {
+                const status = row.bookingStatus.toLowerCase();
+                if (status === 'completed' || status === 'successful') {
+                    statusColor = 'success';
+                    displayStatus = 'successful'; // TUKAR DISINI
+                } else if (status === 'pending') {
+                    statusColor = 'warning';
+                } else if (status === 'cancelled' || status === 'rejected') {
+                    statusColor = 'danger';
                 }
-                
-                html += `
-                    <tr>
-                        <td>${row.bookingID || '-'}</td>
-                        <td>${row.userID || '-'}</td>
-                        <td>${row.name || '-'}</td>
-                        <td>${row.vehicleName || '-'}</td>
-                        <td>${pickupDateTime} - ${returnDateTime}</td>
-                        <td>
-                            <span class="badge bg-${statusColor}">
-                                ${row.bookingStatus ? row.bookingStatus.charAt(0).toUpperCase() + row.bookingStatus.slice(1) : '-'}
-                            </span>
-                        </td>
-                    </tr>`;
-            });
-        } else {
+            }
+            
             html += `
                 <tr>
-                    <td colspan="6" class="text-center py-4">
-                        <div class="text-muted">
-                            <i class="fas fa-info-circle me-2"></i>
-                            No booking data available.
-                        </div>
+                    <td>${row.bookingID || '-'}</td>
+                    <td>${row.userID || '-'}</td>
+                    <td>${row.name || '-'}</td>
+                    <td>${row.vehicleName || '-'}</td>
+                    <td>${pickupDateTime} - ${returnDateTime}</td>
+                    <td>
+                        <span class="badge bg-${statusColor}">
+                            ${displayStatus ? displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1) : '-'}
+                        </span>
                     </td>
                 </tr>`;
-        }
-        
+        });
+    } else {
         html += `
-                    </tbody>
-                </table>
-            </div>`;
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No booking data available.
+                    </div>
+                </td>
+            </tr>`;
+    }
+    
+    html += `
+                </tbody>
+            </table>
+        </div>`;
+    
+    reportContent.innerHTML = html;
+    
+    // Add event listeners for filter buttons
+    const applyBtn = document.getElementById('applyFilter');
+    const resetBtn = document.getElementById('resetFilter');
+    const monthSelect = document.getElementById('filterMonth');
+    const yearSelect = document.getElementById('filterYear');
+    const pdfExportBtn = document.getElementById('pdfExportBtn');
+    const excelExportBtn = document.getElementById('excelExportBtn');
+    
+    let currentFilter = {
+        month: '',
+        year: ''
+    };
+    
+    // Function to update export links with current filter
+    function updateExportLinks() {
+        const month = currentFilter.month ? `month=${currentFilter.month}` : '';
+        const year = currentFilter.year ? `year=${currentFilter.year}` : '';
+        const params = [month, year].filter(p => p).join('&');
+        const query = params ? `?${params}` : '';
         
-        reportContent.innerHTML = html;
+        pdfExportBtn.href = `/admin/reports/total_booking/export-pdf${query}`;
+        excelExportBtn.href = `/admin/reports/total_booking/export-excel${query}`;
+    }
+    
+    // Function to fetch filtered data from server
+    function fetchFilteredData(month, year) {
+        const filterLoading = document.getElementById('filterLoading');
+        const summaryCards = document.getElementById('summaryCards');
+        const tableBody = document.getElementById('bookingTableBody');
         
-        // Add event listeners for filter buttons
-        const applyBtn = document.getElementById('applyFilter');
-        const resetBtn = document.getElementById('resetFilter');
-        const refreshBtn = document.getElementById('refreshData');
-        const monthSelect = document.getElementById('filterMonth');
-        const yearSelect = document.getElementById('filterYear');
-        const pdfExportBtn = document.getElementById('pdfExportBtn');
-        const excelExportBtn = document.getElementById('excelExportBtn');
+        // Show loading
+        filterLoading.style.display = 'block';
+        summaryCards.style.opacity = '0.5';
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    Loading filtered data...
+                </td>
+            </tr>`;
         
-        let currentFilter = {
-            month: '',
-            year: ''
-        };
+        // Update current filter
+        currentFilter = { month, year };
+        updateExportLinks();
         
-        // Function to update export links with current filter
-        function updateExportLinks() {
-            const month = currentFilter.month ? `month=${currentFilter.month}` : '';
-            const year = currentFilter.year ? `year=${currentFilter.year}` : '';
-            const params = [month, year].filter(p => p).join('&');
-            const query = params ? `?${params}` : '';
-            
-            pdfExportBtn.href = `/admin/reports/total_booking/export-pdf${query}`;
-            excelExportBtn.href = `/admin/reports/total_booking/export-excel${query}`;
-        }
-        
-        // Function to fetch filtered data from server
-        function fetchFilteredData(month, year) {
-            const filterLoading = document.getElementById('filterLoading');
-            const summaryCards = document.getElementById('summaryCards');
-            const tableBody = document.getElementById('bookingTableBody');
-            
-            // Show loading
-            filterLoading.style.display = 'block';
-            summaryCards.style.opacity = '0.5';
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center py-4">
-                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        Loading filtered data...
-                    </td>
-                </tr>`;
-            
-            // Update current filter
-            currentFilter = { month, year };
-            updateExportLinks();
-            
-            // Fetch filtered data from server
-            fetch(`/admin/reports/total_booking/filter`, {
-                method: 'POST',
-                headers: { 
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    month: month || null,
-                    year: year || null
-                })
+        // Fetch filtered data from server
+        fetch(`/admin/reports/total_booking/filter`, {
+            method: 'POST',
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                month: month || null,
+                year: year || null
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(filteredData => {
-                console.log('Filtered booking data received:', filteredData);
-                
-                // Hide loading
-                filterLoading.style.display = 'none';
-                summaryCards.style.opacity = '1';
-                
-                // Update summary cards - IKUT BLADE FIELD NAMES
-                document.getElementById('totalCount').textContent = filteredData.summary.total || 0;
-                document.getElementById('completedCount').textContent = filteredData.summary.completed || 0;
-                document.getElementById('pendingCount').textContent = filteredData.summary.pending || 0;
-                document.getElementById('cancelledCount').textContent = filteredData.summary.cancelled || 0;
-                
-                // Update table
-                if (!filteredData.data || filteredData.data.length === 0) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <div class="text-muted">
-                                    <i class="fas fa-search me-2"></i>
-                                    No booking data found for the selected filter.
-                                </div>
-                            </td>
-                        </tr>`;
-                } else {
-                    let newHtml = '';
-                    filteredData.data.forEach(row => {
-                        // Format dates
-                        const pickupDateTime = formatDateTime(row.pickup_dateTime);
-                        const returnDateTime = formatDateTime(row.return_dateTime);
-                        
-                        // Get status badge color
-                        let statusColor = 'secondary';
-                        if (row.bookingStatus) {
-                            const status = row.bookingStatus.toLowerCase();
-                            if (status === 'completed' || status === 'successful') {
-                                statusColor = 'success';
-                            } else if (status === 'pending') {
-                                statusColor = 'warning';
-                            } else if (status === 'cancelled' || status === 'rejected') {
-                                statusColor = 'danger';
-                            }
-                        }
-                        
-                        newHtml += `
-                            <tr>
-                                <td>${row.bookingID || '-'}</td>
-                                <td>${row.userID || '-'}</td>
-                                <td>${row.name || '-'}</td>
-                                <td>${row.vehicleName || '-'}</td>
-                                <td>${pickupDateTime} - ${returnDateTime}</td>
-                                <td>
-                                    <span class="badge bg-${statusColor}">
-                                        ${row.bookingStatus ? row.bookingStatus.charAt(0).toUpperCase() + row.bookingStatus.slice(1) : '-'}
-                                    </span>
-                                </td>
-                            </tr>`;
-                    });
-                    tableBody.innerHTML = newHtml;
-                }
-            })
-            .catch(error => {
-                console.error('Filter error:', error);
-                filterLoading.style.display = 'none';
-                summaryCards.style.opacity = '1';
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(filteredData => {
+            console.log('Filtered booking data received:', filteredData);
+            
+            // Hide loading
+            filterLoading.style.display = 'none';
+            summaryCards.style.opacity = '1';
+            
+            // Update summary card - HANYA TOTAL
+            document.getElementById('totalCount').textContent = filteredData.summary.total || 0;
+            
+            // Update table
+            if (!filteredData.data || filteredData.data.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-danger">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Error loading filtered data: ${error.message}
+                        <td colspan="6" class="text-center py-4">
+                            <div class="text-muted">
+                                <i class="fas fa-search me-2"></i>
+                                No booking data found for the selected filter.
+                            </div>
                         </td>
                     </tr>`;
-            });
-        }
-        
-        // Event listeners
-        if (applyBtn) {
-            applyBtn.addEventListener('click', function() {
-                const month = monthSelect ? monthSelect.value : '';
-                const year = yearSelect ? yearSelect.value : '';
-                fetchFilteredData(month, year);
-            });
-        }
-        
-        if (resetBtn) {
-            resetBtn.addEventListener('click', function() {
-                if (monthSelect) monthSelect.value = '';
-                if (yearSelect) yearSelect.value = '';
-                fetchFilteredData('', '');
-            });
-        }
-        
-        /*if (refreshBtn) {
-            refreshBtn.addEventListener('click', function() {
-                const month = monthSelect ? monthSelect.value : '';
-                const year = yearSelect ? yearSelect.value : '';
-                fetchFilteredData(month, year);
-            });
-        }
-        
-        // Auto-apply filter when dropdown changes
-        if (monthSelect) {
-            monthSelect.addEventListener('change', function() {
-                const month = monthSelect.value;
-                const year = yearSelect ? yearSelect.value : '';
-                fetchFilteredData(month, year);
-            });
-        }
-        
-        if (yearSelect) {
-            yearSelect.addEventListener('change', function() {
-                const month = monthSelect ? monthSelect.value : '';
-                const year = yearSelect.value;
-                fetchFilteredData(month, year);
-            });
-        } */
-        
-        // Initialize export links
-        updateExportLinks();
+            } else {
+                let newHtml = '';
+                filteredData.data.forEach(row => {
+                    // Format dates
+                    const pickupDateTime = formatDateTime(row.pickup_dateTime);
+                    const returnDateTime = formatDateTime(row.return_dateTime);
+                    
+                    // Get status badge color
+                    let statusColor = 'secondary';
+                    let displayStatus = row.bookingStatus;
+                    
+                    if (row.bookingStatus) {
+                        const status = row.bookingStatus.toLowerCase();
+                        if (status === 'completed' || status === 'successful') {
+                            statusColor = 'success';
+                            displayStatus = 'successful';
+                        } else if (status === 'pending') {
+                            statusColor = 'warning';
+                        } else if (status === 'cancelled' || status === 'rejected') {
+                            statusColor = 'danger';
+                        }
+                    }
+                    
+                    newHtml += `
+                        <tr>
+                            <td>${row.bookingID || '-'}</td>
+                            <td>${row.userID || '-'}</td>
+                            <td>${row.name || '-'}</td>
+                            <td>${row.vehicleName || '-'}</td>
+                            <td>${pickupDateTime} - ${returnDateTime}</td>
+                            <td>
+                                <span class="badge bg-${statusColor}">
+                                    ${displayStatus ? displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1) : '-'}
+                                </span>
+                            </td>
+                        </tr>`;
+                });
+                tableBody.innerHTML = newHtml;
+            }
+        })
+        .catch(error => {
+            console.error('Filter error:', error);
+            filterLoading.style.display = 'none';
+            summaryCards.style.opacity = '1';
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error loading filtered data: ${error.message}
+                    </td>
+                </tr>`;
+        });
     }
+    
+    // Event listeners
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            const month = monthSelect ? monthSelect.value : '';
+            const year = yearSelect ? yearSelect.value : '';
+            fetchFilteredData(month, year);
+        });
+    }
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            if (monthSelect) monthSelect.value = '';
+            if (yearSelect) yearSelect.value = '';
+            fetchFilteredData('', '');
+        });
+    }
+    
+    // Initialize export links
+    updateExportLinks();
+}
     
     function renderBlacklistedReport(data) {
         console.log('Blacklist data received:', data);

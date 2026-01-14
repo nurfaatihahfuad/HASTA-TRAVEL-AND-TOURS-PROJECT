@@ -55,37 +55,13 @@
             </div>
         </form>
 
-        <!-- Summary cards -->
+        <!-- Summary card - HANYA TOTAL SAHAJA -->
         <div class="row mb-4" id="summaryCards">
-            <div class="col-md-3">
-                <div class="card text-center">
+            <div class="col-md-12">
+                <div class="card text-center bg-light">
                     <div class="card-body">
-                        <h6>Total</h6>
-                        <p class="fs-5 mb-0" id="totalCount">{{ $summary['total'] ?? 0 }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h6>Completed</h6>
-                        <p class="fs-5 mb-0 text-success" id="completedCount">{{ $summary['completed'] ?? 0 }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h6>Pending</h6>
-                        <p class="fs-5 mb-0 text-warning" id="pendingCount">{{ $summary['pending'] ?? 0 }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h6>Cancelled</h6>
-                        <p class="fs-5 mb-0 text-danger" id="cancelledCount">{{ $summary['cancelled'] ?? 0 }}</p>
+                        <h6 class="text-muted">Total Bookings</h6>
+                        <p class="fs-4 mb-0 text-dark" id="totalCount">{{ $summary['total'] ?? 0 }}</p>
                     </div>
                 </div>
             </div>
@@ -134,8 +110,12 @@
                             - {{ \Carbon\Carbon::parse($row->return_dateTime)->format('d M Y H:i') }}
                         </td>
                         <td>
+                            @php
+                                // Tukar "completed" kepada "successful" untuk paparan
+                                $displayStatus = $row->bookingStatus === 'completed' ? 'successful' : $row->bookingStatus;
+                            @endphp
                             <span class="badge bg-{{ $row->bookingStatus === 'completed' ? 'success' : ($row->bookingStatus === 'pending' ? 'warning' : 'secondary') }}">
-                                {{ ucfirst($row->bookingStatus) }}
+                                {{ ucfirst($displayStatus) }}
                             </span>
                         </td>
                     </tr>
@@ -158,11 +138,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById('filterForm');
     const tbody = document.getElementById('reportTableBody');
-
     const totalCount = document.getElementById('totalCount');
-    const completedCount = document.getElementById('completedCount');
-    const pendingCount = document.getElementById('pendingCount');
-    const cancelledCount = document.getElementById('cancelledCount');
 
     if (!form || !tbody) return;
 
@@ -191,6 +167,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 </tr>`;
             } else {
                 data.forEach(row => {
+                    // Tukar "completed" kepada "successful" untuk paparan
+                    const displayStatus = row.bookingStatus === 'completed' ? 'successful' : row.bookingStatus;
+                    
                     tbody.innerHTML += `
                         <tr>
                             <td>${row.bookingID}</td>
@@ -200,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             <td>${row.pickup_dateTime} - ${row.return_dateTime}</td>
                             <td>
                                 <span class="badge bg-${row.bookingStatus === 'completed' ? 'success' : (row.bookingStatus === 'pending' ? 'warning' : 'secondary')}">
-                                    ${row.bookingStatus.charAt(0).toUpperCase() + row.bookingStatus.slice(1)}
+                                    ${displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}
                                 </span>
                             </td>
                         </tr>
@@ -208,11 +187,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             }
 
-            // Update summary cards
+            // Update summary card - HANYA TOTAL
             totalCount.textContent = summary.total;
-            completedCount.textContent = summary.completed;
-            pendingCount.textContent = summary.pending;
-            cancelledCount.textContent = summary.cancelled;
         })
         .catch(() => alert('Something went wrong. Please try again.'));
     });
