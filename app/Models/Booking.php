@@ -98,4 +98,10 @@ class Booking extends Model
             Carbon::now()->greaterThan(Carbon::parse($this->return_dateTime)) &&
             $this->hasReturnInspection();
     }
+
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class, 'bookingID', 'bookingID');
+    }
+
 }

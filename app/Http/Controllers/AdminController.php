@@ -326,7 +326,7 @@ class AdminController extends Controller
 
         $bookings = $query
             ->orderBy('pickup_dateTime', 'desc')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         return view('admin.bookings.index', compact('bookings'));

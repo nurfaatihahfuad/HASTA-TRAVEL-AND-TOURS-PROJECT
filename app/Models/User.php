@@ -214,7 +214,7 @@ class User extends Authenticatable
     }
 
     //==========
-    //Blaclisted
+    //Blacklisted
     //==========
     public function getIsBlacklistedAttribute()
     {
