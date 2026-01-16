@@ -158,7 +158,7 @@ class CustomerRegistrationController extends Controller
             // store files and create VerificationDocs record
             $verificationData = [
                 'customerID' => $user->userID,
-                'status' => 'pending',
+                //'status' => 'pending',
             ];
 
             // Store IC Copy
