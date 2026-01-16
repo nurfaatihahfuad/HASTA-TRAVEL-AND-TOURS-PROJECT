@@ -169,7 +169,7 @@ class CustomerProfileController extends Controller
         
 
         // Filter by status
-        if ($request->status) {
+        if ($request->filled('status') && $request->status != 'all') {
             $query->where('bookingStatus', $request->status);
         }
 
@@ -186,8 +186,23 @@ class CustomerProfileController extends Controller
         }
     }
 
+    // ✅ Get status counts for filter badges
+    $statusCounts = [
+        'pending' => Booking::where('userID', auth()->id())
+            ->where('bookingStatus', 'pending')
+            ->count(),
+        'successful' => Booking::where('userID', auth()->id())
+            ->where('bookingStatus', 'successful')
+            ->count(),
+        'completed' => Booking::where('userID', auth()->id())
+            ->where('bookingStatus', 'completed')
+            ->count(),
+        'rejected' => Booking::where('userID', auth()->id())
+            ->where('bookingStatus', 'rejected')
+            ->count(),
+    ];
 
-        return view('customers.BookingHistory.index', compact('bookings'));
+        return view('customers.BookingHistory.index', compact('bookings', 'statusCounts'));
     }
 
     public function bookingShow(Booking $booking)
