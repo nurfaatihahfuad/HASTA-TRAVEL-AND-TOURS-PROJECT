@@ -37,12 +37,12 @@
         <h1 class="h2">
             <i class="fas fa-clipboard-check text-danger"></i> Admin: Inspection Management
         </h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
+        <!--<div class="btn-toolbar mb-2 mb-md-0">
             {{-- Tambah butang export jika perlu untuk admin --}}
             <button type="button" class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-download"></i> Export Report
             </button>
-        </div>
+        </div>-->
     </div>
 
     <div class="row mb-4">
@@ -51,7 +51,7 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Inspections (Global)</div>
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Inspections </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalInspections ?? 0 }}</div>
                         </div>
                         <div class="col-auto">
@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-4">
+        <!--<div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-danger shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -108,7 +108,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 
     <div class="card shadow mb-4">

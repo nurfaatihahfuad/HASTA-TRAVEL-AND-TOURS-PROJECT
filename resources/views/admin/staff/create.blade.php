@@ -210,12 +210,12 @@
         
         
         <div class="mt-4 d-flex justify-content-center gap-3">
-            <button type="submit" class="btn btn-primary px-4">
-                <i class="fas fa-user-plus me-2"></i> Create Staff
-            </button>
             <a href="{{ route('staff.index') }}" class="btn btn-outline-secondary px-4">
                 Cancel
             </a>
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="fas fa-user-plus me-2"></i> Create Staff
+            </button>
             
         </div>
     </form>

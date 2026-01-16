@@ -87,11 +87,29 @@ class Customer extends Model
         });
     }
 
+    /**
+     * Get customer's loyalty stamp progress
+     */
+    public function getLoyaltyProgress()
+    {
+        if (!$this->hasLoyaltyCard()) {
+            return null;
+        }
+        
+        return $this->loyaltyCard->getStampProgress();
+    }
+
     // Customer has many vouchers
     public function vouchers()
     {
         return $this->belongsToMany(Voucher::class, 'customer_voucher', 'customerID', 'voucherCode')
                     ->withPivot('redeemed_at');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'userID', 'customerID');
+      
     }
 
 }

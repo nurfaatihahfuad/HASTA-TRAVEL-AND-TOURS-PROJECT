@@ -1,0 +1,190 @@
+@extends('layouts.customer')
+
+@section('content')
+<div class="container">
+    <h2>Return Inspection for Booking #{{ $booking->bookingID }}</h2>
+
+    <form action="{{ route('inspection.storeReturnInspection', $booking->bookingID) }}" 
+          method="POST" enctype="multipart/form-data" id="returnForm">
+        @csrf
+
+        <div class="form-group mb-3">
+            <label>Car Condition (on Return)</label>
+            <input type="text" name="carCondition" class="form-control" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Final Mileage *</label>
+            <input type="number" name="mileageReturned" class="form-control" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Fuel Level (%) *</label>
+            <input type="number" name="fuelLevel" class="form-control" min="0" max="100" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Fuel Evidence *</label>
+            <input type="file" name="fuel_evidence" class="form-control" accept="image/*">
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Any New Damage? *</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="damageDetected" 
+                       id="noDamage" value="0" checked>
+                <label class="form-check-label text-success" for="noDamage">
+                    <i class="fas fa-check-circle"></i> No Damage
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="damageDetected" 
+                       id="hasDamage" value="1">
+                <label class="form-check-label text-danger" for="hasDamage">
+                    <i class="fas fa-exclamation-triangle"></i> Yes, Damage Found
+                </label>
+            </div>
+        </div>
+
+        <!-- Damage Details Section (Conditional) -->
+        <div class="card border-danger mb-4" id="damageDetailsSection" style="display: none;">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Damage Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label>Damage Type *</label>
+                            <select name="casetype" class="form-control" required>
+                                <option value="">Select Type</option>
+                                <option value="Collision Damage">Collision Damage</option>
+                                <option value="Non-Collision Damage">Non-Collision Damage</option>
+                                <option value="Vandalism">Vandalism</option>
+                                <option value="Theft Related">Theft Related</option>
+                                <option value="Weather Damage">Weather Damage</option>
+                                <option value="Mechanical Failure">Mechanical Failure</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                                                
+                        <div class="mb-3">
+                            <label>Severity *</label>
+                            <select name="severity" class="form-control">
+                                <option value="">Select Severity</option>
+                                <option value="low">Low - Minor cosmetic</option>
+                                <option value="medium">Medium - Requires repair</option>
+                                <option value="high">High - Major damage</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label>Damage Photos (Optional)</label>
+                            <input type="file" name="damage_photos" class="form-control" 
+                                   multiple accept="image/*">
+                            <small class="text-muted">Upload clear photos of the damage</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Remark / Notes *</label>
+            <textarea name="remark" class="form-control" rows="3" required 
+                      placeholder="Any additional notes about the vehicle return..."></textarea>
+        </div>
+
+        <h4>Upload Vehicle Photos (Return) *</h4>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>Front View</label>
+                <input type="file" name="front_view" class="form-control" accept="image/*">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label>Back View</label>
+                <input type="file" name="back_view" class="form-control" accept="image/*">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label>Right Side View</label>
+                <input type="file" name="right_view" class="form-control" accept="image/*">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label>Left Side View</label>
+                <input type="file" name="left_view" class="form-control" accept="image/*">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-danger">Submit Return Inspection</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DEBUG: JavaScript loaded for return inspection');
+    
+    const damageRadios = document.querySelectorAll('input[name="damageDetected"]');
+    const damageSection = document.getElementById('damageDetailsSection');
+    
+    if (!damageSection) {
+        console.error('ERROR: damageDetailsSection not found!');
+        return;
+    }
+    
+    console.log('Found damage section and', damageRadios.length, 'radio buttons');
+    
+    function toggleDamageSection() {
+        const selectedRadio = document.querySelector('input[name="damageDetected"]:checked');
+        if (!selectedRadio) {
+            console.error('No damageDetected radio selected');
+            return;
+        }
+        
+        const selectedValue = selectedRadio.value;
+        console.log('Selected damage value:', selectedValue);
+        
+        if (selectedValue === '1') {
+            damageSection.style.display = 'block';
+            console.log('Showing damage section');
+            
+            // Make fields required - hanya untuk field dalam damage section
+            const casetypeField = damageSection.querySelector('[name="casetype"]');
+            const severityField = damageSection.querySelector('[name="severity"]');
+            
+            if (casetypeField) casetypeField.required = true;
+            if (severityField) severityField.required = true;
+            
+        } else {
+            damageSection.style.display = 'none';
+            console.log('Hiding damage section');
+            
+            // Remove required
+            const allFields = damageSection.querySelectorAll('[name]');
+            allFields.forEach(field => {
+                field.required = false;
+            });
+        }
+    }
+    
+    // Add event listeners
+    damageRadios.forEach(radio => {
+        radio.addEventListener('change', toggleDamageSection);
+    });
+    
+    // Initial call
+    toggleDamageSection();
+    
+    // Debug form submission
+    document.getElementById('returnForm').addEventListener('submit', function(e) {
+        console.log('DEBUG: Form submitting...');
+        console.log('Damage detected:', document.querySelector('input[name="damageDetected"]:checked').value);
+        console.log('Casetype value:', document.querySelector('[name="casetype"]').value);
+        console.log('Severity value:', document.querySelector('[name="severity"]').value);
+    });
+});
+</script>
+@endsection

@@ -228,11 +228,12 @@
                 <i class="fas fa-file-invoice"></i>
                 <span class="menu-text">Inspections</span>
             </a>
-
-            <a class="sidebar-link @if($currentRoute == 'damagecase.index') active @endif" href="{{ route('damagecase.index') }}">
+        
+           <!--  <a class="sidebar-link @if($currentRoute == 'staff.damage-cases.index') active @endif" 
+            href="{{ route('staff.damage-cases.index') }}">
                 <i class="fas fa-car-burst"></i>
                 <span class="menu-text">Damage Cases</span>
-            </a>
+            </a>-->
             
             <hr>
             

@@ -33,12 +33,56 @@ class Booking extends Model
             // contoh: BK + tarikh + random number
             $booking->bookingID = 'BK' . date('YmdHis') . rand(10, 99);
         });
+
+        // Award stamp when booking is completed
+        static::updated(function ($booking) {
+            if ($booking->bookingStatus === 'successful') {
+                $totalHours = $booking->getTotalHoursAttribute();
+                if ($totalHours >= 9) {
+                    $booking->awardLoyaltyStamp();
+                }
+            }
+        });
+
     }
 
     public function user() 
     { 
         return $this->belongsTo(User::class, 'userID'); 
     } 
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'userID', 'userID');
+    }
+
+    public function awardLoyaltyStamp(): bool
+    {
+        // DIRECT: Booking → Customer → LoyaltyCard
+        $customer = $this->customer;
+        
+        if (!$customer) {
+            return false;
+        }
+        
+        $loyaltyCard = $customer->loyaltyCard;
+        
+        if (!$loyaltyCard) {
+            return false;
+        }
+        
+        // Award stamp
+        $loyaltyCard->currentStamp += 1;
+        $loyaltyCard->totalStamp += 1;
+        
+        // Check if reward is earned
+        if ($loyaltyCard->currentStamp >= 10) {
+            $loyaltyCard->redeemedStamp += 1;
+            $loyaltyCard->currentStamp = 0;
+        }
+        
+        return $loyaltyCard->save();
+    }
 
     public function vehicle()
     {
@@ -98,4 +142,10 @@ class Booking extends Model
             Carbon::now()->greaterThan(Carbon::parse($this->return_dateTime)) &&
             $this->hasReturnInspection();
     }
+
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class, 'bookingID', 'bookingID');
+    }
+
 }
