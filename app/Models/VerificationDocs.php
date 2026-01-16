@@ -19,8 +19,8 @@ class VerificationDocs extends Model
         'ic_file_path',
         'license_file_path',
         'matric_file_path',
-        'status',
-        'verified_by',
+        //'status',
+        //'verified_by',
         'verified_at'
     ];
 
@@ -62,8 +62,10 @@ class VerificationDocs extends Model
     }
 
     // Relationship to Admin who verified (optional)
+    /*
     public function verifiedBy()
     {
         return $this->belongsTo(User::class, 'verified_by', 'userID');
     }
+        */
 }
