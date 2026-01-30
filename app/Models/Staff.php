@@ -10,9 +10,9 @@ class Staff extends Model
     use HasFactory;
 
     protected $table = 'staff';
-    //protected $primaryKey = 'staffID';
-    //protected $keyType = 'string';
-    //public $incrementing = false;
+    protected $primaryKey = 'staffID';
+    protected $keyType = 'string';
+    public $incrementing = false;
     public $timestamps = false;
     
     protected $fillable = [

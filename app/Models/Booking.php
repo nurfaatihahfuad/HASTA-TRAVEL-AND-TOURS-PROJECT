@@ -25,6 +25,12 @@ class Booking extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+        'pickup_dateTime' => 'datetime',
+        'return_dateTime' => 'datetime',
+    ];
+
+
     protected static function boot()
     {
         parent::boot();
@@ -55,6 +61,19 @@ class Booking extends Model
     {
         return $this->belongsTo(Customer::class, 'userID', 'userID');
     }
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicleID', 'vehicleID');
+    }
+
+    public function payments() 
+    { 
+        return $this->hasMany(Payment::class, 'bookingID', 'bookingID'); 
+    }
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class, 'bookingID', 'bookingID');
+    }
 
     public function awardLoyaltyStamp(): bool
     {
@@ -82,16 +101,6 @@ class Booking extends Model
         }
         
         return $loyaltyCard->save();
-    }
-
-    public function vehicle()
-    {
-        return $this->belongsTo(Vehicle::class, 'vehicleID', 'vehicleID');
-    }
-
-    public function payments() 
-    { 
-        return $this->hasMany(Payment::class, 'bookingID', 'bookingID'); 
     }
 
     public function getTotalHoursAttribute()
@@ -141,11 +150,6 @@ class Booking extends Model
             $this->bookingStatus !== 'cancelled' &&
             Carbon::now()->greaterThan(Carbon::parse($this->return_dateTime)) &&
             $this->hasReturnInspection();
-    }
-
-    public function feedback()
-    {
-        return $this->hasOne(Feedback::class, 'bookingID', 'bookingID');
     }
 
 }

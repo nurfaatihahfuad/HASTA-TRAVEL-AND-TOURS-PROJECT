@@ -26,11 +26,6 @@ class StaffController extends Controller
                             ->whereHas('staff', function($q) {
                                 $q->where('staffRole','runner');
                             })->count();
-        // Get all staff (userType = 'staff')
-        // order by latest staff added
-        /*$staff = User::where('userType', 'staff')
-                    ->orderBy('created_at', 'desc')
-                    ->get();*/
 
         // Get all staff with their staff role information
         $query = User::where('userType', 'staff')
@@ -56,7 +51,6 @@ class StaffController extends Controller
     }
 
     // Show the form for creating a new staff member.
-    
     public function create()
     {
         return view('admin.staff.create');
@@ -157,11 +151,6 @@ class StaffController extends Controller
             'staffRole' => 'required|in:salesperson,runner',
         ]);
 
-        // Update staff
-        /*$staff->update($validated);
-
-        return redirect()->route('staff.index')
-            ->with('success', 'Staff member updated successfully!');*/
         try {
             DB::beginTransaction();
 

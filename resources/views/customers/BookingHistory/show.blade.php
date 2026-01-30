@@ -444,7 +444,8 @@
                         <textarea name="review"
                                   class="form-control form-control-lg"
                                   rows="5"
-                                  placeholder="What did you like about your rental experience? Is there anything we could improve? Your feedback helps us serve you better..."
+                                  placeholder="What did you like about your rental experience? Is there anything we could improve? 
+                                                Your feedback helps us serve you better..."
                                   style="font-size: 1rem;"></textarea>
                     </div>
 

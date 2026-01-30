@@ -41,7 +41,6 @@ class CustomerRegistrationController extends Controller
             'BSN'
         ];
         
-
         return view('customers.register', compact('faculties','residentialColleges','bankTypes'));
     }
 
@@ -79,7 +78,6 @@ class CustomerRegistrationController extends Controller
             $validationRules['staffNo'] = 'required|string|max:50|unique:staffcustomer,staffNo';
         }
 
-
         // file uploads
         $validationRules['ic'] = 'required|file|mimes:jpg,jpeg,png,pdf|max:5120';
         $validationRules['drivers_license'] = 'required|file|mimes:jpg,jpeg,png,pdf|max:5120';
@@ -104,11 +102,7 @@ class CustomerRegistrationController extends Controller
 
 
             $user->refresh(); // reloads trigger-generated userID
-            //$user = User::where('email', $validated['email'])->first();
             \Log::info('Generated UserID: ' . $user->userID);
-
-            // 2. Generate referral code if not provided
-            // $referred_byCode = NULL;
 
             // 3. Create Customer
             $customer = Customer::create([
@@ -137,23 +131,7 @@ class CustomerRegistrationController extends Controller
                 ]);
             }
 
-            // 3b. Referral bonus: if referralCode was provided, reward the referrer
-            /*if (!empty($validated['referralCode'])) {
-                $referrer = Customer::whereHas('loyaltyCard', function ($q) use ($validated) {
-                    $q->where('referralCode', $validated['referralCode']);
-                })->first();
-
-                if ($referrer && $referrer->loyaltyCard) {
-                    $card = $referrer->loyaltyCard;
-                    $card->currentStamp += 2;   // award 2 stamps (adjust as needed)
-                    $card->totalStamp += 2;
-                    $card->save();
-                }
-            }*/
             ReferralService::applyReferral($customer, $validated['referralCode'] ?? null);
-
-
-            
 
             // store files and create VerificationDocs record
             $verificationData = [
@@ -185,20 +163,12 @@ class CustomerRegistrationController extends Controller
             // Commit transaction
             DB::commit();
 
-            // Send verification email or notification
-            // Mail::to($user->email)->send(new CustomerRegistered($user));
-
-            // Log the user in automatically
-            // auth()->login($user);
-
             // Store userID in session
             session(['registered_user_id' => $user->userID]);
             
             // Redirect to success page
             return redirect()->route('customer.register.success');
 
-            // Return back with success message
-            // return back()->with('success', 'Registration successful!');
 
         } catch (\Exception $e) {
             // Rollback transaction on error
@@ -216,34 +186,23 @@ class CustomerRegistrationController extends Controller
         }
     }
 
-    
-
-    // Generate unique referral code
-    /*private function generateReferralCode()
-    {
-        do {
-            $code = Str::upper(Str::random(8));
-        } while (Customer::where('referralCode', $code)->exists());
-
-        return $code;
-    }*/
 
     public function authenticate()
-{
-    $this->ensureIsNotRateLimited();
+    {
+        $this->ensureIsNotRateLimited();
 
-    // Check if user exists with email
-    $user = User::where('email', $this->email)->first();
-    
-    if (!$user || !Hash::check($this->password, $user->password)) {
-        throw ValidationException::withMessages([
-            'email' => __('auth.failed'),
-        ]);
+        // Check if user exists with email
+        $user = User::where('email', $this->email)->first();
+        
+        if (!$user || !Hash::check($this->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+        
+        // Manually log in the user
+        Auth::login($user, $this->boolean('remember'));
     }
-    
-    // Manually log in the user
-    Auth::login($user, $this->boolean('remember'));
-}
     // Show success page (optional)
     public function success()
     {
@@ -269,14 +228,9 @@ class CustomerRegistrationController extends Controller
                 ->with('error', 'User not found. Please register again.');
         }
 
-        //$user = User::find($userId);
-        
         // loads the success.blade.php with registered user data
         return view('customers.success', [
             'user' => $user
         ]);
-
-        
-        
     }
 }

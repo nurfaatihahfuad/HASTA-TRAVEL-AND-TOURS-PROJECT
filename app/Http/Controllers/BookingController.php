@@ -11,9 +11,7 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
-    /**
-     * Show the booking form to the customer.
-     */
+    // Show the booking form to the customer.
     public function create($vehicleID, Request $request): View
     {
         $vehicle = Vehicle::findOrFail($vehicleID);
@@ -28,8 +26,18 @@ class BookingController extends Controller
         $totalHours = round($pickup->diffInHours($return));
         $totalHours = $totalHours == 0 ? 1 : $totalHours; // Minimum 1 hour
         
-        $pricePerHour = $vehicle->price_per_hour; // Convert daily rate to hourly
-        $totalPrice = $pricePerHour * $totalHours;
+        /*$pricePerHour = $vehicle->price_per_hour; // Convert daily rate to hourly
+        $totalPrice = $pricePerHour * $totalHours;*/
+        $pricePerHour = $vehicle->price_per_hour;
+        $pricePerDay  = $vehicle->price_per_day;
+        if ($totalHours >= 24) {
+            // Daily rate + extra hours beyond 24
+            $extraHours = $totalHours - 24;
+            $totalPrice = $pricePerDay + ($extraHours * $pricePerHour);
+        } else {
+            // Hourly rate for less than 24 hours
+            $totalPrice = $pricePerHour * $totalHours;
+        }
         
         // Pass additional data to view
         return view('booking', compact(
@@ -44,9 +52,7 @@ class BookingController extends Controller
         return view('booking', compact('vehicle', 'pickup_dateTime', 'return_dateTime'));
     }
 
-    /**
-     * Store the booking submitted by the customer.
-     */
+    // Store the booking submitted by the customer.
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -110,18 +116,7 @@ class BookingController extends Controller
 
         return redirect()->back()->with('success', 'Booking has been rejected.');
     }
-    //    public function reject($bookingID): RedirectResponse
-    //{
-    //    $booking = Booking::findOrFail($bookingID);
-    //    $booking->bookingStatus = 'rejected';
-    //    $booking->save();
-
-    //    return redirect()->back()->with('success', 'Booking has been rejected.');
-    //}
-
-    /**
-     * Reset booking to pending (additional method if needed)
-     */
+  
     public function resetToPending($bookingID): RedirectResponse
     {
         $booking = Booking::findOrFail($bookingID);

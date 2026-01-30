@@ -108,7 +108,7 @@ public function staffPending()
             $inspectionData = [
                 'bookingID'       => $booking->bookingID,
                 'vehicleID'       => $booking->vehicleID,
-                'staffID'         => auth()->user()->userID, // FIXED: userID bukan id()
+                'customerID'         => auth()->user()->userID, // FIXED: userID bukan id()
                 'inspectionType'  => 'pickup',
                 'carCondition'    => $validated['carCondition'],
                 'mileageReturned' => (int) $validated['mileageReturned'],
@@ -206,7 +206,7 @@ public function staffPending()
             $inspectionData = [
                 'bookingID'       => $booking->bookingID,
                 'vehicleID'       => $booking->vehicleID,
-                'staffID'         => auth()->user()->userID, // FIXED: userID bukan id()
+                'customerID'         => auth()->user()->userID, // FIXED: userID bukan id()
                 'inspectionType'  => 'return',
                 'carCondition'    => $validated['carCondition'],
                 'mileageReturned' => (int) $validated['mileageReturned'],
@@ -316,7 +316,7 @@ public function staffPending()
         
         // Log staff action
         \Log::info('Staff updated inspection', [
-            'staff_id' => auth()->user()->userID,
+            'customer_id' => auth()->user()->userID,
             'inspection_id' => $id,
             'changes' => $validated
         ]);
@@ -355,7 +355,7 @@ public function staffPending()
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('bookingID', 'LIKE', "%{$search}%")
-                ->orWhere('staffID', 'LIKE', "%{$search}%")
+                ->orWhere('customerID', 'LIKE', "%{$search}%")
                 ->orWhere('vehicleID', 'LIKE', "%{$search}%");
             });
         }
@@ -559,7 +559,7 @@ public function adminIndex(Request $request)
         $search = $request->search;
         $query->where(function($q) use ($search) {
             $q->where('bookingID', 'LIKE', "%{$search}%")
-              ->orWhere('staffID', 'LIKE', "%{$search}%")
+              ->orWhere('customerID', 'LIKE', "%{$search}%")
               ->orWhereHas('vehicle', function($v) use ($search) {
                   $v->where('vehicleName', 'LIKE', "%{$search}%")
                     ->orWhere('plateNo', 'LIKE', "%{$search}%");

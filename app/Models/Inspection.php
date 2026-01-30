@@ -21,7 +21,7 @@ class Inspection extends Model
     protected $fillable = [
         'bookingID',
         'vehicleID', 
-        'staffID', 
+        'customerID', 
         'carCondition',
         'mileageReturned', 
         'fuelLevel', 
@@ -62,7 +62,7 @@ class Inspection extends Model
     public function staffUser(): BelongsTo
     {
         // tukar 'id' kepada 'userID' kalau table user PK ialah userID
-        return $this->belongsTo(User::class, 'staffID', 'userID');
+        return $this->belongsTo(User::class, 'customerID', 'userID');
     }
 
     /**
