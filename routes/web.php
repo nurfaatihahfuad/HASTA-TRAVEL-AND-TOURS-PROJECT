@@ -526,12 +526,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/commission-verify/{id}/reject', [CommissionController::class, 'reject'])
         ->name('commissionVerify.reject');
 });
-// Dalam web.php
-/*Route::middleware('auth')->group(function() {
-    Route::get('/inspection-checklist', function() {
-        return view('customer.inspections.index');
-    })->name('inspection.checklist');
-});*/
+
 Route::middleware(['auth'])->group(function() {
     Route::get('/inspection-checklist', function() {
         // Redirect terus ke customer inspections index

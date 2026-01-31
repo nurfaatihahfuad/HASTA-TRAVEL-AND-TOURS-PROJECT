@@ -10,40 +10,30 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * Override default Laravel expectation
-     */
+    // Override default Laravel
     protected $table = 'user';        // table sebenar dalam DB
     protected $primaryKey = 'userID'; // PK sebenar
     protected $keyType = 'string';    // kalau PK bukan integer
     public $incrementing = false;     // kalau PK bukan auto increment
     public $timestamps = false;       // kalau tiada created_at / updated_at
 
-    /**
-     * Mass assignable attributes
-     */
+    // Mass assignable attributes
     protected $fillable = [
         'password', 'name', 'noHP', 'email', 'noIC', 'userType'
     ];
 
-    /**
-     * Hidden attributes
-     */
+    // Hidden attributes
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Cast attributes
-     */
+    // Cast attributes
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * Ensure Laravel uses userID for authentication
-     */
+    // Ensure Laravel uses userID for authentication
     public function getAuthIdentifierName()
     {
         return 'userID';
@@ -54,9 +44,7 @@ class User extends Authenticatable
         return $this->userID;
     }
 
-    /**
-     * Auto-generate userID prefix based on userType
-     */
+    // Auto-generate userID prefix based on userType
     protected static function boot()
     {
         parent::boot();
@@ -81,9 +69,7 @@ class User extends Authenticatable
         });
     }
 
-    /**
-     * Relationships
-     */
+    // Relationships
     public function customer()
     {
         return $this->hasOne(Customer::class, 'userID', 'userID');
@@ -114,7 +100,6 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'userID');
     }
 
-    //Auni tambah
     public function commissions()
     {
         return $this->hasMany(Commission::class, 'userID', 'userID');

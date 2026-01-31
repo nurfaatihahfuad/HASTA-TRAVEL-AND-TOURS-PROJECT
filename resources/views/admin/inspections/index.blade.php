@@ -158,7 +158,6 @@
                             <th>Type</th>
                             <th>Condition</th>
                             <th>Damage</th>
-                            <th>Inspected By (Staff)</th>
                             <th>Date</th>
                             <th>Action</th>
                         </tr>
@@ -187,9 +186,6 @@
                                 {!! $inspection->damageDetected 
                                     ? '<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Yes</span>' 
                                     : '<span class="text-success"><i class="fas fa-check-circle"></i> No</span>' !!}
-                            </td>
-                            <td>
-                                {{ $inspection->staff->name ?? 'Staff ID: '.$inspection->staffID }}
                             </td>
                             <td>{{ $inspection->created_at->format('d M Y, h:i A') }}</td>
                             <td>

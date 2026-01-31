@@ -266,46 +266,7 @@ class DashboardController extends Controller
             'weeklyLabels','weeklyData'
         ));
     }
-    /*public function staffRunner()
-    {
-        // ============================
-        // 1. KPI INSPECTION
-        // ============================
-        $totalInspections = Inspection::count();
-
-        $inspectionToday = Inspection::whereDate('created_at', now())->count();
-
-        $damagedCount = Inspection::where('damageDetected', 1)->count();
-        $okCount      = Inspection::where('damageDetected', 0)->count();
-
-        // ============================
-        // 2. WEEKLY INSPECTION (BAR)
-        // ============================
-        $weeklyLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-        
-        $weeklyData = [];
-        foreach ($weeklyLabels as $day) {
-            $weeklyData[] = Inspection::whereRaw('DAYNAME(created_at) = ?', [$day])->count();
-        }
-
-        // ============================
-        // 3. ALL INSPECTIONS (TABLE)
-        // ============================
-        $inspections = Inspection::with('vehicle')->orderBy('created_at', 'desc')->get();
-
-        return view('dashboard.staff_runner', compact(
-            'totalInspections',
-            'inspectionToday',
-            'damagedCount',
-            'okCount',
-            'weeklyLabels',
-            'weeklyData',
-            'inspections'
-        ));
-    }*/
-
-    
-
+ 
     // ============================
     // Customer Dashboard
     // ============================
@@ -331,7 +292,7 @@ class DashboardController extends Controller
         
         // Calculate total days (example logic)
         // Gunakan TIMESTAMPDIFF dengan HOUR
-        $totalHours = $user->bookings()
+        /*$totalHours = $user->bookings()
             ->where('bookingStatus', 'successful')
             ->whereNotNull('pickup_dateTime')
             ->whereNotNull('return_dateTime')
@@ -340,7 +301,21 @@ class DashboardController extends Controller
             ->sum('hours');
 
         // Convert ke days jika perlu
-        $totalDays = $totalHours / 24;
+        $totalDays = $totalHours / 24;*/
+
+        $totalDays = $user->bookings()
+            ->where('bookingStatus', 'completed')
+            ->whereNotNull('pickup_dateTime')
+            ->whereNotNull('return_dateTime')
+            ->get()
+            ->map(function($booking) {
+                // Calculate hours between pickup and return
+                $hours = $booking->pickup_dateTime->diffInHours($booking->return_dateTime);
+
+                // Convert to days, round up, minimum 1 day
+                return max(1, ceil($hours / 24));
+            })
+            ->sum();
                 
         // Most rented car
         $mostCar = $user->bookings()

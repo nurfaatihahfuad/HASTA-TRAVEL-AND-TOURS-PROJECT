@@ -37,7 +37,7 @@
             <i class="fas fa-clipboard-check"></i> Inspection Details
         </h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('staff.inspections.index') }}" class="btn btn-secondary btn-sm me-2">
+            <a href="{{ route('admin.inspections.index') }}" class="btn btn-secondary btn-sm me-2">
                 <i class="fas fa-arrow-left"></i> Back to List
             </a>
         </div>
@@ -457,29 +457,6 @@
                 </div>
             </div>
             @endif
-
-            <!-- Staff Information -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-user-tie"></i> Inspected By
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="detail-card">
-                        <strong>Customer Name:</strong>
-                        <p class="text-muted">{{ $inspection->staffUser->name ?? 'N/A' }}</p>
-                    </div>
-                    <div class="detail-card">
-                        <strong>Customer ID:</strong>
-                        <p class="text-muted">{{ $inspection->staffID ?? 'N/A' }}</p>
-                    </div>
-                    <div class="detail-card">
-                        <strong>Email:</strong>
-                        <p class="text-muted">{{ $inspection->staffUser->email ?? 'N/A' }}</p>
-                    </div>
-                </div>
-            </div>
 
             <!-- Booking Information -->
             @if(isset($inspection->booking) && $inspection->booking)
