@@ -211,7 +211,7 @@ class PaymentController extends Controller
              */
     public function resetToPending($paymentID): RedirectResponse
     {
-        $payment = Payment::findOrFail($bookingID);
+        $payment = Payment::findOrFail($paymentID);
         $payment->paymentStatus = 'pending';
         $payment->save();
 
